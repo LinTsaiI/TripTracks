@@ -1,3 +1,3 @@
 # TripTracks
 
-## A Travel Plan Tool to help plan your daily trip organized.
+## A Travel Plan Tool help plan your trip day-by-day organized.
