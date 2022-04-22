@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { signIn, switchToSignInForm, switchToSignUpForm } from '../../store/slice/userSlice';
+import { switchToSignInForm, switchToSignUpForm } from '../../store/slice/userSlice';
 import WelcomeAnimation from '../WelcomeAnimation/WelcomeAnimation';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
@@ -23,20 +23,24 @@ const Sign = () => {
 
   return isLoading && !userState.isSignIn
     ? <WelcomeAnimation /> : (
-    <div className='sign-container'>
-      <div className='sign-button-container'>
-        <div className='sign-switch-btn' onClick={() => dispatch(switchToSignInForm())}>Sign In</div>
-        <div className='sign-switch-btn' onClick={() => dispatch(switchToSignUpForm())}>Sign Up</div>
+    <div className='sign-outer-container'>
+      <div className='sign-title'>TripTracks</div>
+      <div className='website-slogan'>PLAN YOUR TRIP</div>
+      <div className='sign-container'>
+        <div className='sign-button-container'>
+          <div className='sign-switch-btn' onClick={() => dispatch(switchToSignInForm())}>Sign In</div>
+          <div className='sign-switch-btn' onClick={() => dispatch(switchToSignUpForm())}>Sign Up</div>
+        </div>
+        {
+          userState.isSignIn
+          ? <Navigate to='/dashboard' />
+          : (
+            userState.isSignInForm
+            ? <SignIn />
+            : <SignUp />
+          )
+        }
       </div>
-      {
-        userState.isSignIn
-        ? <Navigate to='/dashboard' />
-        : (
-          userState.isSignInForm
-          ? <SignIn />
-          : <SignUp />
-        )
-      }
     </div>
   );
 }
