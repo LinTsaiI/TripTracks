@@ -1,0 +1,17 @@
+.pin-container {
+  display: inline-flex;
+  width: 100%;
+  padding: 5px 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+
+.pin-container:hover {
+  box-shadow: 2px 2px 8px rgb(0 0 0 / 20%);
+}
+
+.pin-name {
+  height: 100%;
+  width: 100%;
+  padding: 0 10px;
+}

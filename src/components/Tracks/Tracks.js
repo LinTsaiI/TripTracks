@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import SearchBar from './searchBar';
+import Pin from './Pin';
+
 import './Tracks.css';
 
 const Tracks = () => {
   return (
     <div className='tracks-container'>
-      <div>This is a search bar</div>
+      <SearchBar />
+      <Pin />
     </div>
   )
 }

@@ -36,16 +36,22 @@ const NewTrip = () => {
   return (
     <div className={modalClassName}>
       <div className='modal-main'>
-        <div>Create Your Trip</div>
-        <form className='form'>
-          <label htmlFor='trip-name'>Trip Name: </label>
-          <input type='text' id='trip-name' placeholder='Give a name to your trip' ref={tripName}/>
-          <label htmlFor='start-date'>Start Date: </label>
-          <input type='date' id='start-date' placeholder='Choose a date to start to plan' defaultValue={currentDate} ref={startDate}/>
-          <label htmlFor='duration'>Duration: </label>
-          <input type='number' id='duration' min='1' max='25' defaultValue='1' placeholder='How many days do you plan to stay' ref={duration} />
-          <input type='button' value='Start to Plan' onClick={startToPlan}/>
-          <div onClick={() => dispatch(hideModal())}>Close</div>
+        <div className='create-form-name'>Create A New Trip</div>
+        <div onClick={() => dispatch(hideModal())} className='close-btn'>&#215;</div>
+        <form className='create-form'>
+          <div className='style-on-line'>
+            <label htmlFor='trip-name' className='label-value'>Trip Name : </label>
+            <input type='text' id='trip-name' placeholder='Give a name to your trip' ref={tripName}/>
+          </div>
+          <div className='style-on-line'>
+            <label htmlFor='start-date' className='label-value'>Start Date : </label>
+            <input type='date' id='start-date' placeholder='Choose a date to start to plan' defaultValue={currentDate} ref={startDate}/>
+          </div>
+          <div className='style-on-line'>
+            <label htmlFor='duration' className='label-value'>Duration : </label>
+            <input type='number' id='duration' min='1' max='25' defaultValue='1' placeholder='How many days do you plan to stay' ref={duration} />
+          </div>
+          <input type='button' value='Start to Plan' onClick={startToPlan} className='create-btn'/>
         </form>
       </div>
     </div>

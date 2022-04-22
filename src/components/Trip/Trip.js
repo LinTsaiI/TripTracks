@@ -1,30 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, Outlet } from 'react-router-dom';
+import { useParams, Outlet, Navigate } from 'react-router-dom';
 import { updateTripData } from '../../store/slice/tripSlice';
-import Days from './Days';
+import TripHeader from './TripHeader';
 import Footer from '../Footer/Footer';
-import { getTripData } from '../../API';
 
 const Trip = () => {
   const params = useParams();
   const dispatch = useDispatch();
-  const [tripData] = useState(getTripData(params.place));
+  const tripData = useSelector(state => state.trip.tripData);
 
   useEffect(() => {
-    dispatch(updateTripData({ tripData: tripData }));
-  }, [tripData])
+    dispatch(updateTripData({ tripName: params.place }));
+  }, [])
 
-  return(
-    <div>
-      <nav>
-        <h1>{tripData.tripName}</h1>
-        <Days tripName={tripData.tripName} duration={tripData.duration}/>
-      </nav>
-      <Outlet />
-      <Footer />
-    </div>
-  )
+  if (!params.place) {
+    return <Navigate to='/dashboard'/>
+  } else {
+    return !tripData ? <div>Loading...</div> : (
+      <div>
+        <nav>
+          <TripHeader />
+        </nav>
+        <Outlet />
+        <Footer />
+      </div>
+    )
+  }
 }
 
 export default Trip;

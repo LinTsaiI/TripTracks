@@ -1,7 +1,11 @@
 .tracks-container {
-  width: 300px;
+  position: absolute;
+  width: 360px;
   height: 500px;
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 20px;
+  background-color: #F8F5F2;
+  opacity: 0.9;
+  z-index: 1;
+  margin: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 4px 2px rgb(0 0 0 / 20%);
 }

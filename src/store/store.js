@@ -3,6 +3,8 @@ import userReducer from './slice/userSlice';
 import newTripReducer from './slice/newTripSlice';
 import dashBoardReducer from './slice/dashboardSlice';
 import tripReducer from './slice/tripSlice';
+import notesReducer from './slice/notesSlice';
+import directionReducer from './slice/directionSlice';
 
 export default configureStore({
   reducer: {
@@ -10,5 +12,7 @@ export default configureStore({
     newTrip: newTripReducer,
     dashboard: dashBoardReducer,
     trip: tripReducer,
+    notes: notesReducer,
+    direction: directionReducer
   },
 })

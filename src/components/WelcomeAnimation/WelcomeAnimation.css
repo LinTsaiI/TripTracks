@@ -1,0 +1,19 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-blend-mode: multiply;
+  background-image: url('https://healthmatters.nyp.org/wp-content/uploads/2019/03/Travel-HM-Hero-1200x500.gif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.loading {
+  color: white;
+  font-size: 4rem;
+  font-weight: bold;
+  justify-content: center;
+}

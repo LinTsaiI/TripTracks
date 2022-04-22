@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { signIn } from '../../store/slice/userSlice';
+import { signIn, switchToSignInForm, switchToSignUpForm } from '../../store/slice/userSlice';
 import WelcomeAnimation from '../WelcomeAnimation/WelcomeAnimation';
+import SignIn from './SignIn';
+import SignUp from './SignUp';
+import './Sign.css';
 
 const Sign = () => {
   const userState = useSelector(state => state.user);
@@ -20,15 +23,22 @@ const Sign = () => {
 
   return isLoading && !userState.isSignIn
     ? <WelcomeAnimation /> : (
-    <div>
-      <h1>Please Sign In or Sign Up</h1>
+    <div className='sign-container'>
+      <div className='sign-button-container'>
+        <div className='sign-switch-btn' onClick={() => dispatch(switchToSignInForm())}>Sign In</div>
+        <div className='sign-switch-btn' onClick={() => dispatch(switchToSignUpForm())}>Sign Up</div>
+      </div>
       {
         userState.isSignIn
         ? <Navigate to='/dashboard' />
-        : <button onClick={() => dispatch(signIn())}>Click to Sign In</button>
+        : (
+          userState.isSignInForm
+          ? <SignIn />
+          : <SignUp />
+        )
       }
     </div>
-  )
+  );
 }
 
 export default Sign;

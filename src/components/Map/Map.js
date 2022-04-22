@@ -1,26 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import Tracks from '../Tracks/Tracks';
+import Notes from '../Notes/Notes';
+import Direction from '../Direction/Direction';
 
 const Map = () => {
-  let params = useParams();
-  if (!params.place) {
-    return <Navigate to='/dashboard'/>
-  } else {
-    return params.day
-      ? (
-        <div>
-          <h1>This is {params.place}'s Day{params.day} Map</h1>
-          <Tracks />
-        </div>
-      )
-      : (
+  const params = useParams();
+
+  if (!params.day){
+    return (
         <div>
           <h1>This is {params.place}'s Day1(Default) Map</h1>
           <Tracks />
+          <Notes />
+          <Direction />
         </div>
       )
   }
+  return (
+      <div>
+        <h1>This is {params.place}'s Day{params.day} Map</h1>
+        <Tracks />
+        <Notes />
+        <Direction />
+      </div>
+    )
 }
 
 export default Map;

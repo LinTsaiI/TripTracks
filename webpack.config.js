@@ -21,7 +21,16 @@ module.exports = {
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
-        use: 'file-loader',
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name].[ext]',
+              limit: 8192,
+              fallback: require.resolve('file-loader'),
+            }
+          }
+        ]
       },
       {
         test: /\.m?js$/,   // 偵測所有 js 結尾的檔案

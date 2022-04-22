@@ -1,0 +1,9 @@
+.arrow {
+  display: inline-flex;
+  margin: 0 15px;
+  cursor: pointer;
+}
+
+.arrow-display-none {
+  display: none;
+}

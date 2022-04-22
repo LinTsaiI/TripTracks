@@ -1,0 +1,48 @@
+.sign-container {
+  min-width: 300px;
+  width: 400px;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px;
+  background: #F8F5F2;
+  box-shadow: 2px 2px 6px rgb(0 0 0 / 40%);
+  color: #666666;
+  font-size: 20px;
+}
+
+.sign-button-container {
+  display: flex;
+}
+
+.sign-switch-btn {
+  margin: 0 20px 10px 20px;
+  cursor: pointer;
+  font-size: 24px;
+  text-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+}
+
+.sign-form {
+  padding: 0 20px;
+}
+
+.sign-form > input {
+  height: 45px;
+  width: 100%;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  margin: 10px 0;
+  box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+}
+
+.sign-form > input[type='submit'] {
+  width: auto;
+  cursor: pointer;
+  background-color: #557771;
+  border: 0;
+  color: #F8F5F2;
+  border-radius: 20px;
+  padding: 10px 20px;
+  box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+}

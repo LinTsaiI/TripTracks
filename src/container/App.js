@@ -17,7 +17,6 @@ const App = () => {
           <Route path='/sign' element={<Sign />} />
           <Route path='/dashboard' element={userStatus ? <Dashboard /> : <Navigate to='/sign' />} />
           <Route path='/trip/*' element={<Trip /> }>
-            <Route index element={<Map />} />
             <Route path=':place' element={<Map />}>
               <Route path=':day' element={<Map />}/>
             </Route>
