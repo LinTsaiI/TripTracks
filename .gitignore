@@ -1,4 +1,5 @@
 # API KEY
 .env
 
-node_modules
+# files in node_modules
+**/node_modules
