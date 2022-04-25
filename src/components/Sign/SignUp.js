@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { signUp } from '../../store/slice/userSlice';
 
-const SignUp = () => {
+const SignUp = ({ googleSignIn }) => {
   const userState = useSelector(state => state.user);
   const dispatch = useDispatch();
   const username = useRef();
@@ -25,6 +25,7 @@ const SignUp = () => {
       <input type='email' placeholder='Email' ref={email}/><br/>
       <input type='password' placeholder='Password' ref={password}/><br/>
       <input type='submit' value='Sign Up'/>
+      <div className='google-auth' onClick={googleSignIn}>Sign In by Google Account</div>
     </form>
   );
 }

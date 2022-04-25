@@ -1,3 +1,42 @@
+import { getDatabase, ref, set } from "firebase/database";
+// import { GoogleAuthProvider, linkWithRedirect, getRedirectResult, getAuth, signInWithCustomToken, signOut } from "firebase/auth";
+
+// const googleProvider = new GoogleAuthProvider();
+// const auth = getAuth();
+// linkWithRedirect(auth.currentUser, provider)
+//   .then(/* ... */)
+//   .catch(/* ... */);
+// getRedirectResult(auth).then((result) => {
+//   const credential = GoogleAuthProvider.credentialFromResult(result);
+//   if (credential) {
+//     // Accounts successfully linked.
+//     const user = result.user;
+//     // ...
+//   }
+// }).catch((error) => {
+//   // Handle Errors here.
+//   // ...
+// });
+
+
+// signInWithCustomToken(auth, token)
+//   .then((userCredential) => {
+//     // Signed in
+//     const user = userCredential.user;
+//     // ...
+//   })
+//   .catch((error) => {
+//     const errorCode = error.code;
+//     const errorMessage = error.message;
+//     // ...
+//   });
+
+// signOut(auth).then(() => {
+//   // Sign-out successful.
+// }).catch((error) => {
+//   // An error happened.
+// });
+
 // 使用者身份相關（進入每個頁面都要驗證身份）
 // 登入
 export const userSignIn = (userName, password) => {
@@ -22,7 +61,13 @@ export const userSignUp = (userName, email, password) => {
 // 點擊 start to plan 新增行程，將 tripName, startDate, duration 加入資料庫
 export const createNewTripToDb = (tripName, startDate, duration) => {
   // fetch 資料庫，成功加入資料庫 response ok: true
-  console.log(tripName, startDate, duration)
+  console.log(tripName, startDate, duration);
+  const db = getDatabase();
+  set(ref(db, 'trips'), {
+    tripName: tripName,
+    startDate: startDate,
+    duration: duration
+  })
   return true;
 }
 // 取得使用者已建立的所有行程，用以在 Dashboard 顯示行程名稱/日期區間

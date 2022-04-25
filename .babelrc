@@ -5,7 +5,8 @@
     [
       "@babel/preset-env",
       {
-        "debug": true
+        "debug": true,
+        "useBuiltIns": "entry"
       }
     ],
     [
@@ -14,5 +15,8 @@
         "debug": true
       }
     ]
+  ],
+  "plugins": [
+    "@babel/plugin-transform-runtime"
   ]
 }

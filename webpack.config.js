@@ -1,5 +1,4 @@
 // 載入相關模組
-const webpack = require('webpack');
 const path = require('path');
 const Dotenv = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -7,17 +6,24 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: 'development',   // 預設為 production，使用 development 模式可以優化執行速度
-  devtool: 'inline-source-map',
+  devtool: false,
   entry: './src/index.js',   // entry point，告訴 webpack 從哪裡開始讀取檔案並建構該檔案所需的所有相依關係圖。預設為 ./src/index.js，也可以自訂或設定多個入口點
   output: {   // 設定打包完的檔案要輸出到哪個路徑及檔名為何。預設會放在 ./dist 中
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    publicPath:'/'
   },
+  watch: true,
   module: {   // 設定 Loaders 讓專案可以 import 任意型態的 module，例如 CSS file。test 屬性告訴 webpack 什麼檔案類型要 transform，use 屬性告訴 webpack 要用什麼 loader
     rules: [
       {
         test: /\.css$/,   // 偵測所有 css 結尾的檔案
-        use: [MiniCssExtractPlugin.loader, 'css-loader']
+        use: [{
+          loader: MiniCssExtractPlugin.loader,
+          options: {
+            publicPath: '../'
+          }
+        }, 'css-loader']
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
@@ -25,7 +31,7 @@ module.exports = {
           {
             loader: 'url-loader',
             options: {
-              name: '[name].[ext]',
+              name: 'img/[name].[ext]',
               limit: 8192,
               fallback: require.resolve('file-loader'),
             }

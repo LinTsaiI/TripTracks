@@ -5,8 +5,6 @@ export const userSlice = createSlice({
   name: 'user',
   initialState: {
     isSignIn: window.localStorage.getItem('isSignIn'),
-    isSignInForm: true,
-    isSignUpForm: false,
     id: null,
     username: null,
     email: null
@@ -38,16 +36,8 @@ export const userSlice = createSlice({
       window.localStorage.removeItem('isSignIn');
       state.isSignIn = window.localStorage.getItem('isSignIn');
     },
-    switchToSignInForm: (state) => {
-      state.isSignInForm = true;
-      state.isSignUpForm = false;
-    },
-    switchToSignUpForm: (state) => {
-      state.isSignUpForm = true;
-      state.isSignInForm = false;
-    }
   }
 });
 
-export const { signIn, signUp, signOut, switchToSignInForm, switchToSignUpForm } = userSlice.actions;
+export const { signIn, signUp, signOut } = userSlice.actions;
 export default userSlice.reducer;

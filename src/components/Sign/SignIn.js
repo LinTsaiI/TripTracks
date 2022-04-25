@@ -2,11 +2,12 @@ import React, { useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { signIn } from '../../store/slice/userSlice';
 
-const SignIn = () => {
+const SignIn = ({ googleSignIn }) => {
   const userState = useSelector(state => state.user);
   const dispatch = useDispatch();
   const username = useRef();
   const password = useRef();
+
   const handelSignIn = (e) => {
     e.preventDefault();
     dispatch(signIn({
@@ -14,12 +15,14 @@ const SignIn = () => {
       password: password.current.value
     }));
   }
+
   
   return(
     <form className='sign-form' onSubmit={(e) => handelSignIn(e)}>
       <input type='text' placeholder='Username' ref={username}/><br/>
       <input type='password' placeholder='Password' ref={password}/><br/>
-      <input type='submit' value='Sign In' />
+      <input type='submit' value='Sign In'/>
+      <div className='google-auth' onClick={googleSignIn}>Sign In by Google Account</div>
     </form>
   )
 }

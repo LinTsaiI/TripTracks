@@ -1,21 +1,19 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getDatabase } from "firebase/database";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCwMtcCuyKz-Uj8C094xBHOjc7zFUWiefk",
-  authDomain: "rosy-cache-344503.firebaseapp.com",
-  projectId: "rosy-cache-344503",
-  storageBucket: "rosy-cache-344503.appspot.com",
-  messagingSenderId: "518980134226",
-  appId: "1:518980134226:web:9d2e51a5d1251de69e868b",
-  measurementId: "G-F05HX38NZP"
+  apiKey: "AIzaSyDaw6lweyO0X0iWtkvP_n9dHtiL0XL5nQ8",
+  authDomain: "triptracks-tw.firebaseapp.com",
+  projectId: "triptracks-tw",
+  storageBucket: "triptracks-tw.appspot.com",
+  messagingSenderId: "527843874697",
+  appId: "1:527843874697:web:c7137b65ab4ddb9008f358",
+  measurementId: "G-0YTLTJKYJG"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+export const app = initializeApp(firebaseConfig);
+export const analytics = getAnalytics(app);
+// Get a reference to the database service
+export const db = getDatabase(app);

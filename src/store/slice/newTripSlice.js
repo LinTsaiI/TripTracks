@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { createNewTripToDb } from '../../API';
+import { db } from '../../firebase';
 
 export const newTripSlice = createSlice({
   name: 'newTrip',

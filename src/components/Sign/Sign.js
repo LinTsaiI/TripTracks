@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { switchToSignInForm, switchToSignUpForm } from '../../store/slice/userSlice';
 import WelcomeAnimation from '../WelcomeAnimation/WelcomeAnimation';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
@@ -9,8 +8,8 @@ import './Sign.css';
 
 const Sign = () => {
   const userState = useSelector(state => state.user);
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSignInform, setIsSignForm] = useState(true);
 
   useEffect(() => {
     let timer = setTimeout(() => {
@@ -21,6 +20,19 @@ const Sign = () => {
     };
   }, []);
 
+  const switchToSignInForm = () => {
+    setIsSignForm(true);
+  }
+
+  const switchToSignUpForm = () => {
+    setIsSignForm(false);
+  }
+
+  const googleSignIn = () => {
+    console.log('googleSignIn')
+  }
+
+
   return isLoading && !userState.isSignIn
     ? <WelcomeAnimation /> : (
     <div className='sign-outer-container'>
@@ -28,16 +40,16 @@ const Sign = () => {
       <div className='website-slogan'>PLAN YOUR TRIP</div>
       <div className='sign-container'>
         <div className='sign-button-container'>
-          <div className='sign-switch-btn' onClick={() => dispatch(switchToSignInForm())}>Sign In</div>
-          <div className='sign-switch-btn' onClick={() => dispatch(switchToSignUpForm())}>Sign Up</div>
+          <div className='sign-switch-btn' onClick={switchToSignInForm}>Sign In</div>
+          <div className='sign-switch-btn' onClick={switchToSignUpForm}>Sign Up</div>
         </div>
         {
           userState.isSignIn
           ? <Navigate to='/dashboard' />
           : (
-            userState.isSignInForm
-            ? <SignIn />
-            : <SignUp />
+            isSignInform
+            ? <SignIn googleSignIn={googleSignIn}/>
+            : <SignUp googleSignIn={googleSignIn}/>
           )
         }
       </div>
