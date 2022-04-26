@@ -1,22 +1,6 @@
-// 告訴 babel 使用哪些 preset，可以用 {} 加入 option
-// debug 顯示可以哪些 plugin 被加進來了，可以知道自己的設定到底會用到哪些 plugin
 {
   "presets": [
-    [
-      "@babel/preset-env",
-      {
-        "debug": true,
-        "useBuiltIns": "entry"
-      }
-    ],
-    [
-      "@babel/preset-react",
-      {
-        "debug": true
-      }
-    ]
-  ],
-  "plugins": [
-    "@babel/plugin-transform-runtime"
+    "@babel/preset-env",
+    "@babel/preset-react"
   ]
 }

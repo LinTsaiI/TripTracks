@@ -12,7 +12,6 @@ const Dashboard = () => {
   const userState = useSelector(state => state.user);
   const tripList = useSelector(state => state.dashboard.tripList);
   const username = userState.username;
-  console.log(username)
   useEffect(() => {
     dispatch(getTotalTrip({
       memberId: '123'   // 從 session 取得使用者id
