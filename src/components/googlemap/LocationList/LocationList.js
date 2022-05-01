@@ -5,6 +5,7 @@ import './LocationListSideBar.css';
 
 const LocationList = ({map, showMarker}) => {
   const [input, setInput] = useState('');
+
   const autoCompleteKeyword = (input) => {
     const inputField = input;
     const options = {
@@ -12,7 +13,7 @@ const LocationList = ({map, showMarker}) => {
       strictBounds: false,
       types: ['establishment'],
     };
-    // const autocomplete = new window.google.maps.places.Autocomplete(inputField, options);
+    const autocomplete = new window.google.maps.places.Autocomplete(inputField, options);
     autocomplete.bindTo('bounds', map);
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();

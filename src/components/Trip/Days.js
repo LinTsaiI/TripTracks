@@ -1,11 +1,12 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { hideNotes } from '../../store/slice/notesSlice';
 import { hideDirection } from '../../store/slice/directionSlice';
 import './Days.css';
 
 const Days = () => {
+  const params = useParams();
   const tripData = useSelector(state => state.trip.tripData);
   const dispatch = useDispatch();
 
@@ -13,7 +14,7 @@ const Days = () => {
   for(let i = 0; i < tripData.duration; i++) {
     days.push(
       <NavLink
-        to={`/trip/${tripData.tripName}/${i+1}`}
+        to={`/trip/${params.tripId}?day=${i+1}`}
         key={i+1}
         onClick={() => {
           dispatch(hideNotes());

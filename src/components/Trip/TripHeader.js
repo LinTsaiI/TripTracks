@@ -8,14 +8,14 @@ const TripHeader = () => {
   const tripData = useSelector(state => state.trip.tripData);
   const tripName = tripData.tripName;
   const startDate = tripData.startDate;
-  const endDate = tripData.endDate;
+  // const endDate = tripData.endDate;
   
   return (
     <div className='header'>
       <div className='header-plan'>
         <div className='style-flex'>
           <div className='header-plan-place'>{tripName}</div>
-          <div className='header-plan-date'>{startDate} - {endDate}</div>
+          <div className='header-plan-date'>{startDate}</div>
         </div>
         <Days />
       </div>

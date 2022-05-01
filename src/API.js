@@ -1,41 +1,7 @@
-import { getDatabase, ref, set } from "firebase/database";
-// import { GoogleAuthProvider, linkWithRedirect, getRedirectResult, getAuth, signInWithCustomToken, signOut } from "firebase/auth";
+import { auth, db, provider } from './firebase';
+import { sendSignInLinkToEmail, signInWithPopup  } from "firebase/auth";
+import { setDoc, addDoc, Timestamp, collection, doc, updateDoc, getDoc, arrayUnion, getDocs, query, where } from 'firebase/firestore';
 
-// const googleProvider = new GoogleAuthProvider();
-// const auth = getAuth();
-// linkWithRedirect(auth.currentUser, provider)
-//   .then(/* ... */)
-//   .catch(/* ... */);
-// getRedirectResult(auth).then((result) => {
-//   const credential = GoogleAuthProvider.credentialFromResult(result);
-//   if (credential) {
-//     // Accounts successfully linked.
-//     const user = result.user;
-//     // ...
-//   }
-// }).catch((error) => {
-//   // Handle Errors here.
-//   // ...
-// });
-
-
-// signInWithCustomToken(auth, token)
-//   .then((userCredential) => {
-//     // Signed in
-//     const user = userCredential.user;
-//     // ...
-//   })
-//   .catch((error) => {
-//     const errorCode = error.code;
-//     const errorMessage = error.message;
-//     // ...
-//   });
-
-// signOut(auth).then(() => {
-//   // Sign-out successful.
-// }).catch((error) => {
-//   // An error happened.
-// });
 
 // 使用者身份相關（進入每個頁面都要驗證身份）
 // 登入
@@ -56,314 +22,411 @@ export const userSignUp = (userName, email, password) => {
 // 取得使用者名稱/email(帳號)/會員id
 // 更新密碼
 
+// Sign in with Email
+const actionCodeSettings = {
+  url: 'http://localhost:3000/dashboard',
+  // This must be true.
+  handleCodeInApp: true,
+};
+export const emailSignIn = () => {
+  sendSignInLinkToEmail(auth, email, actionCodeSettings)
+  .then((result) => {
+    console.log(result)
+    window.localStorage.setItem('emailForSignIn', email);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+}
+
+// Sign in with Google
+export const googleSignIn = () => {
+  signInWithPopup(auth, provider)
+  .then(result => {
+    let userId = result.user.uid;
+    console.log(userId)
+  }).catch((error) => {
+    console.log(error);
+  });
+}
+
+// Add user to user collection database
+export const creatUserIfNew = async (username, email, userId) => {
+  try {
+    const userSnap = await getDoc(doc(db, 'user', userId));
+    if (userSnap.exists()) {
+      console.log(userSnap.data());
+    } else {
+      try {
+        await setDoc(doc(db, 'user', userId), {
+          name: username,
+          email: email,
+          tripId: [],
+          FirstEntryTime: Timestamp.now()
+        });
+        console.log('create')
+      } catch (err) {
+        console.error("Error adding document: ", err);
+      }
+    }
+  } catch (err) {
+    console.error("Error adding document: ", err);
+  }
+}
+
 
 // 行程資訊相關
 // 點擊 start to plan 新增行程，將 tripName, startDate, duration 加入資料庫
-export const createNewTripToDb = (tripName, startDate, duration) => {
+export const createNewTrip = async (userId, tripName, startDate, duration, setTripId, setCreateStatus) => {
   // fetch 資料庫，成功加入資料庫 response ok: true
-  console.log(tripName, startDate, duration);
-  const db = getDatabase();
-  set(ref(db, 'trips'), {
-    tripName: tripName,
-    startDate: startDate,
-    duration: duration
-  })
-  return true;
-}
-// 取得使用者已建立的所有行程，用以在 Dashboard 顯示行程名稱/日期區間
-export const getTripList = (memberId) => {
-  // fetch 資料庫，有取到回一個list，沒取到回null
-  let tripList;
-  if (memberId == '123') {
-    tripList = [
-      {
-        tripId: '1234',
-        tripName: 'Tokyo',
-        startDate: 'Apr 30, 2022',
-        endDate: 'May 04, 2022',
-        duration: 5,
-        cover: ''
-      },
-    // {
-    //   tripName: 'New York',
-    //   startDate: 'Jun 15, 2022',
-    //   endDate: 'Jun 24, 2022',
-    //   duration: 10,
-    //   cover: ''
-    // },
-    // {
-    //   tripName: 'Bangkok',
-    //   startDate: 'Feb 01, 2023',
-    //   endDate: 'Feb 07, 2022',
-    //   duration: 7,
-    //   cover: ''
-    // },
-    ]
-    return tripList;
+  try {
+    const docRef = await addDoc(collection(db, 'trips'), {
+      userId: userId,
+      tripName: tripName,
+      startDate: startDate,
+      duration: duration,
+      trackId: []
+    });
+    if (docRef.id) {
+      updateDoc(doc(db, 'user', userId), {
+        tripId: arrayUnion(docRef.id)
+      });
+    }
+    createNewTrack(userId, docRef.id, duration);
+    setTripId(docRef.id);
+    setCreateStatus(true);
+  } catch (err) {
+    console.log("Error adding document: ", err);
   }
 }
-// 取得特定行程的所有資訊，用以顯示行程名稱/天數/日期區間/當天景點list/地圖上的marker位置
-export const getTripData = (tripName) => {
-  // fetch 資料庫符合tripName (實際應用tripId) 的行程資訊
-  let tripData;
-  if(tripName == 'Tokyo') {
-    tripData = {
-      tripName: 'Tokyo',
-      startDate: 'Apr 30, 2022',
-      endDate: 'May 04, 2022',
-      duration: 5,
-      cover: '',
-      dayTrack: [   // 一天一個object紀錄marker等細節
-        {
-          pinList: [  // 每個list列出儲存的點，經緯度，箭頭資訊
-            {
-              name: '東京鐵塔',
-              lat: '35.658737390271604',
-              long: '139.74542216860036',
-              notes: {
-                content: '東京鐵塔伴手禮'
-              }
-            },
-            {
-              name: '東京車站',
-              lat: '35.68155091323363',
-              long: '139.7671054258442',
-              notes: {
-                content: '東京車站伴手禮'
-              }
-            },
-            {
-              name: '皇居',
-              lat: '35.68565607983227',
-              long: '139.7528747159775',
-              notes: {
-                content: '皇居伴手禮'
-              }
-            }
-          ],
-          directionList: [   // 列出該天的箭頭資訊
-            {
-              way: 'mrt',
-              time: '30 min'
-            },
-            {
-              way: 'walk',
-              time: '35 min'
-            }
-          ]
-        },
-        {
-          pinList: [
-            {
-              name: '下北澤',
-              lat: '35.66289774702003',
-              long: '139.66706218520682',
-              notes: {
-                content: '下北澤伴手禮'
-              }
-            },
-            {
-              name: '吉祥寺',
-              lat: '35.70354156394838',
-              long: '139.57990051293342',
-              notes: {
-                content: '吉祥寺伴手禮'
-              }
-            },
-            {
-              name: '吉卜力博物館',
-              lat: '35.696394816236165',
-              long: '139.57049607045548',
-              notes: {
-                content: '吉卜力博物館伴手禮'
-              }
-            },
-          ],
-          directionList: [
-            {
-              way: 'train',
-              time: '40 min'
-            },
-            {
-              way: 'train',
-              time: '60 min'
-            }
-          ]
-        },
-        {
-          pinList: [
-            {
-              name: '淺草寺',
-              lat: '35.715297849839985',
-              long: '139.79683870189155',
-              notes: {
-                content: '淺草寺伴手禮'
-              }
-            },
-            {
-              name: '晴空塔',
-              lat: '35.71028918176141',
-              long: ' 139.810657482093',
-              notes: {
-                content: '晴空塔伴手禮'
-              }
-            },
-          ],
-          directionList: [
-            {
-              way: 'walk',
-              time: '35 min'
-            },
-          ]
-        },
-        {
-          pinList: [
-            {
-              name: '東京迪士尼海洋',
-              lat: '35.6268590321797',
-              long: '139.8850993551084',
-              notes: {
-                content: '東京迪士尼海洋伴手禮'
-              }
-            },
-            {
-              name: '築地市場',
-              lat: '35.66864892878142',
-              long: '139.7702412260595',
-              notes: {
-                content: '築地市場伴手禮'
-              }
-            },
-          ],
-          directionList: [
-            {
-              way: 'mrt',
-              time: '50 min'
-            },
-          ]
-        },
-        {
-          pinList: [
-            {
-              name: '新宿',
-              lat: '35.68989224661832',
-              long: '139.70047869879102',
-              notes: {
-                content: '新宿伴手禮'
-              }
-            },
-            {
-              name: '竹下通',
-              lat: '35.67125657676321',
-              long: '139.70519805510946',
-              notes: {
-                content: '竹下通伴手禮'
-              }
-            },
-            {
-              name: '明治神宮',
-              lat: '35.67919150764017',
-              long: '139.69939833772688',
-              notes: {
-                content: '明治神宮伴手禮'
-              }
-            },
-          ],
-          directionList: [
-            {
-              way: 'mrt',
-              time: '25 min'
-            },
-            {
-              way: 'walk',
-              time: '30 min'
-            }
-          ]
-        },
-      ]
+
+// 建立新 trip，同時依天數建立空的 track 文件
+export const createNewTrack = async (userId, tripId, duration) => {
+  try {
+    const docContent = {
+      userId: userId,
+      tripId: tripId,
+      pins: [],
+      directions: []
+    };
+    for (let i = 0; i < duration; i++) {
+      const docRef = await addDoc(collection(db, 'tracks'), docContent);
+      if (docRef.id) {
+        updateDoc(doc(db, 'trips', tripId), {
+          trackId: arrayUnion(docRef.id)
+        });
+      }
     }
-    return tripData;
-  // } else if(tripName == 'New York') {
-  //   return tripData = {
-  //     tripName: 'New York',
-  //     startDate: 'Jun 15, 2022',
-  //     endDate: 'Jun 21, 2022',
-  //     duration: 7,
-  //     cover: '',
-  //     dayTrack: [   // 一天一個object紀錄marker等細節
-  //       {
-  //         pinList: [  // 每個list列出儲存的點，經緯度...
-  //           '自由女神像'
-  //         ],
-  //       },
-  //       {
-  //         pinList: [
-  //           '第五大道'
-  //         ],
-  //       },
-  //       {
-  //         pinList: [
-  //           '華爾街'
-  //         ],
-  //       },
-  //       {
-  //         pinList: [
-  //           '帝國大廈'
-  //         ],
-  //       },
-  //       {
-  //         pinList: [
-  //           '百老匯'
-  //         ],
-  //       },
-  //       {
-  //         pinList: [
-  //           '中央公園'
-  //         ],
-  //       },
-  //       {
-  //         pinList: [
-  //           '布魯克林大橋'
-  //         ],
-  //       },
-  //     ]
-  //   }
-  // } else if(tripName == 'Bangkok') {
-  //   return tripData = {
-  //     tripName: 'Bangkok',
-  //     startDate: 'Feb 01, 2023',
-  //     endDate: 'Feb 05, 2022',
+  } catch (err) {
+    console.log("Error adding document: ", err);
+  }
+}
+
+// 取得使用者已建立的所有行程，用以在 Dashboard 顯示行程名稱/日期區間
+export const getTripList = async (userId) => {
+  const condition = query(collection(db, 'trips'), where('userId', "==", userId));
+  const querySnapshot = await getDocs(condition);
+  let tripList = [];
+  querySnapshot.forEach(doc => {
+    // doc.data() is never undefined for query doc snapshots
+    let trip = {
+      tripId: doc.id,
+      tripName: doc.data().tripName,
+      startDate: doc.data().startDate,
+      duration: doc.data().duration
+    }
+    tripList.push(trip);
+  });
+  return tripList;
+}
+
+// 進入 /trip/tripId?day= 頁面，載入該天的資料
+export const getTrackData = async (trackId) => {
+  try {
+    console.log(trackId)
+    const trackSnap = await getDoc(doc(db, 'tracks', trackId));
+    if (trackSnap.exists()) {
+      return trackSnap.data();
+    }
+  } catch (err) {
+    console.log('Error getting document: ', err);
+  }
+}
+
+
+// 取得特定行程的所有資訊，用以顯示行程名稱/天數/日期區間/當天景點list/地圖上的marker位置
+export const getTripData = async (tripId) => {
+  try {
+    const tripSnap = await getDoc(doc(db, 'trips', tripId));
+    if (tripSnap.exists()) {
+      console.log(tripSnap.data());
+      return tripSnap.data();
+    }
+  } catch (err) {
+    console.log("Error getting document: ", err);
+  }
+  // fetch 資料庫符合 tripId 的行程資訊
+  // let tripData;
+  // if(tripId == 'e4uScTLClSzVNcGsFOCE') {
+  //   tripData = {
+  //     tripName: 'Tokyo',
+  //     startDate: 'Apr 30, 2022',
+  //     endDate: 'May 04, 2022',
   //     duration: 5,
   //     cover: '',
   //     dayTrack: [   // 一天一個object紀錄marker等細節
   //       {
-  //         pinList: [  // 每個list列出儲存的點，經緯度...
-  //           '曼谷清真寺'
+  //         pinList: [  // 每個list列出儲存的點，經緯度，箭頭資訊
+  //           {
+  //             name: '東京鐵塔',
+  //             lat: '35.658737390271604',
+  //             long: '139.74542216860036',
+  //             notes: {
+  //               content: '東京鐵塔伴手禮'
+  //             }
+  //           },
+  //           {
+  //             name: '東京車站',
+  //             lat: '35.68155091323363',
+  //             long: '139.7671054258442',
+  //             notes: {
+  //               content: '東京車站伴手禮'
+  //             }
+  //           },
+  //           {
+  //             name: '皇居',
+  //             lat: '35.68565607983227',
+  //             long: '139.7528747159775',
+  //             notes: {
+  //               content: '皇居伴手禮'
+  //             }
+  //           }
   //         ],
+  //         directionList: [   // 列出該天的箭頭資訊
+  //           {
+  //             way: 'mrt',
+  //             time: '30 min'
+  //           },
+  //           {
+  //             way: 'walk',
+  //             time: '35 min'
+  //           }
+  //         ]
   //       },
   //       {
   //         pinList: [
-  //           '水上市集'
+  //           {
+  //             name: '下北澤',
+  //             lat: '35.66289774702003',
+  //             long: '139.66706218520682',
+  //             notes: {
+  //               content: '下北澤伴手禮'
+  //             }
+  //           },
+  //           {
+  //             name: '吉祥寺',
+  //             lat: '35.70354156394838',
+  //             long: '139.57990051293342',
+  //             notes: {
+  //               content: '吉祥寺伴手禮'
+  //             }
+  //           },
+  //           {
+  //             name: '吉卜力博物館',
+  //             lat: '35.696394816236165',
+  //             long: '139.57049607045548',
+  //             notes: {
+  //               content: '吉卜力博物館伴手禮'
+  //             }
+  //           },
   //         ],
+  //         directionList: [
+  //           {
+  //             way: 'train',
+  //             time: '40 min'
+  //           },
+  //           {
+  //             way: 'train',
+  //             time: '60 min'
+  //           }
+  //         ]
   //       },
   //       {
   //         pinList: [
-  //           '火車市集'
+  //           {
+  //             name: '淺草寺',
+  //             lat: '35.715297849839985',
+  //             long: '139.79683870189155',
+  //             notes: {
+  //               content: '淺草寺伴手禮'
+  //             }
+  //           },
+  //           {
+  //             name: '晴空塔',
+  //             lat: '35.71028918176141',
+  //             long: ' 139.810657482093',
+  //             notes: {
+  //               content: '晴空塔伴手禮'
+  //             }
+  //           },
   //         ],
+  //         directionList: [
+  //           {
+  //             way: 'walk',
+  //             time: '35 min'
+  //           },
+  //         ]
   //       },
   //       {
   //         pinList: [
-  //           '洽圖洽市集'
+  //           {
+  //             name: '東京迪士尼海洋',
+  //             lat: '35.6268590321797',
+  //             long: '139.8850993551084',
+  //             notes: {
+  //               content: '東京迪士尼海洋伴手禮'
+  //             }
+  //           },
+  //           {
+  //             name: '築地市場',
+  //             lat: '35.66864892878142',
+  //             long: '139.7702412260595',
+  //             notes: {
+  //               content: '築地市場伴手禮'
+  //             }
+  //           },
   //         ],
+  //         directionList: [
+  //           {
+  //             way: 'mrt',
+  //             time: '50 min'
+  //           },
+  //         ]
   //       },
   //       {
   //         pinList: [
-  //           '大佛寺'
+  //           {
+  //             name: '新宿',
+  //             lat: '35.68989224661832',
+  //             long: '139.70047869879102',
+  //             notes: {
+  //               content: '新宿伴手禮'
+  //             }
+  //           },
+  //           {
+  //             name: '竹下通',
+  //             lat: '35.67125657676321',
+  //             long: '139.70519805510946',
+  //             notes: {
+  //               content: '竹下通伴手禮'
+  //             }
+  //           },
+  //           {
+  //             name: '明治神宮',
+  //             lat: '35.67919150764017',
+  //             long: '139.69939833772688',
+  //             notes: {
+  //               content: '明治神宮伴手禮'
+  //             }
+  //           },
   //         ],
+  //         directionList: [
+  //           {
+  //             way: 'mrt',
+  //             time: '25 min'
+  //           },
+  //           {
+  //             way: 'walk',
+  //             time: '30 min'
+  //           }
+  //         ]
   //       },
   //     ]
   //   }
-  }
+  //   console.log(tripId);
+  //   console.log(tripData)
+  //   return tripData;
+  // // } else if(tripName == 'New York') {
+  // //   return tripData = {
+  // //     tripName: 'New York',
+  // //     startDate: 'Jun 15, 2022',
+  // //     endDate: 'Jun 21, 2022',
+  // //     duration: 7,
+  // //     cover: '',
+  // //     dayTrack: [   // 一天一個object紀錄marker等細節
+  // //       {
+  // //         pinList: [  // 每個list列出儲存的點，經緯度...
+  // //           '自由女神像'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '第五大道'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '華爾街'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '帝國大廈'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '百老匯'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '中央公園'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '布魯克林大橋'
+  // //         ],
+  // //       },
+  // //     ]
+  // //   }
+  // // } else if(tripName == 'Bangkok') {
+  // //   return tripData = {
+  // //     tripName: 'Bangkok',
+  // //     startDate: 'Feb 01, 2023',
+  // //     endDate: 'Feb 05, 2022',
+  // //     duration: 5,
+  // //     cover: '',
+  // //     dayTrack: [   // 一天一個object紀錄marker等細節
+  // //       {
+  // //         pinList: [  // 每個list列出儲存的點，經緯度...
+  // //           '曼谷清真寺'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '水上市集'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '火車市集'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '洽圖洽市集'
+  // //         ],
+  // //       },
+  // //       {
+  // //         pinList: [
+  // //           '大佛寺'
+  // //         ],
+  // //       },
+  // //     ]
+  // //   }
+  // }
 }
 // 刪除指定的Pin
 export const deleteSelectedPin = (tripName, day, id) => {

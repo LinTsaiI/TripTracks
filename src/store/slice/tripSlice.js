@@ -4,13 +4,24 @@ import { getTripData, deleteSelectedPin } from '../../API';
 export const tripSlice = createSlice({
   name: 'trip',
   initialState: {
+    tripList: [],
     tripData: null,
+    dayTrack: null,
+    day: 1
   },
   reducers: {
-    updateTripData: (state, actions) => {
-      let tripName = actions.payload.tripName;
-      let data = getTripData(tripName);
-      state.tripData = data;
+    setTripList: (state, actions) => {
+      let trips = actions.payload.tripList;
+      state.tripList = trips;
+    },
+    setTripData: (state, actions) => {
+      let tripData = actions.payload.tripData;
+      state.tripData = tripData;
+    },
+    setDayTrack: (state, actions) => {
+      let dayTrack = actions.payload.dayTrack;
+      console.log(dayTrack)
+      state.dayTrack = dayTrack;
     },
     deletePin: (state, actions) => {
       let tripName = actions.payload.tripName;
@@ -32,7 +43,7 @@ export const tripSlice = createSlice({
   }
 });
 
-export const { updateTripData, deletePin } = tripSlice.actions;
+export const { setTripList, setTripData, setDayTrack, deletePin } = tripSlice.actions;
 export default tripSlice.reducer;
 
 

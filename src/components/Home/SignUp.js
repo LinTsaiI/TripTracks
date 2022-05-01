@@ -25,7 +25,7 @@ const SignUp = ({ googleSignIn }) => {
       <input type='email' placeholder='Email' ref={email}/><br/>
       <input type='password' placeholder='Password' ref={password}/><br/>
       <input type='submit' value='Sign Up'/>
-      <div className='google-auth' onClick={googleSignIn}>Sign In by Google Account</div>
+      <div className='google-auth' onClick={googleSignIn}>Sign In with Google Account</div>
     </form>
   );
 }

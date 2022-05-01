@@ -1,57 +1,51 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { hideModal, createNewTrip } from '../../store/slice/newTripSlice';
 import { getCurrentDate } from '../utilities';
+import { createNewTrip } from '../../API';
 import './NewTrip.css';
 
-const NewTrip = () => {
-  const tripName = useRef();
-  const startDate = useRef();
-  const duration = useRef();
-  const navigate = useNavigate();
+const NewTrip = ({ openModal }) => {
+  const userId = useSelector(state => state.user.userId);
   const currentDate = getCurrentDate();
-  const modalState = useSelector(state => state.newTrip);
-  const dispatch = useDispatch();
-  const modalClassName = modalState.isShow ? 'modal' : 'display-none';
+  const [tripName, setTripName] = useState('');
+  const [startDate, setStartDate] = useState(currentDate);
+  const [duration, setDuration] = useState(1);
+  const [tripId, setTripId] = useState(null);
+  const [isCreateSuccessfully, setIsCreateSuccessfully] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if(modalState.createSuccessfully) {
-      navigate(`/trip/${tripName.current.value}`);
-      dispatch(hideModal());
+    if (isCreateSuccessfully) {
+      navigate(`/trip/${tripId}`);
+      openModal(false);
     }
-  }, [modalState.createSuccessfully]);
+  }, [isCreateSuccessfully]);
 
-  const startToPlan = () => {
-    dispatch(createNewTrip(
-      {
-        tripName: tripName.current.value,
-        startDate: startDate.current.value,
-        duration: duration.current.value
-      }
-    ));
+  const handelSubmit = (e) => {
+    e.preventDefault();
+    createNewTrip(userId, tripName, startDate, duration, setTripId, setIsCreateSuccessfully);
   }
 
-
   return (
-    <div className={modalClassName}>
+    <div className='modal'>
       <div className='modal-main'>
         <div className='create-form-name'>Create A New Trip</div>
-        <div onClick={() => dispatch(hideModal())} className='close-btn'>&#215;</div>
-        <form className='create-form'>
+        <div onClick={() => openModal(false)} className='close-btn'>&#215;</div>
+        <form className='create-form' onSubmit={handelSubmit}>
           <div className='style-on-line'>
             <label htmlFor='trip-name' className='label-value'>Trip Name : </label>
-            <input type='text' id='trip-name' placeholder='Give a name to your trip' ref={tripName}/>
+            <input type='text' id='trip-name' placeholder='Give a name to your trip' onChange={e => setTripName(e.target.value)}/>
           </div>
           <div className='style-on-line'>
             <label htmlFor='start-date' className='label-value'>Start Date : </label>
-            <input type='date' id='start-date' placeholder='Choose a date to start to plan' defaultValue={currentDate} ref={startDate}/>
+            <input type='date' id='start-date' placeholder='Choose a date to start to plan' defaultValue={currentDate} onChange={e => setStartDate(e.target.value)}/>
           </div>
           <div className='style-on-line'>
             <label htmlFor='duration' className='label-value'>Duration : </label>
-            <input type='number' id='duration' min='1' max='25' defaultValue='1' placeholder='How many days do you plan to stay' ref={duration} />
+            <input type='number' id='duration' min='1' max='25' defaultValue='1' placeholder='How many days do you plan to stay' onChange={e => setDuration(e.target.value)}/>
           </div>
-          <input type='button' value='Start to Plan' onClick={startToPlan} className='create-btn'/>
+          <input type='submit' value='Start to Plan' className='create-btn'/>
         </form>
       </div>
     </div>

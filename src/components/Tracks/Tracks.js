@@ -1,13 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchBar from './searchBar';
 import Pin from './Pin';
-
 import './Tracks.css';
 
-const Tracks = () => {
+const Tracks = ({ map, showMarker }) => {
+  const [input, setInput] = useState('');
+  const options = {
+    fields: ['geometry'],
+    strictBounds: false,
+    types: ['establishment'],
+  };
+
+  useEffect(() => {
+    if (window.google) {
+      const autocomplete = new window.google.maps.places.Autocomplete(input, options);
+      autocomplete.bindTo('bounds', map);
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        showMarker(place.geometry.location);
+      });
+    }
+  }, [input])
+
   return (
     <div className='tracks-container'>
-      <SearchBar />
+      <SearchBar onInputChange={setInput}/>
       <Pin />
     </div>
   )

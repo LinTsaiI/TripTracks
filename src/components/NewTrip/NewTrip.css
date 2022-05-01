@@ -13,7 +13,7 @@
   position: fixed;
   width: 500px;
   height: auto;
-  top: 200px;
+  top: 20vh;
   border-radius: 10px;
   background: #F8F5F2;
   padding: 25px;
@@ -79,8 +79,4 @@ input {
 
 .create-btn:hover {
   box-shadow: 2px 2px 6px rgb(0 0 0 / 40%);
-}
-
-.display-none {
-  display: none;
 }

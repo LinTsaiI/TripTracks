@@ -1,25 +1,24 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { showModal } from '../../store/slice/newTripSlice';
 import './TripCard.css';
 
-const TripCard = () => {
-  const tripList = useSelector(state => state.dashboard.tripList);
-  const dispatch = useDispatch();
+const TripCard = ({ openModal }) => {
+  const tripList = useSelector(state => state.trip.tripList);
   const navigate = useNavigate();
+
   let tripCards = [];
   for (let i = 0; i < tripList.length; i++) {
     tripCards.push(
       <div
         key={i}
         className='trip-card'
-        onClick={() => navigate(`/trip/${tripList[i].tripName}`)}
+        onClick={() => navigate(`/trip/${tripList[i].tripId}`)}
       >
         <div className='trip-card-content'>
           <div className='trip-name'>{tripList[i].tripName}</div>
           <div className='duration'>{tripList[i].duration} Days</div>
-          <div className='duration'>{tripList[i].startDate} - {tripList[i].endDate}</div>
+          <div className='duration'>Start from {tripList[i].startDate}</div>
         </div>
       </div>
     )
@@ -28,7 +27,7 @@ const TripCard = () => {
     <div
       key={tripCards.length}
       className='trip-card'
-      onClick={() => dispatch(showModal())}
+      onClick={() => openModal(true)}
     >
       <div className='plus-icon'>+</div>
     </div>

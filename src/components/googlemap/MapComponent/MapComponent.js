@@ -6,7 +6,7 @@ const Map = ({mapCenter, onMapLoad}) => {
   let map;
   const onScriptLoad = () => {
     map = new window.google.maps.Map(mapRegin.current, {
-      mapId: '1a89d2f234549565',
+      mapId: '6fe2140f54e6c7b3',
       center: mapCenter,
       zoom: 15
     });
@@ -17,6 +17,7 @@ const Map = ({mapCenter, onMapLoad}) => {
       let mapScript = document.createElement('script');
       mapScript.type = 'text/javascript';
       mapScript.src = process.env.GOOGLE_MAP_API_URL;
+      mapScript.async = true;
       let head = document.getElementsByTagName('head')[0];
       head.appendChild(mapScript);
       mapScript.addEventListener('load', () => {

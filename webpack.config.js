@@ -14,7 +14,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, 'dist'),
       filename: 'bundle.js',
       assetModuleFilename: 'img/[name][ext]',
-      publicPath:'/'
+      publicPath: '/'
     },
     module: {
       rules: [
@@ -46,7 +46,9 @@ module.exports = (env, argv) => {
         template: path.join(__dirname, 'src', 'index.html'),
       }),
       new MiniCssExtractPlugin(),
-      new Dotenv()
+      new Dotenv({
+        ignoreStub: true
+      })
     ],
     devServer: {
       port: 3000,
@@ -55,7 +57,8 @@ module.exports = (env, argv) => {
         watch: false,
       },
       open: true,
-      hot: true
+      hot: true,
+      historyApiFallback: true,
     }
   }
 };
