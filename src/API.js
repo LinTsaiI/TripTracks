@@ -140,10 +140,9 @@ export const getTripList = async (userId) => {
   return tripList;
 }
 
-// 進入 /trip/tripId?day= 頁面，載入該天的資料
+// 進入 /trip/tripId?day= 頁面，載入該天的景點list/地圖上的marker位置
 export const getTrackData = async (trackId) => {
   try {
-    console.log(trackId)
     const trackSnap = await getDoc(doc(db, 'tracks', trackId));
     if (trackSnap.exists()) {
       return trackSnap.data();
@@ -154,7 +153,7 @@ export const getTrackData = async (trackId) => {
 }
 
 
-// 取得特定行程的所有資訊，用以顯示行程名稱/天數/日期區間/當天景點list/地圖上的marker位置
+// 取得特定 tripId 的所有資訊，進入 /trip/tripId 時用以顯示行程名稱/天數/日期區間
 export const getTripData = async (tripId) => {
   try {
     const tripSnap = await getDoc(doc(db, 'trips', tripId));
@@ -346,97 +345,41 @@ export const getTripData = async (tripId) => {
   //   console.log(tripId);
   //   console.log(tripData)
   //   return tripData;
-  // // } else if(tripName == 'New York') {
-  // //   return tripData = {
-  // //     tripName: 'New York',
-  // //     startDate: 'Jun 15, 2022',
-  // //     endDate: 'Jun 21, 2022',
-  // //     duration: 7,
-  // //     cover: '',
-  // //     dayTrack: [   // 一天一個object紀錄marker等細節
-  // //       {
-  // //         pinList: [  // 每個list列出儲存的點，經緯度...
-  // //           '自由女神像'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '第五大道'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '華爾街'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '帝國大廈'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '百老匯'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '中央公園'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '布魯克林大橋'
-  // //         ],
-  // //       },
-  // //     ]
-  // //   }
-  // // } else if(tripName == 'Bangkok') {
-  // //   return tripData = {
-  // //     tripName: 'Bangkok',
-  // //     startDate: 'Feb 01, 2023',
-  // //     endDate: 'Feb 05, 2022',
-  // //     duration: 5,
-  // //     cover: '',
-  // //     dayTrack: [   // 一天一個object紀錄marker等細節
-  // //       {
-  // //         pinList: [  // 每個list列出儲存的點，經緯度...
-  // //           '曼谷清真寺'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '水上市集'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '火車市集'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '洽圖洽市集'
-  // //         ],
-  // //       },
-  // //       {
-  // //         pinList: [
-  // //           '大佛寺'
-  // //         ],
-  // //       },
-  // //     ]
-  // //   }
   // }
 }
+
+// 將景點加入 pinList
+export const addToPinList = async (trackId, placeName, lat, lng, renderNewDayTrack) => {
+  try {
+    await updateDoc(doc(db, 'tracks', trackId), {
+      pins: arrayUnion({
+        name: placeName,
+        lat: lat,
+        lng: lng,
+        notes: ''
+      })
+    });
+    const trackSnap = await getDoc(doc(db, 'tracks', trackId));
+    renderNewDayTrack(trackSnap.data());
+  } catch (err) {
+    console.log('Error updating pinList', err);
+  }
+}
+
 // 刪除指定的Pin
-export const deleteSelectedPin = (tripName, day, id) => {
-  // fetch 資料庫，將該會員對應到 tripName, day, pin id的景點刪除
-  let data = getTripData(tripName);
-  let pinList = data.dayTrack[day].pinList;
-  pinList.splice(id, 1);
-  // 刪除成功 response ok
-  // 此時若 getTripData(tripName) 抓到的景點資料就會更新。此處先以回傳更改過的tripData替代
-  return pinList;
+export const deletePin = async (trackId, index, renderNewDayTrack) => {
+  try {
+    const trackSnap = await getDoc(doc(db, 'tracks', trackId));
+    const pinList = trackSnap.data().pins;
+    pinList.splice(index, 1);
+    await updateDoc(doc(db, 'tracks', trackId), {
+      pins: pinList
+    });
+    const newTrackSnap = await getDoc(doc(db, 'tracks', trackId));
+    renderNewDayTrack(newTrackSnap.data());
+  } catch (err) {
+    console.log('Error updating pinList', err);
+  }
 }
 
 // 景點or路線筆記相關
@@ -480,3 +423,44 @@ export const getDirectionHistory = (tripName, day, id) => {
 
 
 // 當景點list上的先後順序改變，重新生成連線
+
+
+// 載入 Google map
+export const loadMap = (mapRegin, mapCenter, initMap, initMarker) => {
+  let map = new window.google.maps.Map(mapRegin, {
+    mapId: '6fe2140f54e6c7b3',
+    mapTypeControl: false,
+    center: mapCenter,
+    zoom: 7
+  });
+  initMap(map);
+  let marker = new window.google.maps.Marker({
+    map,
+    visible: false
+  })
+  initMarker(marker);
+}
+
+// 顯示 marker
+export const showMarker = (position) => {
+  if(!marker.getVisible()) {
+    map.setCenter(position);
+    map.setZoom(14);
+    marker.setPosition(position);
+    marker.setVisible(true);
+  } else {
+    marker.setVisible(false);
+    map.setZoom(13);
+    setTimeout(() => {
+      map.setCenter(position);
+      map.setZoom(14);
+      marker.setPosition(position);
+      marker.setVisible(true);
+    }, 500)
+  }
+}
+
+// 顯示 infoWindow
+export const showInfoWindow = () => {
+
+}

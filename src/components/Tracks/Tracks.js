@@ -3,29 +3,51 @@ import SearchBar from './searchBar';
 import Pin from './Pin';
 import './Tracks.css';
 
-const Tracks = ({ map, showMarker }) => {
+const Tracks = ({ map, pinList, showMarker, setPlaceInfo, closeInfoWindow }) => {
   const [input, setInput] = useState('');
-  const options = {
-    fields: ['geometry'],
+  const placeReturnField = ['name', 'geometry', 'formatted_address', 'photos'];
+  const autocompleteOptions = {
+    fields: placeReturnField,
     strictBounds: false,
     types: ['establishment'],
   };
 
   useEffect(() => {
-    if (window.google) {
-      const autocomplete = new window.google.maps.places.Autocomplete(input, options);
-      autocomplete.bindTo('bounds', map);
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        showMarker(place.geometry.location);
-      });
-    }
-  }, [input])
+    setTimeout(() => {
+      if (map) {
+        let autocomplete = new window.google.maps.places.Autocomplete(input, autocompleteOptions);
+        autocomplete.bindTo('bounds', map);
+        autocomplete.addListener('place_changed', () => {
+          closeInfoWindow();
+          const place = autocomplete.getPlace();
+          setPlaceInfo(place);
+          showMarker(place.geometry.location);
+        });
+        console.log('place request')
+      }
+    }, 1500);
+  }, [input]);
+
+  const searchPlace = () => {
+    const service = new google.maps.places.PlacesService(map);
+    let request = {
+      query: input.value,
+      fields: placeReturnField,
+    };
+    service.findPlaceFromQuery(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        closeInfoWindow();
+        setPlaceInfo(results[0]);
+        console.log(results[0].name);
+        showMarker(results[0].geometry.location);
+      }
+    });
+  }
 
   return (
     <div className='tracks-container'>
-      <SearchBar onInputChange={setInput}/>
-      <Pin />
+      <SearchBar onInputChange={setInput} onSearchClick={searchPlace}/>
+      <Pin pinList={pinList}/>
     </div>
   )
 }

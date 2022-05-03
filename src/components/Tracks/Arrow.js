@@ -1,24 +1,12 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { switchDirection, getDirectionChoice } from '../../store/slice/directionSlice';
 import { hideNotes } from '../../store/slice/notesSlice';
 import './Arrow.css';
 
-const Arrow = ({ index, number }) => {
-  const params = useParams();
-  const day = params.day;
+const Arrow = ({ index }) => {
   const dispatch = useDispatch();
-  const tripData = useSelector(state => state.trip.tripData);
-  let directionList;
-  let pinList;
-  if (!day) {
-    pinList = tripData.dayTrack[0].pinList;
-    directionList = tripData.dayTrack[0].directionList;
-  } else {
-    pinList = tripData.dayTrack[day-1].pinList;
-    directionList = tripData.dayTrack[day-1].directionList;
-  }
+  const dayTrack = useSelector(state => state.trip.dayTrack);
 
   let arrowClassName;
   let way;
@@ -26,29 +14,29 @@ const Arrow = ({ index, number }) => {
   let pinAName;
   let pinBName;
   let latA;
-  let longA;
+  let lngA;
   let latB;
-  let longB;
-  if (index == number - 1 ) {   // 若為最後一個箭頭，不顯示
+  let lngB;
+  if (index == dayTrack.pins.length - 1 ) {   // 若為最後一個箭頭，不顯示
     arrowClassName = 'arrow-display-none';
-    pinAName = '';   // 無需pin name
-    pinBName = '';
-    way = '';   // way & time 無資料，顯示空白避免 error
-    time = '';
-    latA = null;   // 經緯度無需pass資料，設定null
-    longA = null;
-    latB = null;
-    longB = null;
+    // pinAName = '';   // 無需pin name
+    // pinBName = '';
+    // way = '';   // way & time 無資料，顯示空白避免 error
+    // time = '';
+    // latA = null;   // 經緯度無需pass資料，設定null
+    // lngA = null;
+    // latB = null;
+    // lngB = null;
   } else {
     arrowClassName = 'arrow';
-    pinAName = pinList[index].name;
-    pinBName = pinList[index+1].name;
-    way = directionList[index].way;
-    time = directionList[index].time;
-    latA = pinList[index].lat;
-    longA = pinList[index].long;
-    latB = pinList[index+1].lat;
-    longB = pinList[index+1].long;
+    pinAName = dayTrack.pins[index].name;
+    pinBName = dayTrack.pins[index+1].name;
+    // way = directions[index].way;
+    // time = directions[index].time;
+    latA = dayTrack.pins[index].lat;
+    lngA = dayTrack.pins[index].lng;
+    latB = dayTrack.pins[index+1].lat;
+    lngB = dayTrack.pins[index+1].lng;
   }
   const handelDirection = (e) => {
     dispatch(hideNotes());
@@ -59,9 +47,9 @@ const Arrow = ({ index, number }) => {
       start: pinAName,
       end: pinBName,
       latA: latA,
-      longA: longA,
+      lngA: lngA,
       latB: latB,
-      longB: longB,
+      lngB: lngB,
     }));
   }
 
@@ -72,8 +60,8 @@ const Arrow = ({ index, number }) => {
       onClick={e => handelDirection(e)}
     >
       <div>&#8595;</div>
-      <div>{way}</div>
-      <div>{time}</div>
+      {/* <div>{way}</div>
+      <div>{time}</div> */}
     </div>
   )
 }

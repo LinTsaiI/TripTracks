@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { savePreviousTrackState } from '../../store/slice/tripSlice';
 import { hideNotes } from '../../store/slice/notesSlice';
 import { hideDirection } from '../../store/slice/directionSlice';
 import './Days.css';
@@ -17,6 +18,7 @@ const Days = () => {
         to={`/trip/${params.tripId}?day=${i+1}`}
         key={i+1}
         onClick={() => {
+          dispatch(savePreviousTrackState());
           dispatch(hideNotes());
           dispatch(hideDirection());
         }}

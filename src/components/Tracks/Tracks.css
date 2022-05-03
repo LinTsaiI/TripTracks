@@ -8,4 +8,5 @@
   margin: 10px;
   border-radius: 10px;
   box-shadow: 2px 4px 2px rgb(0 0 0 / 20%);
+  overflow-y: auto;
 }

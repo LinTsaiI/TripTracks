@@ -6,6 +6,7 @@ export const tripSlice = createSlice({
   initialState: {
     tripList: [],
     tripData: null,
+    trackId: null,
     dayTrack: null,
     day: 1
   },
@@ -19,31 +20,23 @@ export const tripSlice = createSlice({
       state.tripData = tripData;
     },
     setDayTrack: (state, actions) => {
+      let trackId = actions.payload.trackId;
       let dayTrack = actions.payload.dayTrack;
-      console.log(dayTrack)
+      state.trackId = trackId;
       state.dayTrack = dayTrack;
     },
-    deletePin: (state, actions) => {
-      let tripName = actions.payload.tripName;
-      let day = actions.payload.day;
-      if (!day) {
-        day = 0;
-      } else {
-         day = day - 1;
-      }
-      let id = actions.payload.id;
-      let result = deleteSelectedPin(tripName, day, id);
-      // 若刪除成功，更新行程資料。此處先以刪除後回傳的新tripData替代
-      // if (result) {
-      //   let data = getTripData(tripName);
-      //   state.tripData = data;
-      // }
-      state.tripData.dayTrack[day].pinList = result;
-    }
+    updateDayTrack: (state, actions) => {
+      let dayTrack = actions.payload.dayTrack;
+      state.dayTrack = dayTrack;
+    },
+    // 切換不同天的行程時，需將上一個行程的狀態 e.g. mapCenter 記錄下來並更新到資料庫
+    savePreviousTrackState: (state, actions) => {
+      console.log('save previous dayTrack state, target: ', state.trackId)
+    },
   }
 });
 
-export const { setTripList, setTripData, setDayTrack, deletePin } = tripSlice.actions;
+export const { setTripList, setTripData, setDayTrack, updateDayTrack, savePreviousTrackState, deletePin } = tripSlice.actions;
 export default tripSlice.reducer;
 
 
