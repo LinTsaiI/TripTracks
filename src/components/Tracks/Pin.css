@@ -8,10 +8,14 @@
 
 .pin-container:hover {
   box-shadow: 2px 2px 8px rgb(0 0 0 / 20%);
+  cursor: pointer;
 }
 
 .pin-name {
   height: 100%;
   width: 100%;
   padding: 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

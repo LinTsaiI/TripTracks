@@ -3,8 +3,8 @@ import SearchBar from './searchBar';
 import Pin from './Pin';
 import './Tracks.css';
 
-const Tracks = ({ map, pinList, showMarker, setPlaceInfo, closeInfoWindow }) => {
-  const [input, setInput] = useState('');
+const Tracks = ({ map, pinList, showMarker, setPlaceInfo }) => {
+  const [input, setInput] = useState(null);
   const placeReturnField = ['name', 'geometry', 'formatted_address', 'photos'];
   const autocompleteOptions = {
     fields: placeReturnField,
@@ -18,7 +18,6 @@ const Tracks = ({ map, pinList, showMarker, setPlaceInfo, closeInfoWindow }) => 
         let autocomplete = new window.google.maps.places.Autocomplete(input, autocompleteOptions);
         autocomplete.bindTo('bounds', map);
         autocomplete.addListener('place_changed', () => {
-          closeInfoWindow();
           const place = autocomplete.getPlace();
           setPlaceInfo(place);
           showMarker(place.geometry.location);
@@ -36,9 +35,7 @@ const Tracks = ({ map, pinList, showMarker, setPlaceInfo, closeInfoWindow }) => 
     };
     service.findPlaceFromQuery(request, (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        closeInfoWindow();
         setPlaceInfo(results[0]);
-        console.log(results[0].name);
         showMarker(results[0].geometry.location);
       }
     });

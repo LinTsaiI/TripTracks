@@ -1,16 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setDayTrack, updateDayTrack } from '../../store/slice/tripSlice';
 import { getTrackData, addToPinList } from '../../API';
 import { Loader } from '@googlemaps/js-api-loader';
+import { MapContext } from '../Trip/Trip';
 import Tracks from '../Tracks/Tracks';
 import Notes from '../Notes/Notes';
 import Direction from '../Direction/Direction';
-import pin from '../../img/icons_google.png';
-import './Map.css';
+import pinImg from '../../img/icons_google.png';
+import './MapContent.css';
 
-const Map = () => {
+const MapContent = () => {
   const [searchParams] = useSearchParams();
   const day = searchParams.get('day');
   const index = day ? day-1 : 0;
@@ -23,18 +24,13 @@ const Map = () => {
   const [marker, setMarker] = useState(null);
   const [infoWindow, setInfoWindow] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
+  // const value = useContext(MapContext);
+  // const map = value.map;
+  // const marker = value.marker;
+  // const infoWindow = value.infoWindow;
   
   useEffect(() => {
-    getTrackData(tripData.trackId[index])
-      .then(dayTrack => {
-        dispatch(setDayTrack({
-          trackId: tripData.trackId[index],
-          dayTrack: dayTrack
-        }));
-      });
-  });
-
-  useEffect(() => {
+    console.log(mapRegin)
     const mapLoader = new Loader({
       apiKey: process.env.REACT_GOOGLE_MAP_API_KEY,
       libraries: ['places']
@@ -49,7 +45,6 @@ const Map = () => {
       });
       let marker = new google.maps.Marker({
         map: map,
-        position: mapCenter,
         visible: false
       });
       let infoWindow = new google.maps.InfoWindow();
@@ -60,11 +55,30 @@ const Map = () => {
   }, []);
 
   useEffect(() => {
+    if (map) {
+      console.log('load')
+      getTrackData(tripData.trackId[index])
+        .then(dayTrack => {
+          console.log('Now is in: ' ,tripData.trackId[index])
+          showPinMarkers(map, dayTrack.pins);
+          // center 定在 dayTrack 儲存的狀態
+          // setCenter
+          dispatch(setDayTrack({
+            trackId: tripData.trackId[index],
+            dayTrack: dayTrack
+          }));
+        });
+    }
+  });
+
+
+  useEffect(() => {
     if (marker) {
       marker.addListener('click', () => {
         showInfoWindow();
       });
-      google.maps.event.addListener(infoWindow, 'domready', () => {
+      closeInfoWindow();
+      let infoWindowListener = infoWindow.addListener('domready', () => {
         const addBtn = document.getElementById('addBtn');
         const renderNewDayTrack = (newDayTrack) => {
           addBtn.disabled = true;
@@ -74,10 +88,30 @@ const Map = () => {
         }
         addBtn.addEventListener('click', () => {
           addToPinList(trackId, placeInfo.name, placeInfo.geometry.location.lat(), placeInfo.geometry.location.lng(), renderNewDayTrack);
+          marker.setVisible(false);
+          new google.maps.Marker({
+            map: map,
+            position: placeInfo.geometry.location,
+            icon: pinImg
+          });
         });
       });
+      return () => {
+        google.maps.event.removeListener(infoWindowListener);
+      }
     }
   }, [placeInfo]);
+
+  const showPinMarkers = (map, pinList) => {
+    pinList.forEach(pin => {
+      const markerOptions = {
+        map: map,
+        position: pin.position,
+        icon: pinImg
+      }
+      new google.maps.Marker(markerOptions);
+    });
+  }
 
   const showMarker = (position) => {
     if(!marker.getVisible()) {
@@ -131,12 +165,12 @@ const Map = () => {
   return (
     <div className='map'>
       <div>This is {tripData.tripName}'s Day{index+1} Map</div>
-      <Tracks map={map} showMarker={showMarker} setPlaceInfo={setPlaceInfo} closeInfoWindow={closeInfoWindow} />
+      <Tracks map={map} showMarker={showMarker} setPlaceInfo={setPlaceInfo} />
       <Notes />
       <Direction />
-      <div className='map-region' ref={mapRegin} />
+      <div className='map-region' ref={mapRegin}/>
     </div>
   );
 }
 
-export default Map;
+export default MapContent;

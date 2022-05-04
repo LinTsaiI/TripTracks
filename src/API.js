@@ -106,6 +106,8 @@ export const createNewTrack = async (userId, tripId, duration) => {
     const docContent = {
       userId: userId,
       tripId: tripId,
+      mapCenter: '',
+      zoom: '',
       pins: [],
       directions: []
     };
@@ -212,150 +214,16 @@ export const getTripData = async (tripId) => {
   //           }
   //         ]
   //       },
-  //       {
-  //         pinList: [
-  //           {
-  //             name: '下北澤',
-  //             lat: '35.66289774702003',
-  //             long: '139.66706218520682',
-  //             notes: {
-  //               content: '下北澤伴手禮'
-  //             }
-  //           },
-  //           {
-  //             name: '吉祥寺',
-  //             lat: '35.70354156394838',
-  //             long: '139.57990051293342',
-  //             notes: {
-  //               content: '吉祥寺伴手禮'
-  //             }
-  //           },
-  //           {
-  //             name: '吉卜力博物館',
-  //             lat: '35.696394816236165',
-  //             long: '139.57049607045548',
-  //             notes: {
-  //               content: '吉卜力博物館伴手禮'
-  //             }
-  //           },
-  //         ],
-  //         directionList: [
-  //           {
-  //             way: 'train',
-  //             time: '40 min'
-  //           },
-  //           {
-  //             way: 'train',
-  //             time: '60 min'
-  //           }
-  //         ]
-  //       },
-  //       {
-  //         pinList: [
-  //           {
-  //             name: '淺草寺',
-  //             lat: '35.715297849839985',
-  //             long: '139.79683870189155',
-  //             notes: {
-  //               content: '淺草寺伴手禮'
-  //             }
-  //           },
-  //           {
-  //             name: '晴空塔',
-  //             lat: '35.71028918176141',
-  //             long: ' 139.810657482093',
-  //             notes: {
-  //               content: '晴空塔伴手禮'
-  //             }
-  //           },
-  //         ],
-  //         directionList: [
-  //           {
-  //             way: 'walk',
-  //             time: '35 min'
-  //           },
-  //         ]
-  //       },
-  //       {
-  //         pinList: [
-  //           {
-  //             name: '東京迪士尼海洋',
-  //             lat: '35.6268590321797',
-  //             long: '139.8850993551084',
-  //             notes: {
-  //               content: '東京迪士尼海洋伴手禮'
-  //             }
-  //           },
-  //           {
-  //             name: '築地市場',
-  //             lat: '35.66864892878142',
-  //             long: '139.7702412260595',
-  //             notes: {
-  //               content: '築地市場伴手禮'
-  //             }
-  //           },
-  //         ],
-  //         directionList: [
-  //           {
-  //             way: 'mrt',
-  //             time: '50 min'
-  //           },
-  //         ]
-  //       },
-  //       {
-  //         pinList: [
-  //           {
-  //             name: '新宿',
-  //             lat: '35.68989224661832',
-  //             long: '139.70047869879102',
-  //             notes: {
-  //               content: '新宿伴手禮'
-  //             }
-  //           },
-  //           {
-  //             name: '竹下通',
-  //             lat: '35.67125657676321',
-  //             long: '139.70519805510946',
-  //             notes: {
-  //               content: '竹下通伴手禮'
-  //             }
-  //           },
-  //           {
-  //             name: '明治神宮',
-  //             lat: '35.67919150764017',
-  //             long: '139.69939833772688',
-  //             notes: {
-  //               content: '明治神宮伴手禮'
-  //             }
-  //           },
-  //         ],
-  //         directionList: [
-  //           {
-  //             way: 'mrt',
-  //             time: '25 min'
-  //           },
-  //           {
-  //             way: 'walk',
-  //             time: '30 min'
-  //           }
-  //         ]
-  //       },
-  //     ]
-  //   }
-  //   console.log(tripId);
-  //   console.log(tripData)
-  //   return tripData;
-  // }
 }
 
 // 將景點加入 pinList
 export const addToPinList = async (trackId, placeName, lat, lng, renderNewDayTrack) => {
+  console.log('add pin in: ', trackId)
   try {
     await updateDoc(doc(db, 'tracks', trackId), {
       pins: arrayUnion({
         name: placeName,
-        lat: lat,
-        lng: lng,
+        position: { lat: lat, lng: lng},
         notes: ''
       })
     });
@@ -368,6 +236,7 @@ export const addToPinList = async (trackId, placeName, lat, lng, renderNewDayTra
 
 // 刪除指定的Pin
 export const deletePin = async (trackId, index, renderNewDayTrack) => {
+  console.log('delete pin in: ', trackId)
   try {
     const trackSnap = await getDoc(doc(db, 'tracks', trackId));
     const pinList = trackSnap.data().pins;
@@ -379,6 +248,16 @@ export const deletePin = async (trackId, index, renderNewDayTrack) => {
     renderNewDayTrack(newTrackSnap.data());
   } catch (err) {
     console.log('Error updating pinList', err);
+  }
+}
+
+export const saveMapCenter = async (mapCenter) => {
+  try {
+    await setDoc(doc(db, 'tracks', trackId), {
+      mapCenter: mapCenter
+    }, { merge: true });
+  } catch (err) {
+    console.log('Error saving mapCenter', err);
   }
 }
 

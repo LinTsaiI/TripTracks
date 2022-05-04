@@ -8,7 +8,7 @@ import { creatUserIfNew } from '../API';
 import Home from '../components/Home/Home';
 import Dashboard from '../components/Dashboard/Dashboard';
 import Trip from '../components/Trip/Trip';
-import Map from '../components/Map/Map';
+import MapContent from '../components/MapContent/MapContent';
 
 const App = () => {
   const userId = useSelector(state => state.user.userId);
@@ -31,7 +31,7 @@ const App = () => {
           <Route path='/' element={userId ? <Navigate to='/dashboard' /> : <Home />} />
           <Route path='/dashboard' element={userId ? <Dashboard /> : <Navigate to='/' />} />
           <Route path='/trip/*' element={<Trip /> }>
-            <Route path=':tripId' element={<Map />}>
+            <Route path=':tripId' element={<Trip />}>
             </Route>
           </Route>
           <Route

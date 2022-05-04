@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getTripData, deleteSelectedPin } from '../../API';
 
 export const tripSlice = createSlice({
   name: 'trip',
@@ -8,7 +7,6 @@ export const tripSlice = createSlice({
     tripData: null,
     trackId: null,
     dayTrack: null,
-    day: 1
   },
   reducers: {
     setTripList: (state, actions) => {

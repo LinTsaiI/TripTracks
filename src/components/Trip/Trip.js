@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, Outlet, Navigate } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { setTripData } from '../../store/slice/tripSlice';
 import { getTripData } from '../../API';
+import MapContent from '../MapContent/MapContent';
 import TripHeader from './TripHeader';
 import Footer from '../Footer/Footer';
 
@@ -10,25 +11,26 @@ const Trip = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const tripData = useSelector(state => state.trip.tripData);
+  const dom = useRef();
 
   useEffect(() => {
+    console.log(dom)
     getTripData(params.tripId)
       .then(tripData => {
         dispatch(setTripData({
           tripData: tripData
         }));
       });
-  }, []);
+  }, [dom]);
 
   if (!params.tripId) {
     return <Navigate to='/dashboard'/>
   } else {
     return !tripData ? <div>Loading...</div> : (
       <div>
-        <nav>
-          <TripHeader />
-        </nav>
-        <Outlet />
+        <TripHeader />
+        <MapContent />
+        <div ref={dom} className='test-dom'></div>
         <Footer />
       </div>
     )
