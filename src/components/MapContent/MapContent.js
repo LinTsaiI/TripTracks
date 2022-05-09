@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useContext, createContext } from 'react';
-import { useSearchParams, useOutletContext } from 'react-router-dom';
+import { useSearchParams, useLocation, useOutletContext } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { setTrackId, fetchDayTrack, setDayTrack, updateDayTrack } from '../../store/slice/tripSlice';
-import { getTrackData, addToPinList } from '../../API';
+import { setTrackId, fetchDayTrack, addNewPin, updateMapCenter } from '../../store/slice/tripSlice';
 import { Loader } from '@googlemaps/js-api-loader';
 import { MapContext } from '../Trip/Trip';
 import Tracks from '../Tracks/Tracks';
@@ -16,6 +15,7 @@ export const TrackContext = createContext();
 
 const MapContent = () => {
   const tripInfo = useOutletContext();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const day = searchParams.get('day');
   const index = day ? day-1 : 0;
@@ -46,24 +46,6 @@ const MapContent = () => {
         marker.setMap(null);
       });
     }
-
-    // getTrackData(tripData.trackId[index])
-    //   .then(dayTrack => {
-    //     console.log('Now is in: ' ,tripData.trackId[index])
-    //     if (pinMarkerList) {
-    //       let currentMarkerList = [...pinMarkerList];
-    //       currentMarkerList.forEach(marker => {
-    //         marker.setMap(null);
-    //       });
-    //     }
-    //     showPinMarkers(dayTrack.pins);
-    //     // center 定在 dayTrack 儲存的狀態
-    //     // setCenter
-    //     dispatch(setDayTrack({
-    //       trackId: tripData.trackId[index],
-    //       dayTrack: dayTrack
-    //     }));
-    //   });
   }, [trackId]);
 
   useEffect(() => {
@@ -80,14 +62,21 @@ const MapContent = () => {
       closeInfoWindow();
       let infoWindowListener = infoWindow.addListener('domready', () => {
         const addBtn = document.getElementById('addBtn');
-        const renderNewDayTrack = (newDayTrack) => {
-          addBtn.disabled = true;
-          dispatch(updateDayTrack({
-            dayTrack: newDayTrack
-          }));
-        }
+        // const renderNewDayTrack = (newDayTrack) => {
+        //   addBtn.disabled = true;
+        //   dispatch(updateDayTrack({
+        //     dayTrack: newDayTrack
+        //   }));
+        // }
         addBtn.addEventListener('click', () => {
-          addToPinList(dayTrack.trackId, placeInfo.name, placeInfo.geometry.location.lat(), placeInfo.geometry.location.lng(), renderNewDayTrack);
+          dispatch(addNewPin({
+            trackId: trackId,
+            placeName: placeInfo.name,
+            lat: placeInfo.geometry.location.lat(),
+            lng: placeInfo.geometry.location.lng(),
+            address: placeInfo.formatted_address,
+            photo: placeInfo.photos[0].getUrl()
+          }));
           marker.setVisible(false);
           new google.maps.Marker({
             map: map,
@@ -101,6 +90,18 @@ const MapContent = () => {
       }
     }
   }, [placeInfo]);
+
+  useEffect(() => {
+    if (map) {
+      const mapCenter = map.getCenter();
+      dispatch(updateMapCenter({
+        trackId: trackId,
+        lat: mapCenter.lat(),
+        lng: mapCenter.lng(),
+        zoom: map.getZoom()
+      }));
+    }
+  }, [location]);
 
   const showPinMarkers = (pinList) => {
     let markerList = [];

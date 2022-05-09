@@ -36,9 +36,9 @@ const App = () => {
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={userId ? <Navigate to='/dashboard' /> : <Home />} />
+          <Route path='/' element={<Home />} />
           <Route path='/dashboard' element={userId ? <Dashboard /> : <Navigate to='/' />} />
-          <Route path='/trip/*' element={<Trip />}>
+          <Route path='/trip' element={<Trip />}>
             <Route path=':tripId' element={<MapContent />} />
           </Route>
           <Route

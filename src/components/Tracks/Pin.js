@@ -1,11 +1,10 @@
 import React, { useEffect, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateDayTrack } from '../../store/slice/tripSlice';
+import { updateDayTrack, deletePin } from '../../store/slice/tripSlice';
 import { switchNotes, showNotesContent } from '../../store/slice/notesSlice';
 import { hideDirection } from '../../store/slice/directionSlice';
 import { MapContentContext } from '../MapContent/MapContent';
-import { deletePin } from '../../API';
 import Arrow from './Arrow';
 import './Pin.css';
 
@@ -20,14 +19,17 @@ const Pin = () => {
   // } else {
   //   pinList = tripData.dayTrack[day-1].pinList;
   // }
-  const renderNewDayTrack = (newDayTrack) => {
-    dispatch(updateDayTrack({
-      dayTrack: newDayTrack
-    }));
-  }
+  // const renderNewDayTrack = (newDayTrack) => {
+  //   dispatch(updateDayTrack({
+  //     dayTrack: newDayTrack
+  //   }));
+  // }
 
   const deleteSelectedPin = (e) => {
-    deletePin(trackId, e.target.parentNode.id, renderNewDayTrack);
+    dispatch(deletePin({
+      trackId: trackId,
+      targetIndex: e.target.parentNode.id
+    }));
   }
   
   const handelNotes = (e) => {

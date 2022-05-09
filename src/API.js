@@ -106,7 +106,7 @@ export const createNewTrack = async (userId, tripId, duration) => {
     const docContent = {
       userId: userId,
       tripId: tripId,
-      mapCenter: '',
+      mapCenter: {lat: 0, lng: 0},
       zoom: 0,
       pins: [],
       directions: []
@@ -216,47 +216,57 @@ export const getTrackData = async (trackId) => {
 };
 
 // 將景點加入 pinList
-export const addToPinList = async (trackId, placeName, lat, lng, address, photo, renderNewDayTrack) => {
+export const addToPinList = async (pinInfo) => {
+  const { trackId, placeName, lat, lng, address, photo } = pinInfo;
   console.log('add pin in: ', trackId);
   try {
     await updateDoc(doc(db, 'tracks', trackId), {
       pins: arrayUnion({
         name: placeName,
-        position: { lat: lat, lng: lng},
-        address: '',
-        photo: '',
+        position: { lat: lat, lng: lng },
+        address: address,
+        photo: photo,
         notes: ''
       })
     });
-    const trackSnap = await getDoc(doc(db, 'tracks', trackId));
-    renderNewDayTrack(trackSnap.data());
+    const newTrackSnap = await getDoc(doc(db, 'tracks', pinInfo.trackId));
+    return newTrackSnap.data().pins;
   } catch (err) {
     console.log('Error updating pinList', err);
   }
 };
 
 // 刪除指定的Pin
-export const deletePin = async (trackId, index, renderNewDayTrack) => {
+export const deleteSelectedPin = async (pinInfo) => {
+  const { trackId, targetIndex } = pinInfo;
   console.log('delete pin in: ', trackId);
   try {
     const trackSnap = await getDoc(doc(db, 'tracks', trackId));
     const pinList = trackSnap.data().pins;
-    pinList.splice(index, 1);
+    pinList.splice(targetIndex, 1);
     await updateDoc(doc(db, 'tracks', trackId), {
       pins: pinList
     });
     const newTrackSnap = await getDoc(doc(db, 'tracks', trackId));
-    renderNewDayTrack(newTrackSnap.data());
+    return newTrackSnap.data().pins;
   } catch (err) {
     console.log('Error updating pinList', err);
   }
 };
 
-export const saveMapCenter = async (trackId, mapCenter) => {
+// 紀錄目前的 mapCenter
+export const saveMapCenter = async (mapInfo) => {
+  const { trackId, lat, lng, zoom } = mapInfo;
   try {
-    await setDoc(doc(db, 'tracks', trackId), {
-      mapCenter: mapCenter
-    }, { merge: true });
+    await updateDoc(doc(db, 'tracks', trackId), {
+      mapCenter: { lat: lat, lng: lng },
+      zoom: zoom
+    });
+    const newTrackData = await getDoc(doc(db, 'tracks', trackId));
+    return {
+      mapCenter: newTrackData.data().mapCenter,
+      zoom: newTrackData.data().zoom
+    };
   } catch (err) {
     console.log('Error saving mapCenter', err);
   }

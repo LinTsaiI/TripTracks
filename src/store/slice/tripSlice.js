@@ -1,9 +1,24 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getTrackData } from '../../API';
+import { getTrackData, addToPinList, deleteSelectedPin, saveMapCenter } from '../../API';
 
 export const fetchDayTrack = createAsyncThunk('trip/fetchDayTrack', async (trackId) => {
   const dayTrack = await getTrackData(trackId);
   return dayTrack;
+});
+
+export const addNewPin = createAsyncThunk('trip/addNewPin', async (pinInfo) => {
+  const newPinList = await addToPinList(pinInfo);
+  return newPinList;
+});
+
+export const deletePin = createAsyncThunk('trip/deletePin', async (pinInfo) => {
+  const newPinList = await deleteSelectedPin(pinInfo);
+  return newPinList;
+});
+
+export const updateMapCenter = createAsyncThunk('trip/updateMapCenter', async (mapInfo) => {
+  const mapCenter = await saveMapCenter(mapInfo);
+  return mapCenter;
 });
 
 export const tripSlice = createSlice({
@@ -31,10 +46,10 @@ export const tripSlice = createSlice({
       state.trackId = trackId;
       state.dayTrack = dayTrack;
     },
-    updateDayTrack: (state, actions) => {
-      let dayTrack = actions.payload.dayTrack;
-      state.dayTrack = dayTrack;
-    },
+    // updateDayTrack: (state, actions) => {
+    //   let dayTrack = actions.payload.dayTrack;
+    //   state.dayTrack = dayTrack;
+    // },
     // 切換不同天的行程時，需將上一個行程的狀態 e.g. mapCenter 記錄下來並更新到資料庫
     savePreviousTrackState: (state, actions) => {
       console.log('save previous dayTrack state, target: ', state.trackId);
@@ -57,11 +72,33 @@ export const tripSlice = createSlice({
         }
         state.pinList = action.payload.pins;
         state.directions = action.payload.directions;
-      });
+      })
+      .addCase(addNewPin.pending, (state, action) => {
+        console.log('add new pin pending');
+      })
+      .addCase(addNewPin.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.pinList = action.payload;
+      })
+      .addCase(deletePin.pending, (state, action) => {
+        console.log('delete pin pending');
+      })
+      .addCase(deletePin.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.pinList = action.payload;
+      })
+      .addCase(updateMapCenter.pending, (state, action) => {
+        console.log('save map center pending');
+      })
+      .addCase(updateMapCenter.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.mapCenter = action.payload.mapCenter;
+        state.zoom = action.payload.zoom;
+      })
   }
 });
 
-export const { setTrackId, setTripData, setDayTrack, updateDayTrack, savePreviousTrackState, deletePin } = tripSlice.actions;
+export const { setTrackId, setTripData, setDayTrack, updateDayTrack, savePreviousTrackState } = tripSlice.actions;
 export default tripSlice.reducer;
 
 

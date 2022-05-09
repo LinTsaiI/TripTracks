@@ -37,7 +37,6 @@ const Trip = () => {
       .then(() => {
         mapLoader.load().then(() => {
           console.log('map init')
-          console.log(mapRegin.current)
           let map = new google.maps.Map(mapRegin.current, {
             mapId: '6fe2140f54e6c7b3',
             mapTypeControl: false,
