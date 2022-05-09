@@ -38,8 +38,8 @@ const App = () => {
         <Routes>
           <Route path='/' element={userId ? <Navigate to='/dashboard' /> : <Home />} />
           <Route path='/dashboard' element={userId ? <Dashboard /> : <Navigate to='/' />} />
-          <Route path='/trip/*' element={userId ? <Trip /> : <Navigate to='/' />}>
-            <Route path=':tripId' element={<Trip />} />
+          <Route path='/trip/*' element={<Trip />}>
+            <Route path=':tripId' element={<MapContent />} />
           </Route>
           <Route
               path='*'

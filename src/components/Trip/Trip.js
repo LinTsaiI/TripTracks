@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, Outlet, useSearchParams } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
 import { fetchDayTrack, setTripData, savePreviousTrackState } from '../../store/slice/tripSlice';
 import { hideNotes } from '../../store/slice/notesSlice';
@@ -23,6 +23,7 @@ const Trip = () => {
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [infoWindow, setInfoWindow] = useState(null);
+
   const mapLoader = new Loader({
     apiKey: process.env.REACT_GOOGLE_MAP_API_KEY,
     libraries: ['places']
@@ -31,14 +32,12 @@ const Trip = () => {
   useEffect(() => {
     getTripData(tripId)
       .then(tripData => {
-        // dispatch(setTripData({
-        //   tripData: tripData
-        // }));
         setTripInfo(tripData);
       })
       .then(() => {
         mapLoader.load().then(() => {
-          console.log('init')
+          console.log('map init')
+          console.log(mapRegin.current)
           let map = new google.maps.Map(mapRegin.current, {
             mapId: '6fe2140f54e6c7b3',
             mapTypeControl: false,
@@ -55,7 +54,7 @@ const Trip = () => {
           setInfoWindow(infoWindow);
         });
       });
-  }, [tripId]);
+  }, []);
 
   return !tripInfo ? <div>Loading...</div> : (
     <div>
@@ -66,7 +65,7 @@ const Trip = () => {
         infoWindow: infoWindow
       }}>
         <div className='map'>
-          <MapContent tripInfo={tripInfo} />
+          <Outlet context={tripInfo} />
           <div className='map-region' ref={mapRegin}/>
         </div>
       </MapContext.Provider> 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext, createContext } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useOutletContext } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTrackId, fetchDayTrack, setDayTrack, updateDayTrack } from '../../store/slice/tripSlice';
 import { getTrackData, addToPinList } from '../../API';
@@ -14,7 +14,8 @@ import pinImg from '../../img/icons_google.png';
 export const MapContentContext = createContext();
 export const TrackContext = createContext();
 
-const MapContent = ({ tripInfo }) => {
+const MapContent = () => {
+  const tripInfo = useOutletContext();
   const [searchParams] = useSearchParams();
   const day = searchParams.get('day');
   const index = day ? day-1 : 0;
