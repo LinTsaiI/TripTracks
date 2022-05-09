@@ -1,6 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { auth, provider } from '../../firebase';
-import { signInWithPopup  } from "firebase/auth";
 import { userSignIn, userSignUp } from '../../API';
 
 export const userSlice = createSlice({
@@ -37,12 +35,15 @@ export const userSlice = createSlice({
       window.localStorage.removeItem('isSignIn');
       state.isSignIn = window.localStorage.getItem('isSignIn');
     },
-    setUserId: (state, actions) => {
-      let userId = actions.payload.userId;
+    setUser: (state, actions) => {
+      const { userId, username, email } = actions.payload;
       state.userId = userId;
+      state.username = username;
+      state.email = email;
     }
   }
 });
 
-export const { signIn, signUp, signOut, setUserId } = userSlice.actions;
+export const userIdentity = state => state.user.userId;
+export const { signIn, signUp, signOut, setUser } = userSlice.actions;
 export default userSlice.reducer;

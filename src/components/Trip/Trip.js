@@ -1,43 +1,78 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, Navigate } from 'react-router-dom';
-import { setTripData } from '../../store/slice/tripSlice';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { Loader } from '@googlemaps/js-api-loader';
+import { fetchDayTrack, setTripData, savePreviousTrackState } from '../../store/slice/tripSlice';
+import { hideNotes } from '../../store/slice/notesSlice';
+import { hideDirection } from '../../store/slice/directionSlice';
 import { getTripData } from '../../API';
 import MapContent from '../MapContent/MapContent';
 import TripHeader from './TripHeader';
 import Footer from '../Footer/Footer';
+import './Trip.css';
+
+export const MapContext = createContext();
 
 const Trip = () => {
   const params = useParams();
+  const tripId = params.tripId;
   const dispatch = useDispatch();
-  const tripData = useSelector(state => state.trip.tripData);
-  const dom = useRef();
+  const dayTrack = useSelector(state => state.trip);
+  const mapRegin = useRef();
+  const [tripInfo, setTripInfo] = useState(null);
+  const [map, setMap] = useState(null);
+  const [marker, setMarker] = useState(null);
+  const [infoWindow, setInfoWindow] = useState(null);
+  const mapLoader = new Loader({
+    apiKey: process.env.REACT_GOOGLE_MAP_API_KEY,
+    libraries: ['places']
+  });
 
   useEffect(() => {
-    console.log(dom)
-    getTripData(params.tripId)
+    getTripData(tripId)
       .then(tripData => {
-        dispatch(setTripData({
-          tripData: tripData
-        }));
+        // dispatch(setTripData({
+        //   tripData: tripData
+        // }));
+        setTripInfo(tripData);
+      })
+      .then(() => {
+        mapLoader.load().then(() => {
+          console.log('init')
+          let map = new google.maps.Map(mapRegin.current, {
+            mapId: '6fe2140f54e6c7b3',
+            mapTypeControl: false,
+            center: dayTrack.mapCenter,
+            zoom: dayTrack.zoom
+          });
+          let marker = new google.maps.Marker({
+            map: map,
+            visible: false
+          });
+          let infoWindow = new google.maps.InfoWindow();
+          setMap(map);
+          setMarker(marker);
+          setInfoWindow(infoWindow);
+        });
       });
-  }, [dom]);
+  }, [tripId]);
 
-  if (!params.tripId) {
-    return <Navigate to='/dashboard'/>
-  } else {
-    return !tripData ? <div>Loading...</div> : (
-      <div>
-        <TripHeader />
-        <MapContent />
-        <div ref={dom} className='test-dom'></div>
-        <Footer />
-      </div>
-    )
-  }
+  return !tripInfo ? <div>Loading...</div> : (
+    <div>
+      <TripHeader tripInfo={tripInfo} />
+      <MapContext.Provider value={{
+        map: map,
+        marker: marker,
+        infoWindow: infoWindow
+      }}>
+        <div className='map'>
+          <MapContent tripInfo={tripInfo} />
+          <div className='map-region' ref={mapRegin}/>
+        </div>
+      </MapContext.Provider> 
+      <Footer />
+    </div>
+  );
 }
 
 export default Trip;
-
-// 進入行程頁面，call API取得該使用者下對應的行程名稱資訊：開始日期，停留天數
-// 開始地圖預設拉很遠的大圖

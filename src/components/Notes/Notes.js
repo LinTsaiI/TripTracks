@@ -1,23 +1,32 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
+import { MapContentContext } from '../MapContent/MapContent';
 import './Notes.css';
 
 const Notes = () => {
   const notesState = useSelector(state => state.notes);
-  const notesClassName  = notesState.isOpen ? 'notes-container' : 'display-none';
+  const pinList = useSelector(state => state.trip.pinList);
+  const value = useContext(MapContentContext);
+  const { isNoteOpen, setIsNoteOpen, currentFocusNote } = value;
+  const focusIndex = currentFocusNote ? currentFocusNote : 0;
+  const notesClassName  = isNoteOpen ? 'notes-container' : 'display-none';
 
-  return (
-    <div className={notesClassName}>
-      <div className='notes-top-part'>
-        <div className='notes-title'>
-          <div className='notes-img'/>
-          <div>Notes</div>
+  if (!pinList) {
+    return <div>Loading...</div>
+  } else if (pinList.length > 1) {
+    return (
+      <div className={notesClassName}>
+        <div className='notes-top-part'>
+          <div className='notes-title'>
+            <div className='notes-img'/>
+            <div>Notes</div>
+          </div>
+          <div className='notes-pin-name'>{pinList[focusIndex].name}</div>
         </div>
-        <div className='notes-pin-name'>{notesState.notesName}</div>
+        <textarea type='textarea' className='notes-input-field'/>
       </div>
-      <textarea type='textarea' className='notes-input-field' defaultValue={notesState.content}/>
-    </div>
-  )
+    );
+  }
 }
 
 export default Notes;

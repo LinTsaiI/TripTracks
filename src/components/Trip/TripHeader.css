@@ -46,3 +46,16 @@
   font-weight: bold;
   box-shadow: 2px 4px 2px rgb(0 0 0 / 20%);
 }
+
+.header-plan-day {
+  display: inline-flex;
+  margin: 0 10px;
+  font-size: 24px;
+  color: #F8F5F2;
+  font-weight: bold;
+  text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
+}
+
+a {
+  text-decoration: none;
+}

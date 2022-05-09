@@ -1,13 +1,13 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import './TripCard.css';
 
-const TripCard = ({ openModal }) => {
-  const tripList = useSelector(state => state.trip.tripList);
+const TripCard = ({ tripList, openModal, isLoading }) => {
   const navigate = useNavigate();
+  const loadingIcon = isLoading ? 'loading-icon' : 'display-none';
+  const loading = <div className={loadingIcon} key='loading'/>
 
-  let tripCards = [];
+  let tripCards = [loading];
   for (let i = 0; i < tripList.length; i++) {
     tripCards.push(
       <div

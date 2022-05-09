@@ -29,6 +29,7 @@
   height: 40px;
   border-radius: 20px;
   background: #819DB8 url('../../img/icons_note.png') no-repeat center center;
+  background-size: 30px;
 }
 
 .notes-pin-name {

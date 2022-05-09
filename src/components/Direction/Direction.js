@@ -1,24 +1,36 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { MapContentContext } from '../MapContent/MapContent';
 import './Direction.css';
 
 const Direction = () => {
-  const directionState = useSelector(state => state.direction);
-  const directionClassName  = directionState.isOpen ? 'direction-container' : 'display-none';
-  return (
-    <div className={directionClassName}>
-      <div className='direction-top-part'>
-        <div className='direction-title'>
-          <div className='direction-img'/>
-          <div>Direction</div>
+  // const directionState = useSelector(state => state.direction);
+  const pinList = useSelector(state => state.trip.pinList);
+  const directions = useSelector(state => state.trip.directions);
+  const value = useContext(MapContentContext);
+  const { isDirectionOpen, setIsDirectionOpen, currentFocusDirection } = value;
+  const startIndex = currentFocusDirection ? Number(currentFocusDirection) : 0;
+  const endIndex = startIndex + 1;
+  const directionClassName  = isDirectionOpen ? 'direction-container' : 'display-none';
+
+  if (!pinList) {
+    return <div>Loading...</div>
+  } else if (pinList.length > 1) {
+    return (
+      <div className={directionClassName}>
+        <div className='direction-top-part'>
+          <div className='direction-title'>
+            <div className='direction-img'/>
+            <div>Direction</div>
+          </div>
+          <div className='direction-pin-name'>{pinList[startIndex].name}</div>
+          <div className='direction-arrow'>&#8595;</div>
+          <div className='direction-pin-name'>{pinList[endIndex].name}</div>
         </div>
-        <div className='direction-pin-name'>{directionState.start}</div>
-        <div className='direction-arrow'>&#8595;</div>
-        <div className='direction-pin-name'>{directionState.end}</div>
+        <div className='direction-choice'>Here embed Google Direction results:{directions[startIndex]}</div>
       </div>
-      <div className='direction-choice'>Here embed Google Direction results:{directionState.directionInfo}</div>
-    </div>
-  )
+    );
+  }
 }
 
 export default Direction;

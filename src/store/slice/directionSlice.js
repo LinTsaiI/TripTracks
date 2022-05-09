@@ -34,8 +34,8 @@ export const directionSlice = createSlice({
          day = day - 1;
       }
       let id = actions.payload.id;
-      let result = getDirectionHistory(tripName, day, id);
-      state.directionInfo = result;
+      // let result = getDirectionHistory(tripName, day, id);
+      // state.directionInfo = result;
     },
     getDirectionChoice: (state, actions) => {
       // 負責 call google direction api

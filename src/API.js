@@ -1,5 +1,5 @@
 import { auth, db, provider } from './firebase';
-import { sendSignInLinkToEmail, signInWithPopup  } from "firebase/auth";
+import { sendSignInLinkToEmail, signInWithPopup  } from 'firebase/auth';
 import { setDoc, addDoc, Timestamp, collection, doc, updateDoc, getDoc, arrayUnion, getDocs, query, where } from 'firebase/firestore';
 
 
@@ -10,14 +10,14 @@ export const userSignIn = (userName, password) => {
   console.log(userName, password);
   // 有的話response ok
   return true;
-}
+};
 // 註冊
 export const userSignUp = (userName, email, password) => {
   // fetch 資料庫，查看是否有已有相同email被註冊
   console.log(userName, email, password);
   // 沒有的話把資料新增到資料庫，response ok
   return true;
-}
+};
 
 // 取得使用者名稱/email(帳號)/會員id
 // 更新密碼
@@ -28,30 +28,30 @@ const actionCodeSettings = {
   // This must be true.
   handleCodeInApp: true,
 };
-export const emailSignIn = () => {
+export const emailSignIn = (email) => {
   sendSignInLinkToEmail(auth, email, actionCodeSettings)
   .then((result) => {
-    console.log(result)
+    console.log(result);
     window.localStorage.setItem('emailForSignIn', email);
   })
   .catch((error) => {
     console.log(error);
   });
-}
+};
 
 // Sign in with Google
 export const googleSignIn = () => {
   signInWithPopup(auth, provider)
   .then(result => {
     let userId = result.user.uid;
-    console.log(userId)
+    console.log(userId);
   }).catch((error) => {
     console.log(error);
   });
-}
+};
 
 // Add user to user collection database
-export const creatUserIfNew = async (username, email, userId) => {
+export const creatUserIfNew = async (userId, username, email) => {
   try {
     const userSnap = await getDoc(doc(db, 'user', userId));
     if (userSnap.exists()) {
@@ -64,15 +64,15 @@ export const creatUserIfNew = async (username, email, userId) => {
           tripId: [],
           FirstEntryTime: Timestamp.now()
         });
-        console.log('create')
+        console.log('create');
       } catch (err) {
-        console.error("Error adding document: ", err);
+        console.error('Error adding document: ', err);
       }
     }
   } catch (err) {
-    console.error("Error adding document: ", err);
+    console.error('Error adding document: ', err);
   }
-}
+};
 
 
 // 行程資訊相關
@@ -96,9 +96,9 @@ export const createNewTrip = async (userId, tripName, startDate, duration, setTr
     setTripId(docRef.id);
     setCreateStatus(true);
   } catch (err) {
-    console.log("Error adding document: ", err);
+    console.log('Error adding document: ', err);
   }
-}
+};
 
 // 建立新 trip，同時依天數建立空的 track 文件
 export const createNewTrack = async (userId, tripId, duration) => {
@@ -107,7 +107,7 @@ export const createNewTrack = async (userId, tripId, duration) => {
       userId: userId,
       tripId: tripId,
       mapCenter: '',
-      zoom: '',
+      zoom: 0,
       pins: [],
       directions: []
     };
@@ -120,13 +120,13 @@ export const createNewTrack = async (userId, tripId, duration) => {
       }
     }
   } catch (err) {
-    console.log("Error adding document: ", err);
+    console.log('Error adding document: ', err);
   }
-}
+};
 
 // 取得使用者已建立的所有行程，用以在 Dashboard 顯示行程名稱/日期區間
 export const getTripList = async (userId) => {
-  const condition = query(collection(db, 'trips'), where('userId', "==", userId));
+  const condition = query(collection(db, 'trips'), where('userId', '==', userId));
   const querySnapshot = await getDocs(condition);
   let tripList = [];
   querySnapshot.forEach(doc => {
@@ -136,24 +136,11 @@ export const getTripList = async (userId) => {
       tripName: doc.data().tripName,
       startDate: doc.data().startDate,
       duration: doc.data().duration
-    }
+    };
     tripList.push(trip);
   });
   return tripList;
-}
-
-// 進入 /trip/tripId?day= 頁面，載入該天的景點list/地圖上的marker位置
-export const getTrackData = async (trackId) => {
-  try {
-    const trackSnap = await getDoc(doc(db, 'tracks', trackId));
-    if (trackSnap.exists()) {
-      return trackSnap.data();
-    }
-  } catch (err) {
-    console.log('Error getting document: ', err);
-  }
-}
-
+};
 
 // 取得特定 tripId 的所有資訊，進入 /trip/tripId 時用以顯示行程名稱/天數/日期區間
 export const getTripData = async (tripId) => {
@@ -164,7 +151,7 @@ export const getTripData = async (tripId) => {
       return tripSnap.data();
     }
   } catch (err) {
-    console.log("Error getting document: ", err);
+    console.log('Error getting document: ', err);
   }
   // fetch 資料庫符合 tripId 的行程資訊
   // let tripData;
@@ -214,16 +201,30 @@ export const getTripData = async (tripId) => {
   //           }
   //         ]
   //       },
-}
+};
+
+// 進入 /trip/tripId?day= 頁面，載入該天的景點list/地圖上的marker位置
+export const getTrackData = async (trackId) => {
+  try {
+    const trackSnap = await getDoc(doc(db, 'tracks', trackId));
+    if (trackSnap.exists()) {
+      return trackSnap.data();
+    }
+  } catch (err) {
+    console.log('Error getting document: ', err);
+  }
+};
 
 // 將景點加入 pinList
-export const addToPinList = async (trackId, placeName, lat, lng, renderNewDayTrack) => {
-  console.log('add pin in: ', trackId)
+export const addToPinList = async (trackId, placeName, lat, lng, address, photo, renderNewDayTrack) => {
+  console.log('add pin in: ', trackId);
   try {
     await updateDoc(doc(db, 'tracks', trackId), {
       pins: arrayUnion({
         name: placeName,
         position: { lat: lat, lng: lng},
+        address: '',
+        photo: '',
         notes: ''
       })
     });
@@ -232,11 +233,11 @@ export const addToPinList = async (trackId, placeName, lat, lng, renderNewDayTra
   } catch (err) {
     console.log('Error updating pinList', err);
   }
-}
+};
 
 // 刪除指定的Pin
 export const deletePin = async (trackId, index, renderNewDayTrack) => {
-  console.log('delete pin in: ', trackId)
+  console.log('delete pin in: ', trackId);
   try {
     const trackSnap = await getDoc(doc(db, 'tracks', trackId));
     const pinList = trackSnap.data().pins;
@@ -249,9 +250,9 @@ export const deletePin = async (trackId, index, renderNewDayTrack) => {
   } catch (err) {
     console.log('Error updating pinList', err);
   }
-}
+};
 
-export const saveMapCenter = async (mapCenter) => {
+export const saveMapCenter = async (trackId, mapCenter) => {
   try {
     await setDoc(doc(db, 'tracks', trackId), {
       mapCenter: mapCenter
@@ -259,7 +260,7 @@ export const saveMapCenter = async (mapCenter) => {
   } catch (err) {
     console.log('Error saving mapCenter', err);
   }
-}
+};
 
 // 景點or路線筆記相關
 // 取得筆記內容
@@ -271,11 +272,11 @@ export const getNotes = (tripName, day, id) => {
   let content = pinList[id].notes.content;
   // 有取到回一個object，沒取到回null
   return [pinName, content];
-}
+};
 // 更新筆記內容
 export const saveNotes = () => {
 
-}
+};
 
 
 // 路線規劃相關
@@ -287,7 +288,7 @@ export const getDirection = (latitudeA, longitudeA, latitudeB, longitudeB) => {
     return 'this is the last arrow, won\'t show any data';
   }
   return `${latitudeA}, ${longitudeA}, ${latitudeB}, ${longitudeB}`;
-}
+};
 
 // 取得最近一次規劃路線選擇的方式＆所需時間（e.g. 步行，五分鐘），顯示在箭頭旁
 export const getDirectionHistory = (tripName, day, id) => {
@@ -296,7 +297,7 @@ export const getDirectionHistory = (tripName, day, id) => {
   let directionList = data.dayTrack[day].directionList;
   let directionInfo = directionList[id];
   return directionInfo;
-}
+};
 
 // 再次點擊路線規劃按鈕，取得該路線上一次紀錄的交通方式顯示出來（e.g. 步行，但google direction動態生成，因此可能實際內容會有改變）
 
@@ -316,12 +317,12 @@ export const loadMap = (mapRegin, mapCenter, initMap, initMarker) => {
   let marker = new window.google.maps.Marker({
     map,
     visible: false
-  })
+  });
   initMarker(marker);
-}
+};
 
 // 顯示 marker
-export const showMarker = (position) => {
+export const showMarker = (marker, map, position) => {
   if(!marker.getVisible()) {
     map.setCenter(position);
     map.setZoom(14);
@@ -335,11 +336,11 @@ export const showMarker = (position) => {
       map.setZoom(14);
       marker.setPosition(position);
       marker.setVisible(true);
-    }, 500)
+    }, 500);
   }
-}
+};
 
 // 顯示 infoWindow
 export const showInfoWindow = () => {
 
-}
+};

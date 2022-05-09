@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext, createContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { setDayTrack, updateDayTrack } from '../../store/slice/tripSlice';
+import { setTrackId, fetchDayTrack, setDayTrack, updateDayTrack } from '../../store/slice/tripSlice';
 import { getTrackData, addToPinList } from '../../API';
 import { Loader } from '@googlemaps/js-api-loader';
 import { MapContext } from '../Trip/Trip';
@@ -9,68 +9,67 @@ import Tracks from '../Tracks/Tracks';
 import Notes from '../Notes/Notes';
 import Direction from '../Direction/Direction';
 import pinImg from '../../img/icons_google.png';
-import './MapContent.css';
+// import './MapContent.css';
 
-const MapContent = () => {
+export const MapContentContext = createContext();
+export const TrackContext = createContext();
+
+const MapContent = ({ tripInfo }) => {
   const [searchParams] = useSearchParams();
   const day = searchParams.get('day');
   const index = day ? day-1 : 0;
-  const tripData = useSelector(state => state.trip.tripData);
-  const trackId = useSelector(state => state.trip.trackId);
+  const trackId = tripInfo.trackId[index];
   const dispatch = useDispatch();
-  const mapRegin = useRef();
-  const [mapCenter, serMapCenter] = useState({ lat: 23.247797913420555, lng: 119.4327646617118 });
-  const [map, setMap] = useState(null);
-  const [marker, setMarker] = useState(null);
-  const [infoWindow, setInfoWindow] = useState(null);
+  const dayTrack = useSelector(state => state.trip);
+  // const [mapCenter, serMapCenter] = useState({ lat: 23.247797913420555, lng: 119.4327646617118 });
+  // const [map, setMap] = useState(null);
+  // const [marker, setMarker] = useState(null);
+  // const [infoWindow, setInfoWindow] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
-  // const value = useContext(MapContext);
-  // const map = value.map;
-  // const marker = value.marker;
-  // const infoWindow = value.infoWindow;
+  const [pinMarkerList, setPinMarkerList] = useState(null);
+  const [isNoteOpen, setIsNoteOpen] = useState(false);
+  const [isDirectionOpen, setIsDirectionOpen] = useState(false);
+  const [currentFocusNote, setCurrentFocusNote] = useState(null);
+  const [currentFocusDirection, setCurrentFocusDirection] = useState(null);
+  const value = useContext(MapContext);
+  const { map, marker, infoWindow } = value;
   
   useEffect(() => {
-    console.log(mapRegin)
-    const mapLoader = new Loader({
-      apiKey: process.env.REACT_GOOGLE_MAP_API_KEY,
-      libraries: ['places']
-    });
-    mapLoader.load().then(() => {
-      console.log('init')
-      let map = new google.maps.Map(mapRegin.current, {
-        mapId: '6fe2140f54e6c7b3',
-        mapTypeControl: false,
-        center: mapCenter,
-        zoom: 3
+    console.log('load')
+    dispatch(setTrackId(trackId));
+    dispatch(fetchDayTrack(trackId));
+    console.log('Now is in: ' , trackId)
+    if (pinMarkerList) {
+      let currentMarkerList = [...pinMarkerList];
+      currentMarkerList.forEach(marker => {
+        marker.setMap(null);
       });
-      let marker = new google.maps.Marker({
-        map: map,
-        visible: false
-      });
-      let infoWindow = new google.maps.InfoWindow();
-      setMap(map);
-      setMarker(marker);
-      setInfoWindow(infoWindow);
-    });
-  }, []);
+    }
+
+    // getTrackData(tripData.trackId[index])
+    //   .then(dayTrack => {
+    //     console.log('Now is in: ' ,tripData.trackId[index])
+    //     if (pinMarkerList) {
+    //       let currentMarkerList = [...pinMarkerList];
+    //       currentMarkerList.forEach(marker => {
+    //         marker.setMap(null);
+    //       });
+    //     }
+    //     showPinMarkers(dayTrack.pins);
+    //     // center 定在 dayTrack 儲存的狀態
+    //     // setCenter
+    //     dispatch(setDayTrack({
+    //       trackId: tripData.trackId[index],
+    //       dayTrack: dayTrack
+    //     }));
+    //   });
+  }, [trackId]);
 
   useEffect(() => {
-    if (map) {
-      console.log('load')
-      getTrackData(tripData.trackId[index])
-        .then(dayTrack => {
-          console.log('Now is in: ' ,tripData.trackId[index])
-          showPinMarkers(map, dayTrack.pins);
-          // center 定在 dayTrack 儲存的狀態
-          // setCenter
-          dispatch(setDayTrack({
-            trackId: tripData.trackId[index],
-            dayTrack: dayTrack
-          }));
-        });
+    if (dayTrack.pinList) {
+      showPinMarkers(dayTrack.pinList);
     }
-  });
-
+  }, [dayTrack.pinList]);
 
   useEffect(() => {
     if (marker) {
@@ -87,7 +86,7 @@ const MapContent = () => {
           }));
         }
         addBtn.addEventListener('click', () => {
-          addToPinList(trackId, placeInfo.name, placeInfo.geometry.location.lat(), placeInfo.geometry.location.lng(), renderNewDayTrack);
+          addToPinList(dayTrack.trackId, placeInfo.name, placeInfo.geometry.location.lat(), placeInfo.geometry.location.lng(), renderNewDayTrack);
           marker.setVisible(false);
           new google.maps.Marker({
             map: map,
@@ -102,15 +101,18 @@ const MapContent = () => {
     }
   }, [placeInfo]);
 
-  const showPinMarkers = (map, pinList) => {
+  const showPinMarkers = (pinList) => {
+    let markerList = [];
     pinList.forEach(pin => {
       const markerOptions = {
         map: map,
         position: pin.position,
         icon: pinImg
       }
-      new google.maps.Marker(markerOptions);
+      let marker = new google.maps.Marker(markerOptions);
+      markerList.push(marker);
     });
+    setPinMarkerList(markerList);
   }
 
   const showMarker = (position) => {
@@ -163,12 +165,22 @@ const MapContent = () => {
   }
 
   return (
-    <div className='map'>
-      <div>This is {tripData.tripName}'s Day{index+1} Map</div>
-      <Tracks map={map} showMarker={showMarker} setPlaceInfo={setPlaceInfo} />
-      <Notes />
-      <Direction />
-      <div className='map-region' ref={mapRegin}/>
+    <div>
+      <div>This is {tripInfo.tripName}'s Day{index+1} Map</div>
+      <MapContentContext.Provider value={{
+        isNoteOpen: isNoteOpen,
+        setIsNoteOpen: setIsNoteOpen,
+        isDirectionOpen: isDirectionOpen,
+        setIsDirectionOpen: setIsDirectionOpen,
+        currentFocusNote: currentFocusNote,
+        setCurrentFocusNote: setCurrentFocusNote,
+        currentFocusDirection: currentFocusDirection,
+        setCurrentFocusDirection: setCurrentFocusDirection
+      }}>
+        <Tracks showMarker={showMarker} setPlaceInfo={setPlaceInfo} />
+        <Notes />
+        <Direction />
+      </MapContentContext.Provider>
     </div>
   );
 }

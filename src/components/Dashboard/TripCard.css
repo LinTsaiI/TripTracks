@@ -47,3 +47,16 @@
   line-height: 40px;
   box-shadow: 1px 1px 4px rgb(0 0 0 / 30%);
 }
+
+.loading-icon {
+  width: 250px;
+  height: 250px;
+  text-align: center;
+  margin: 20px;
+  line-height: 250px;
+  background: #ffffff url('../../img/icons_loading.gif') no-repeat center center;
+}
+
+.display-none {
+  display: none;
+}

@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { MapContext } from '../Trip/Trip';
 import SearchBar from './searchBar';
 import Pin from './Pin';
 import './Tracks.css';
 
-const Tracks = ({ map, pinList, showMarker, setPlaceInfo }) => {
+const Tracks = ({ showMarker, setPlaceInfo }) => {
   const [input, setInput] = useState(null);
+  const value = useContext(MapContext);
+  const map = value.map;
   const placeReturnField = ['name', 'geometry', 'formatted_address', 'photos'];
   const autocompleteOptions = {
     fields: placeReturnField,
@@ -44,7 +47,7 @@ const Tracks = ({ map, pinList, showMarker, setPlaceInfo }) => {
   return (
     <div className='tracks-container'>
       <SearchBar onInputChange={setInput} onSearchClick={searchPlace}/>
-      <Pin pinList={pinList}/>
+      <Pin/>
     </div>
   )
 }

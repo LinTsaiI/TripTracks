@@ -1,23 +1,40 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { useParams, NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Days from './Days';
 import './TripHeader.css';
 
-const TripHeader = () => {
-  const tripData = useSelector(state => state.trip.tripData);
-  const tripName = tripData.tripName;
-  const startDate = tripData.startDate;
-  // const endDate = tripData.endDate;
+const TripHeader = ({ tripInfo }) => {
+  // const tripData = useSelector(state => state.trip.tripData);
+  const params = useParams();
+  const tripId = params.tripId;
+
+  const days = [];
+  for(let i = 0; i < tripInfo.duration; i++) {
+    days.push(
+      <NavLink
+        to={`/trip/${tripId}?day=${i+1}`}
+        key={i+1}
+        onClick={() => {
+          dispatch(savePreviousTrackState());
+          dispatch(hideNotes());
+          dispatch(hideDirection());
+        }}
+      >
+        <div className='header-plan-day'>Day{i+1}</div>
+      </NavLink>
+    );
+  }
   
   return (
     <div className='header'>
       <div className='header-plan'>
         <div className='style-flex'>
-          <div className='header-plan-place'>{tripName}</div>
-          <div className='header-plan-date'>{startDate}</div>
+          <div className='header-plan-place'>{tripInfo.tripName}</div>
+          <div className='header-plan-date'>{tripInfo.startDate}</div>
         </div>
-        <Days />
+        {days}
+        {/* <Days /> */}
       </div>
       <NavLink to='/dashboard'>
         <div className='header-avatar'>
