@@ -9,9 +9,9 @@ export const userSlice = createSlice({
     email: null
   },
   reducers: {
-    signIn: (state, actions) => {
-      let username = actions.payload.username;
-      let password = actions.payload.password;
+    signIn: (state, action) => {
+      let username = action.payload.username;
+      let password = action.payload.password;
       let result = userSignIn(username, password);
       if (result) {
         window.localStorage.setItem('isSignIn', true);
@@ -19,10 +19,10 @@ export const userSlice = createSlice({
         state.username = username;
       }
     },
-    signUp: (state, actions) => {
-      let username = actions.payload.username;
-      let email = actions.payload.email;
-      let password = actions.payload.password;
+    signUp: (state, action) => {
+      let username = action.payload.username;
+      let email = action.payload.email;
+      let password = action.payload.password;
       let result = userSignUp(username, email, password);
       if (result) {
         window.localStorage.setItem('isSignIn', true);
@@ -35,8 +35,8 @@ export const userSlice = createSlice({
       window.localStorage.removeItem('isSignIn');
       state.isSignIn = window.localStorage.getItem('isSignIn');
     },
-    setUser: (state, actions) => {
-      const { userId, username, email } = actions.payload;
+    setUser: (state, action) => {
+      const { userId, username, email } = action.payload;
       state.userId = userId;
       state.username = username;
       state.email = email;

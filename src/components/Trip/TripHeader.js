@@ -5,7 +5,6 @@ import Days from './Days';
 import './TripHeader.css';
 
 const TripHeader = ({ tripInfo }) => {
-  // const tripData = useSelector(state => state.trip.tripData);
   const params = useParams();
   const tripId = params.tripId;
   const dispatch = useDispatch();
@@ -27,7 +26,7 @@ const TripHeader = ({ tripInfo }) => {
       <div className='header-plan'>
         <div className='style-flex'>
           <div className='header-plan-place'>{tripInfo.tripName}</div>
-          <div className='header-plan-date'>{tripInfo.startDate}</div>
+          <div className='header-plan-day'>{tripInfo.startDate}</div>
         </div>
         <nav>
           {days}

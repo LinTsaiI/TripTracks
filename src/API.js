@@ -274,20 +274,28 @@ export const saveMapCenter = async (mapInfo) => {
 
 // 景點or路線筆記相關
 // 取得筆記內容
-export const getNotes = (tripName, day, id) => {
-  // fetch 資料庫，將該會員對應到 tripName, day, pin id的筆記內容抓出來
-  let data = getTripData(tripName);
-  let pinList = data.dayTrack[day].pinList;
-  let pinName = pinList[id].name;
-  let content = pinList[id].notes.content;
-  // 有取到回一個object，沒取到回null
-  return [pinName, content];
+export const getNotes = async (trackId, pinId) => {
+  try {
+    const condition = query(doc(db, 'tracks', trackId), where('id', '==', pinId));
+  const querySnapshot = await getDocs(condition);  } catch (err) {
+    console.log('Error getting notes', err);
+  }
 };
 // 更新筆記內容
-export const saveNotes = () => {
-
+export const saveNotes = async (notesInfo) => {
+  const { trackId, targetIndex, notes } = notesInfo;
+  try {
+    await updateDoc(doc(db, 'tracks', trackId), {
+      pins: arrayUnion({
+        notes: ''
+      })
+    });
+    const newTrackSnap = await getDoc(doc(db, 'tracks', pinInfo.trackId));
+    return newTrackSnap.data().pins;
+  } catch (err) {
+    console.log('Error updating notes', err);
+  }
 };
-
 
 // 路線規劃相關
 // 初次生成箭頭，自動產生最佳的路線選擇，回傳方式(用來顯示對應的icon)及所需時間

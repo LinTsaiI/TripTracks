@@ -26,13 +26,6 @@
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
 }
 
-.header-plan-day {
-  font-size: 24px;
-  color: #F8F5F2;
-  font-weight: bold;
-  text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
-}
-
 .header-avatar-circle {
   width: 80px;
   height: 80px;
@@ -50,7 +43,7 @@
 .header-plan-day {
   display: inline-flex;
   margin: 0 10px;
-  font-size: 24px;
+  font-size: 20px;
   color: #F8F5F2;
   font-weight: bold;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);

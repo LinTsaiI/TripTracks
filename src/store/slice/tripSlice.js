@@ -24,10 +24,9 @@ export const updateMapCenter = createAsyncThunk('trip/updateMapCenter', async (m
 export const tripSlice = createSlice({
   name: 'trip',
   initialState: {
-    // tripData: null,
     trackId: null,
-    mapCenter: { lat: 23.247797913420555, lng: 119.4327646617118 },
-    zoom: 3,
+    mapCenter: null,
+    zoom: null,
     pinList: null,
     directions: null
   },
@@ -36,21 +35,18 @@ export const tripSlice = createSlice({
       console.log(action.payload);
       state.trackId = action.payload;
     },
-    // setTripData: (state, actions) => {
-    //   let tripData = actions.payload.tripData;
-    //   state.tripData = tripData;
-    // },
-    setDayTrack: (state, actions) => {
-      let trackId = actions.payload.trackId;
-      let dayTrack = actions.payload.dayTrack;
-      state.trackId = trackId;
-      state.dayTrack = dayTrack;
+    initTrackDate: (state, action) => {
+      const { mapCenter, zoom, pins, directions } = action.payload;
+      if (mapCenter && zoom) {
+        state.mapCenter = mapCenter;
+        state.zoom = zoom;
+      } else {
+        state.mapCenter = { lat: 23.247797913420555, lng: 119.4327646617118 };
+        state.zoom = 3;
+      }
+      state.pinList = pins;
+      state.directions = directions;
     },
-    // updateDayTrack: (state, actions) => {
-    //   let dayTrack = actions.payload.dayTrack;
-    //   state.dayTrack = dayTrack;
-    // },
-    // 切換不同天的行程時，需將上一個行程的狀態 e.g. mapCenter 記錄下來並更新到資料庫
     savePreviousTrackState: (state, actions) => {
       console.log('save previous dayTrack state, target: ', state.trackId);
     },
@@ -62,13 +58,14 @@ export const tripSlice = createSlice({
         // state.status = 'loading'
       })
       .addCase(fetchDayTrack.fulfilled, (state, action) => {
-        console.log('success');
+        console.log('dayTrack data fetch success');
         console.log(action.payload);
-        if (action.payload.mapCenter) {
+        if (action.payload.mapCenter && action.payload.zoom) {
           state.mapCenter = action.payload.mapCenter;
-        }
-        if (action.payload.zoom) {
           state.zoom = action.payload.zoom;
+        } else {
+          state.mapCenter = { lat: 23.247797913420555, lng: 119.4327646617118 };
+          state.zoom = 3;
         }
         state.pinList = action.payload.pins;
         state.directions = action.payload.directions;
@@ -98,8 +95,5 @@ export const tripSlice = createSlice({
   }
 });
 
-export const { setTrackId, setTripData, setDayTrack, updateDayTrack, savePreviousTrackState } = tripSlice.actions;
+export const { setTrackId, initTrackDate, savePreviousTrackState } = tripSlice.actions;
 export default tripSlice.reducer;
-
-
-// Trip 中的 tripData 要視 params 動態由 getTripData() 取得，是否可以集中在 store 管理？

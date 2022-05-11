@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { MapContentContext } from '../MapContent/MapContent';
+import { TripContext } from '../Trip/Trip';
 import { switchDirection, getDirectionChoice } from '../../store/slice/directionSlice';
 import { hideNotes } from '../../store/slice/notesSlice';
 import './Arrow.css';
@@ -8,7 +8,7 @@ import './Arrow.css';
 const Arrow = ({ index }) => {
   const dispatch = useDispatch();
   const pinList = useSelector(state => state.trip.pinList);
-  const value = useContext(MapContentContext);
+  const value = useContext(TripContext);
   const { setIsNoteOpen, setIsDirectionOpen, currentFocusDirection, setCurrentFocusDirection } = value;
 
   let arrowClassName;

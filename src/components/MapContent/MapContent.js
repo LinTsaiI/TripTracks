@@ -11,7 +11,6 @@ import pinImg from '../../img/icons_google.png';
 // import './MapContent.css';
 
 export const MapContentContext = createContext();
-export const TrackContext = createContext();
 
 const MapContent = () => {
   const tripInfo = useOutletContext();
@@ -36,10 +35,9 @@ const MapContent = () => {
   const { map, marker, infoWindow } = value;
   
   useEffect(() => {
-    console.log('load')
+    console.log('track data load, now is in: ', trackId);
     dispatch(setTrackId(trackId));
     dispatch(fetchDayTrack(trackId));
-    console.log('Now is in: ' , trackId)
     if (pinMarkerList) {
       let currentMarkerList = [...pinMarkerList];
       currentMarkerList.forEach(marker => {
@@ -50,7 +48,17 @@ const MapContent = () => {
 
   useEffect(() => {
     if (dayTrack.pinList) {
-      showPinMarkers(dayTrack.pinList);
+      let markerList = [];
+      dayTrack.pinList.forEach(pin => {
+      const markerOptions = {
+        map: map,
+        position: pin.position,
+        icon: pinImg
+      }
+      let marker = new google.maps.Marker(markerOptions);
+      markerList.push(marker);
+    });
+      setPinMarkerList(markerList);
     }
   }, [dayTrack.pinList]);
 
@@ -62,12 +70,6 @@ const MapContent = () => {
       closeInfoWindow();
       let infoWindowListener = infoWindow.addListener('domready', () => {
         const addBtn = document.getElementById('addBtn');
-        // const renderNewDayTrack = (newDayTrack) => {
-        //   addBtn.disabled = true;
-        //   dispatch(updateDayTrack({
-        //     dayTrack: newDayTrack
-        //   }));
-        // }
         addBtn.addEventListener('click', () => {
           dispatch(addNewPin({
             trackId: trackId,
@@ -102,20 +104,6 @@ const MapContent = () => {
       }));
     }
   }, [location]);
-
-  const showPinMarkers = (pinList) => {
-    let markerList = [];
-    pinList.forEach(pin => {
-      const markerOptions = {
-        map: map,
-        position: pin.position,
-        icon: pinImg
-      }
-      let marker = new google.maps.Marker(markerOptions);
-      markerList.push(marker);
-    });
-    setPinMarkerList(markerList);
-  }
 
   const showMarker = (position) => {
     if(!marker.getVisible()) {
