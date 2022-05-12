@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import Days from './Days';
 import './TripHeader.css';
 
 const TripHeader = ({ tripInfo }) => {
@@ -31,7 +30,6 @@ const TripHeader = ({ tripInfo }) => {
         <nav>
           {days}
         </nav>
-        {/* <Days /> */}
       </div>
       <Link to='/dashboard'>
         <div className='header-avatar'>

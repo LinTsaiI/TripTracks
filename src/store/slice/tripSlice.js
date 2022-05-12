@@ -7,13 +7,13 @@ export const fetchDayTrack = createAsyncThunk('trip/fetchDayTrack', async (track
 });
 
 export const addNewPin = createAsyncThunk('trip/addNewPin', async (pinInfo) => {
-  const newPinList = await addToPinList(pinInfo);
-  return newPinList;
+  const newPin = await addToPinList(pinInfo);
+  return newPin;
 });
 
 export const deletePin = createAsyncThunk('trip/deletePin', async (pinInfo) => {
-  const newPinList = await deleteSelectedPin(pinInfo);
-  return newPinList;
+  const deleteTarget = await deleteSelectedPin(pinInfo);
+  return deleteTarget;
 });
 
 export const updateMapCenter = createAsyncThunk('trip/updateMapCenter', async (mapInfo) => {
@@ -27,8 +27,9 @@ export const tripSlice = createSlice({
     trackId: null,
     mapCenter: null,
     zoom: null,
-    pinList: null,
-    directions: null
+    pinId: [],
+    pinList: [],
+    directions: []
   },
   reducers: {
     setTrackId: (state, action) => {
@@ -36,7 +37,7 @@ export const tripSlice = createSlice({
       state.trackId = action.payload;
     },
     initTrackDate: (state, action) => {
-      const { mapCenter, zoom, pins, directions } = action.payload;
+      const { mapCenter, zoom, pinId, pinList, directions } = action.payload;
       if (mapCenter && zoom) {
         state.mapCenter = mapCenter;
         state.zoom = zoom;
@@ -44,7 +45,8 @@ export const tripSlice = createSlice({
         state.mapCenter = { lat: 23.247797913420555, lng: 119.4327646617118 };
         state.zoom = 3;
       }
-      state.pinList = pins;
+      state.pinId = pinId
+      state.pinList = pinList;
       state.directions = directions;
     },
     savePreviousTrackState: (state, actions) => {
@@ -59,30 +61,34 @@ export const tripSlice = createSlice({
       })
       .addCase(fetchDayTrack.fulfilled, (state, action) => {
         console.log('dayTrack data fetch success');
+        const { mapCenter, zoom, pinId, pinList, directions } = action.payload;
         console.log(action.payload);
-        if (action.payload.mapCenter && action.payload.zoom) {
-          state.mapCenter = action.payload.mapCenter;
-          state.zoom = action.payload.zoom;
+        if (mapCenter && zoom) {
+          state.mapCenter = mapCenter;
+          state.zoom = zoom;
         } else {
           state.mapCenter = { lat: 23.247797913420555, lng: 119.4327646617118 };
           state.zoom = 3;
         }
-        state.pinList = action.payload.pins;
-        state.directions = action.payload.directions;
+        state.pinId = pinId;
+        state.pinList = pinList;
+        state.directions = directions;
       })
       .addCase(addNewPin.pending, (state, action) => {
         console.log('add new pin pending');
       })
       .addCase(addNewPin.fulfilled, (state, action) => {
-        console.log(action.payload);
-        state.pinList = action.payload;
+        const { pinId, pinContent } = action.payload;
+        state.pinId.push(pinId);
+        state.pinList.push(pinContent);
       })
       .addCase(deletePin.pending, (state, action) => {
         console.log('delete pin pending');
       })
       .addCase(deletePin.fulfilled, (state, action) => {
-        console.log(action.payload);
-        state.pinList = action.payload;
+        const { newPinIdList, targetIndex } = action.payload;
+        state.pinId = newPinIdList;
+        state.pinList.splice(targetIndex, 1);
       })
       .addCase(updateMapCenter.pending, (state, action) => {
         console.log('save map center pending');

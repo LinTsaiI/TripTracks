@@ -6,7 +6,7 @@ import Pin from './Pin';
 import pinImg from '../../img/icons_google.png';
 import './Tracks.css';
 
-const Tracks = () => {
+const Tracks = ({ setFocusInfoWindow }) => {
   const [input, setInput] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
   const trackId = useSelector(state => state.trip.trackId);
@@ -57,13 +57,9 @@ const Tracks = () => {
           setIsNoteOpen(false);
           setIsDirectionOpen(false);
           marker.setVisible(false);
-          // new google.maps.Marker({
-          //   map: map,
-          //   position: placeInfo.geometry.location,
-          //   icon: pinImg
-          // });
         });
       });
+      setFocusInfoWindow(infoWindowListener);
       return () => {
         google.maps.event.removeListener(infoWindowListener);
       }

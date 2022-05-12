@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { TripContext } from '../Trip/Trip';
 import { switchDirection, getDirectionChoice } from '../../store/slice/directionSlice';
-import { hideNotes } from '../../store/slice/notesSlice';
 import './Arrow.css';
 
 const Arrow = ({ index }) => {
