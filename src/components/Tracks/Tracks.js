@@ -66,7 +66,7 @@ const Tracks = ({ tripInfo }) => {
         <div className='trip-date'>
           {date}
         </div>
-        <Pin/>
+        <Pin />
       </div>
     </div>
   );

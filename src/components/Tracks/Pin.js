@@ -12,9 +12,10 @@ const Pin = () => {
   const mapValue = useContext(MapContext);
   const { map, infoWindow } = mapValue;
   const tripValue = useContext(TripContext);
-  const { setIsNoteOpen, setIsDirectionOpen, currentFocusNote, setCurrentFocusNote, pinMarkerList } = tripValue;
+  const { setIsNoteOpen, setIsDirectionOpen, currentFocusNote, setCurrentFocusNote, pinMarkerList, setFocusInfoWindow } = tripValue;
 
   const switchToPin = (e) => {
+    setFocusInfoWindow(null);
     const index = e.target.id;
     map.panTo(dayTrack.pinList[index].position);
     infoWindow.setContent(`

@@ -6,3 +6,9 @@
   height: calc(100vh - 40px);
   width: calc(100vw - 360px);
 }
+
+.marker-label {
+  position: absolute;
+  top: 38px;
+  left: -4px;
+}

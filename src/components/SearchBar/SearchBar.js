@@ -98,9 +98,9 @@ const SearchBar = ({ setFocusInfoWindow }) => {
             <h2>${placeInfo.name}</h2>
             <h5>${placeInfo.formatted_address}</h5>
           </div>
-          <div style='width: 40%; margin: 0 0 10px 10px; background: #ffffff url("${placeInfo.photos[0].getUrl()}") no-repeat center center; background-size: cover'></div>
+          <div style='width: 40%; margin: 10px; background: #ffffff url("${placeInfo.photos[0].getUrl()}") no-repeat center center; background-size: cover'></div>
         </div>
-        <img id='addBtn' src=${pinImg} title='Add to Itinerary' style='float: right; width: 25px; height: 25px; margin: 0 10px; cursor: pointer;'/>
+        <img id='addBtn' src=${pinImg} style='float: right; width: 28px; height: 28px; margin: 0 10px; cursor: pointer;'/>
       </div>
     `);
     infoWindow.open({

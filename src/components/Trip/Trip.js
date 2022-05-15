@@ -9,10 +9,10 @@ import SearchBar from '../searchBar/searchBar';
 import Notes from '../Notes/Notes';
 import Direction from '../Direction/Direction';
 import Footer from '../Footer/Footer';
-import markerImg from '../../img/icons_marker.png';
+import markerImg from '../../img/icons_marker_2.png';
 import './Trip.css';
 import trashCanIcon from '../../img/icons_trashcan.png';
-import searchMarker from '../../img/icons_searchMarker.png';
+import searchMarker from '../../img/icons_searchMarker_2.png';
 
 export const TripContext = createContext();
 export const MapContext = createContext();
@@ -73,11 +73,17 @@ const Trip = () => {
           setInfoWindow(infoWindow);
           let markerList = [];
           let latLngList = [];
-          trackData.pinList.forEach(pin => {
+          trackData.pinList.forEach((pin, index) => {
             const markerOptions = {
               map: map,
               position: pin.position,
-              icon: markerImg
+              icon: markerImg,
+              label: {
+                text: (index+1).toString(),
+                className: 'marker-label',
+                color: 'grey',
+                fontWeight: 'bold'
+              }
             }
             let marker = new google.maps.Marker(markerOptions);
             markerList.push(marker);
@@ -159,11 +165,17 @@ const Trip = () => {
       }
       let markerList = [];
       let latLngList = [];
-      dayTrack.pinList.forEach(pin => {
+      dayTrack.pinList.forEach((pin, index) => {
         const markerOptions = {
           map: map,
           position: pin.position,
-          icon: markerImg
+          icon: markerImg,
+          label: {
+            text: (index+1).toString(),
+            className: 'marker-label',
+            color: 'grey',
+            fontWeight: 'bold'
+          }
         }
         let marker = new google.maps.Marker(markerOptions);
         markerList.push(marker);
@@ -243,9 +255,10 @@ const Trip = () => {
           currentFocusDirection: currentFocusDirection,
           setCurrentFocusDirection: setCurrentFocusDirection,
           pinMarkerList: pinMarkerList,
-          setPinMarkerList: setPinMarkerList
+          setPinMarkerList: setPinMarkerList,
+          setFocusInfoWindow: setFocusInfoWindow
         }}>
-          <Tracks tripInfo={tripInfo} />
+          <Tracks tripInfo={tripInfo} setFocusInfoWindow={setFocusInfoWindow} />
           <SearchBar setFocusInfoWindow={setFocusInfoWindow} />
           <Notes />
           <Direction />
