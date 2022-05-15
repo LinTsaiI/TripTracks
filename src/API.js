@@ -220,17 +220,13 @@ export const deleteSelectedPin = async (pinInfo) => {
 
 // 紀錄目前的 mapCenter & zoom
 export const saveMap = async (mapInfo) => {
-  const { trackId, lat, lng, zoom } = mapInfo;
+  const { tripId, trackId, lat, lng, zoom } = mapInfo;
+  console.log('save map, target: ', trackId);
   try {
-    await updateDoc(doc(db, 'tracks', trackId), {
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
       mapCenter: { lat: lat, lng: lng },
       zoom: zoom
     });
-    const newTrackData = await getDoc(doc(db, 'tracks', trackId));
-    return {
-      mapCenter: newTrackData.data().mapCenter,
-      zoom: newTrackData.data().zoom
-    };
   } catch (err) {
     console.log('Error saving mapCenter', err);
   }

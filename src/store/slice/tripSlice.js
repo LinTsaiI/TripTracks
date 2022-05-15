@@ -48,6 +48,9 @@ export const tripSlice = createSlice({
       state.pinIds = pinIds;
       state.pinList = pinList;
       state.directions = directions;
+    },
+    clearPinList: (state) => {
+      state.pinList = [];
     }
   },
   extraReducers: builder => {
@@ -89,14 +92,8 @@ export const tripSlice = createSlice({
         state.pinIds = newPinIds;
         state.pinList = newPinList;
       })
-      .addCase(updateMapCenter.pending, (state, action) => {
-        console.log('save map center pending');
-      })
-      .addCase(updateMapCenter.fulfilled, (state, action) => {
-        console.log('save map center success', action.payload);
-      })
   }
 });
 
-export const { initTrackData } = tripSlice.actions;
+export const { initTrackData, clearPinList } = tripSlice.actions;
 export default tripSlice.reducer;

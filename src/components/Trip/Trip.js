@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
-import { fetchDayTrack, initTrackData, updateMapCenter, deletePin } from '../../store/slice/tripSlice';
+import { fetchDayTrack, initTrackData, clearPinList, deletePin } from '../../store/slice/tripSlice';
 import { getTripData, getTrackData, saveMap } from '../../API';
 import Tracks from '../Tracks/Tracks';
 import SearchBar from '../searchBar/searchBar';
@@ -31,6 +31,8 @@ const Trip = () => {
   const [marker, setMarker] = useState(null);
   const [infoWindow, setInfoWindow] = useState(null);
   const [pinMarkerList, setPinMarkerList] = useState([]);
+  const [pinLatLng, setPinLatLng] = useState([]);
+  const [path, setPath] = useState(null);
   const [focusInfoWindow, setFocusInfoWindow] = useState(null);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [isDirectionOpen, setIsDirectionOpen] = useState(false);
@@ -70,6 +72,7 @@ const Trip = () => {
           setMarker(marker);
           setInfoWindow(infoWindow);
           let markerList = [];
+          let latLngList = [];
           trackData.pinList.forEach(pin => {
             const markerOptions = {
               map: map,
@@ -78,16 +81,48 @@ const Trip = () => {
             }
             let marker = new google.maps.Marker(markerOptions);
             markerList.push(marker);
+            latLngList.push(pin.position)
           });
           setPinMarkerList(markerList);
+          setPinLatLng(latLngList);
         });
       });
   }, []);
 
   useEffect(() => {
+    if (pinLatLng && map) {
+      const pinPath = new google.maps.Polyline({
+        path: pinLatLng,
+        geodesic: true,
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.5,
+        strokeWeight: 3,
+      });
+      setPath(pinPath);
+      pinPath.setMap(map);
+    }
+  }, [pinLatLng]);
+
+  useEffect(() => {
+    if (map) {
+      return () => {
+        dispatch(clearPinList());
+      }
+    }
+  }, [map]);
+
+  useEffect(() => {
     if (tripInfo) {
-      dispatch(updateMapCenter());
-      console.log('fetch different dayTrack');
+      const mapCenter = map.getCenter();
+      const zoom = map.getZoom();
+      saveMap({
+        tripId: tripId,
+        trackId: dayTrack.trackId,
+        lat: mapCenter.lat(),
+        lng: mapCenter.lng(),
+        zoom: zoom
+      });
+      path.setMap(null);
       if (pinMarkerList) {
         let currentMarkerList = [...pinMarkerList];
         currentMarkerList.forEach(marker => {
@@ -97,7 +132,7 @@ const Trip = () => {
       }
       dispatch(fetchDayTrack({
         tripId: tripId,
-        trackIndex: trackIndex
+        trackIndex: trackIndex,
       }));
       setIsNoteOpen(false);
       setCurrentFocusNote(null);
@@ -115,6 +150,7 @@ const Trip = () => {
 
   useEffect(() => {
     if (map && dayTrack.pinList) {
+      path.setMap(null);
       if (pinMarkerList) {
         let currentMarkerList = [...pinMarkerList];
         currentMarkerList.forEach(marker => {
@@ -122,6 +158,7 @@ const Trip = () => {
         });
       }
       let markerList = [];
+      let latLngList = [];
       dayTrack.pinList.forEach(pin => {
         const markerOptions = {
           map: map,
@@ -130,8 +167,10 @@ const Trip = () => {
         }
         let marker = new google.maps.Marker(markerOptions);
         markerList.push(marker);
+        latLngList.push(pin.position);
       });
       setPinMarkerList(markerList);
+      setPinLatLng(latLngList);
     }
   }, [dayTrack.pinList]);
 
