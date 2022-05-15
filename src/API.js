@@ -1,6 +1,6 @@
 import { auth, db, provider } from './firebase';
 import { sendSignInLinkToEmail, signInWithPopup  } from 'firebase/auth';
-import { setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, getDocs, query, where, deleteDoc } from 'firebase/firestore';
+import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, getDocs, query, where, deleteDoc } from 'firebase/firestore';
 
 
 // 使用者身份相關（進入每個頁面都要驗證身份）
@@ -47,7 +47,7 @@ export const creatUserIfNew = async (userId, username, email) => {
           tripId: [],
           FirstEntryTime: serverTimestamp()
         });
-        console.log('create');
+        console.log('create user successfully');
       } catch (err) {
         console.error('Error adding document: ', err);
       }
@@ -59,52 +59,59 @@ export const creatUserIfNew = async (userId, username, email) => {
 
 
 // 行程資訊相關
-// 點擊 start to plan 新增行程，將 tripName, startDate, duration 加入資料庫
-export const createNewTrip = async (userId, tripName, startDate, duration, setTripId, setCreateStatus) => {
+// 點擊 start to plan 新增空白行程
+export const createNewTrip = async (newTrip) => {
+  const { userId, tripName, startDate, endDate } = newTrip;
   try {
     const docRef = await addDoc(collection(db, 'trips'), {
       userId: userId,
       tripName: tripName,
       startDate: startDate,
-      duration: duration,
-      trackId: []
+      endDate: endDate,
     });
     if (docRef.id) {
       updateDoc(doc(db, 'user', userId), {
         tripId: arrayUnion(docRef.id)
       });
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const duration = (end - start)/(1000 * 3600 * 24) + 1;
+      for (let i = 0; i < duration; i++) {
+        await addDoc(collection(db, 'trips', docRef.id, 'tracks'), {
+          mapCenter: {lat: 0, lng: 0},
+          zoom: 0,
+        });
+      }
+      return docRef.id;
     }
-    createNewTrack(userId, docRef.id, duration);
-    setTripId(docRef.id);
-    setCreateStatus(true);
   } catch (err) {
-    console.log('Error adding document: ', err);
+    console.log('Error creating new trip: ', err);
   }
 };
 
 // 建立新 trip，同時依天數建立空的 track 文件
-export const createNewTrack = async (userId, tripId, duration) => {
-  try {
-    const docContent = {
-      userId: userId,
-      tripId: tripId,
-      mapCenter: {lat: 0, lng: 0},
-      zoom: 0,
-      pins: [],
-      directions: []
-    };
-    for (let i = 0; i < duration; i++) {
-      const docRef = await addDoc(collection(db, 'tracks'), docContent);
-      if (docRef.id) {
-        updateDoc(doc(db, 'trips', tripId), {
-          trackId: arrayUnion(docRef.id)
-        });
-      }
-    }
-  } catch (err) {
-    console.log('Error adding document: ', err);
-  }
-};
+// export const createNewTrack = async (userId, tripId, duration) => {
+//   try {
+//     const docContent = {
+//       userId: userId,
+//       tripId: tripId,
+//       mapCenter: {lat: 0, lng: 0},
+//       zoom: 0,
+//       pins: [],
+//       directions: []
+//     };
+//     for (let i = 0; i < duration; i++) {
+//       const docRef = await addDoc(collection(db, 'tracks'), docContent);
+//       if (docRef.id) {
+//         updateDoc(doc(db, 'trips', tripId), {
+//           trackId: arrayUnion(docRef.id)
+//         });
+//       }
+//     }
+//   } catch (err) {
+//     console.log('Error adding document: ', err);
+//   }
+// };
 
 // 取得使用者已建立的所有行程，用以在 Dashboard 顯示行程名稱/日期區間
 export const getTripList = async (userId) => {
@@ -112,12 +119,11 @@ export const getTripList = async (userId) => {
   const querySnapshot = await getDocs(condition);
   let tripList = [];
   querySnapshot.forEach(doc => {
-    // doc.data() is never undefined for query doc snapshots
     let trip = {
       tripId: doc.id,
       tripName: doc.data().tripName,
       startDate: doc.data().startDate,
-      duration: doc.data().duration
+      endDate: doc.data().endDate
     };
     tripList.push(trip);
   });
@@ -138,71 +144,55 @@ export const getTripData = async (tripId) => {
 };
 
 // 進入 /trip/tripId?day= 頁面，載入該天的景點list/地圖上的marker位置
-export const getTrackData = async (trackId) => {
+export const getTrackData = async (tripId, trackIndex) => {
   try {
-    const trackSnap = await getDoc(doc(db, 'tracks', trackId));
-    if (trackSnap.exists()) {
-      const condition = query(collection(db, 'pins'), where('trackId', '==', trackId));
-      let pinList = []
-      const querySnapshot = await getDocs(condition);
-      querySnapshot.forEach(pinDoc => {
-        pinList.push(pinDoc.data());
-      });
-      return {
-        mapCenter: trackSnap.data().mapCenter,
-        zoom: trackSnap.data().zoom,
-        pinId: trackSnap.data().pins,
-        pinList: pinList,
-        directions: trackSnap.data().directions
-      }
+    const trackSnap = await getDocs(collection(db, 'trips', tripId, 'tracks'));
+    const trackIds = [];
+    const trackInfos = [];
+    trackSnap.forEach(track => {
+      trackIds.push(track.id);
+      trackInfos.push(track.data());
+    });
+    const targetTrackId = trackIds[trackIndex];
+    const { mapCenter, zoom } = trackInfos[trackIndex];
+    const pinSnap = await getDocs(collection(db, 'trips', tripId, 'tracks', targetTrackId, 'pins'));
+    let pinIds = [];
+    let pinList = [];
+    pinSnap.forEach(pin => {
+      pinIds.push(pin.id);
+      pinList.push(pin.data());
+    });
+    const directionSnap = await getDocs(collection(db, 'trips', tripId, 'tracks', targetTrackId, 'directions'));
+    let directions = [];
+    directionSnap.forEach(direction => directions.push(direction.data()));
+    return {
+      tripId: tripId,
+      trackId: targetTrackId,
+      mapCenter: mapCenter,
+      zoom: zoom,
+      pinIds: pinIds,
+      pinList: pinList,
+      directions: directions
     }
   } catch (err) {
     console.log('Error getting document: ', err);
   }
 };
 
-// 取得 track 對應的 pins
-export const getPinData = async (pinId) => {
-  try {
-    const pinSnap = await getDoc(doc(db, 'pins', pinId));
-    if (pinSnap.exists()) {
-      return pinSnap.data();
-    }
-  } catch (err) {
-    console.log('Error getting pin data: ', err);
-  }
-}
-
-// 取得 track 對應的 directions
-// export const getDirectionData = async (directionId) => {
-//   try{
-//     const directionSnap = await get(doc(db, 'directions', directionId));
-//     if (directionSnap.exists()) {
-//       return directionSnap.data();
-//     }
-//   } catch (err) {
-//     console.log('Error getting direction data: ', err);
-//   }
-// }
-
 // 將景點加入 pinList
 export const addToPinList = async (pinInfo) => {
-  const { trackId, placeName, lat, lng, address, photo } = pinInfo;
+  const { tripId, trackId, placeName, lat, lng, address, photo } = pinInfo;
   try {
     const pinContent = {
-      trackId: trackId,
       name: placeName,
       position: { lat: lat, lng: lng },
       address: address,
       photo: photo,
       notes: ''
     }
-    const docRef = await addDoc(collection(db, 'pins'), pinContent);
-    if (docRef.id) {
-      updateDoc(doc(db, 'tracks', trackId), {
-        pins: arrayUnion(docRef.id)
-      });
-      return { pinId: docRef.id, pinContent: pinContent};
+    const pinDocRef = await addDoc(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), pinContent);
+    if (pinDocRef.id) {
+      return { pinId: pinDocRef.id, pinContent: pinContent };
     }
   } catch (err) {
     console.log('Error updating pinList', err);
@@ -212,24 +202,24 @@ export const addToPinList = async (pinInfo) => {
 // 刪除指定的Pin
 export const deleteSelectedPin = async (pinInfo) => {
   console.log(pinInfo)
-  const { trackId, pinId, targetIndex } = pinInfo;
+  const { tripId, trackId, pinId } = pinInfo;
   try {
-    await deleteDoc(doc(db, 'pins', pinId));
-    const trackSnap = await getDoc(doc(db, 'tracks', trackId));
-    const pinIdList = trackSnap.data().pins;
-    const newPinIdList = pinIdList.filter(item => item != pinId);
-    console.log(newPinIdList)
-    await updateDoc(doc(db, 'tracks', trackId), {
-      pins: newPinIdList
+    await deleteDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId));
+    const pinSnap = await getDocs(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'));
+    let newPinIds = [];
+    let newPinList = [];
+    pinSnap.forEach(pin => {
+      newPinIds.push(pin.id);
+      newPinList.push(pin.data());
     });
-    return { newPinIdList: newPinIdList, targetIndex: targetIndex };
+    return { newPinIds: newPinIds, newPinList: newPinList };
   } catch (err) {
     console.log('Error updating pinList', err);
   }
 };
 
-// 紀錄目前的 mapCenter
-export const saveMapCenter = async (mapInfo) => {
+// 紀錄目前的 mapCenter & zoom
+export const saveMap = async (mapInfo) => {
   const { trackId, lat, lng, zoom } = mapInfo;
   try {
     await updateDoc(doc(db, 'tracks', trackId), {
@@ -248,9 +238,10 @@ export const saveMapCenter = async (mapInfo) => {
 
 // 景點or路線筆記相關
 // 取得筆記內容
-export const getNotes = async (pinId) => {
+export const getNotes = async (targetNotes) => {
+  const { tripId, trackId, pinId } = targetNotes;
   try {
-    const pinSnap = await getDoc(doc(db, 'pins', pinId));
+    const pinSnap = await getDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId));
     if (pinSnap.exists()) {
       return pinSnap.data().notes;
     }
@@ -259,9 +250,10 @@ export const getNotes = async (pinId) => {
   }
 };
 // 更新筆記內容
-export const saveNotes = async (pinId, notes) => {
+export const saveNotes = async (notesInfo) => {
+  const { tripId, trackId, pinId, notes } = notesInfo;
   try {
-    await updateDoc(doc(db, 'pins', pinId), {
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId), {
       notes: notes
     });
   } catch (err) {

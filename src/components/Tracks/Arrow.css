@@ -1,9 +1,11 @@
 .arrow {
-  display: inline-flex;
-  margin: 0 15px;
-  cursor: pointer;
+  margin: 0 auto 0 10px;
 }
 
 .arrow-display-none {
   display: none;
+}
+
+.path-icon {
+  cursor: pointer;
 }

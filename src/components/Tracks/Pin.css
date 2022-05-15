@@ -1,21 +1,66 @@
-.pin-container {
-  display: inline-flex;
-  width: 100%;
-  padding: 5px 10px;
-  margin: 5px 0;
-  border-radius: 5px;
+.pin-collection {
+  width: 310px;
+  padding: 10px 0 20px 0;
+  margin-bottom: 40px;
+  overflow-y: auto;
 }
 
-.pin-container:hover {
-  box-shadow: 2px 2px 8px rgb(0 0 0 / 20%);
-  cursor: pointer;
+.pin-block {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.pin-block:hover {
+  cursor: grab;
 }
 
 .pin-name {
   height: 100%;
   width: 100%;
-  padding: 0 10px;
-  white-space: nowrap;
+  border-radius: 10px;
+  padding: 10px;
+  margin-right: 10px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  color: #212529;
+  background-color: #F8F5F2;
+  cursor: pointer;
+}
+
+.pin-name:hover {
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
+}
+
+.pin-btns {
+  display: flex;
+}
+
+.notes-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  background: #819DB8 url('../../img/icons_note.png') no-repeat center center;
+  background-size: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.notes-btn:hover {
+  background-size: 22px;
+}
+
+.delete-btn {
+  width: 28px;
+  height: 28px;
+  background: url('../../img/icons_trashcan.png') no-repeat center center;
+  background-size: 25px;
+  opacity: 0.6;
+  border: none;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  opacity: 1;
 }

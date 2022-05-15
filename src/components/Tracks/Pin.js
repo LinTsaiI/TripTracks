@@ -1,17 +1,41 @@
 import React, { useEffect, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deletePin } from '../../store/slice/tripSlice';
-import { TripContext } from '../Trip/Trip';
+import { MapContext, TripContext } from '../Trip/Trip';
 import Arrow from './Arrow';
 import './Pin.css';
+import trashCanIcon from '../../img/icons_trashcan.png';
 
 const Pin = () => {
   const dispatch = useDispatch();
-  const pinList = useSelector(state => state.trip.pinList);
-  const trackId = useSelector(state => state.trip.trackId);
-  const pinId = useSelector(state => state.trip.pinId);
-  const value = useContext(TripContext);
-  const { setIsNoteOpen, setIsDirectionOpen, currentFocusNote, setCurrentFocusNote, pinMarkerList } = value;
+  const dayTrack = useSelector(state => state.trip);
+  const mapValue = useContext(MapContext);
+  const { map, infoWindow } = mapValue;
+  const tripValue = useContext(TripContext);
+  const { setIsNoteOpen, setIsDirectionOpen, currentFocusNote, setCurrentFocusNote, pinMarkerList } = tripValue;
+
+  const switchToPin = (e) => {
+    const index = e.target.id;
+    map.panTo(dayTrack.pinList[index].position);
+    infoWindow.setContent(`
+      <div style='width: 300px'>
+        <div style='width: 100%; display: flex'>
+          <div style='width: 60%'>
+            <h2>${dayTrack.pinList[index].name}</h2>
+            <h5>${dayTrack.pinList[index].address}</h5>
+          </div>
+          <div style='width: 40%; margin: 0 0 10px 10px; background: #ffffff url("${dayTrack.pinList[index].photo}") no-repeat center center; background-size: cover'></div>
+        </div>
+        <img id='deleteBtn' src=${trashCanIcon} title='Delete' style='float: right; width: 28px; height: 28px; margin: 0 10px; cursor: pointer;'/>
+      </div>
+    `);
+    infoWindow.open({
+      anchor: pinMarkerList[index],
+      map: map,
+      shouldFocus: true,
+      maxWidth: 350
+    });
+  }
 
   const handelNotes = (e) => {
     setIsDirectionOpen(false);
@@ -28,26 +52,28 @@ const Pin = () => {
     setIsNoteOpen(false);
     setIsDirectionOpen(false);
     dispatch(deletePin({
-      trackId: trackId,
-      pinId: pinId[e.target.parentNode.id],
-      targetIndex: e.target.parentNode.id
+      tripId: dayTrack.tripId,
+      trackId: dayTrack.trackId,
+      pinId: dayTrack.pinIds[e.target.parentNode.id],
     }));
-    // const currentPinMarkerList = [...pinMarkerList];
-    // currentPinMarkerList[e.target.parentNode.id].setMap(null);
   };
 
-  return !pinList ? <div>Loading...</div> : (
-    <div>
+  return !dayTrack.pinList ? <div>Loading...</div> : (
+    <div className='pin-collection'>
       { 
-        pinList.map((pin, index) => {
+        dayTrack.pinList.map((pin, index) => {
           return (
-            <div key={index}> 
-              <div className='pin-container' id={index}>
+            <div key={index} className='pin-container'> 
+              <div className='pin-block'>
                 <div
+                  id={index}
                   className='pin-name'
+                  onClick={switchToPin}
                 >{pin.name}</div>
-                <button onClick={handelNotes}>Notes</button>
-                <button onClick={deleteSelectedPin}>Delete</button>
+                <div className='pin-btns' id={index}>
+                  <button className='notes-btn' onClick={handelNotes}/>
+                  <button className='delete-btn' onClick={deleteSelectedPin}/>
+                </div>
               </div>
               <Arrow index={index} />
             </div>

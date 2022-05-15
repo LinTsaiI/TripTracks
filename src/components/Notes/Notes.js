@@ -10,20 +10,24 @@ const Notes = () => {
   const [savedClassName, setSavedClassName] = useState('display-none');
   const [isSaved, setIsSaved] = useState(false);
   const dayTrack = useSelector(state => state.trip);
-  const dispatch = useDispatch();
   const value = useContext(TripContext);
-  const { isNoteOpen, setIsNoteOpen, currentFocusNote } = value;
+  const { isNoteOpen, setIsNoteOpen, currentFocusNote, isDirectionOpen } = value;
   const focusIndex = currentFocusNote ? currentFocusNote : 0;
   const notesClassName  = isNoteOpen ? 'notes-container' : 'display-none';
 
   useEffect(() => {
-    if (focusIndex) {
-      getNotes(dayTrack.pinId[focusIndex])
+    if (focusIndex && isNoteOpen) {
+      console.log('get notes')
+      getNotes({
+        tripId: dayTrack.tripId,
+        trackId: dayTrack.trackId,
+        pinId: dayTrack.pinIds[focusIndex]
+      })
         .then(notes => {
           setNotes(notes);
         });
     }
-  }, [focusIndex]);
+  }, [focusIndex, isDirectionOpen]);
 
   useEffect(() => {
     if (!isSaved) {
@@ -41,7 +45,12 @@ const Notes = () => {
   const handelSubmit = (e) => {
     e.preventDefault();
     setSaveBtnClassName('display-none');
-    saveNotes(dayTrack.pinId[focusIndex], notes)
+    saveNotes({
+      tripId: dayTrack.tripId,
+      trackId: dayTrack.trackId,
+      pinId: dayTrack.pinIds[focusIndex],
+      notes: notes
+    })
       .then(() => {
         setIsSaved(true);
         setSavedClassName('saved');
@@ -72,7 +81,3 @@ const Notes = () => {
 }
 
 export default Notes;
-
-/* 做筆記框框
-地圖上該景點圖示，跳出Notes及規劃路線按鈕，點擊Notes按鈕跳出筆記視窗
-*/

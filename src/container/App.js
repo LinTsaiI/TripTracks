@@ -8,6 +8,7 @@ import { creatUserIfNew } from '../API';
 import Home from '../components/Home/Home';
 import Dashboard from '../components/Dashboard/Dashboard';
 import Trip from '../components/Trip/Trip';
+import Footer from '../components/Footer/Footer';
 
 const App = () => {
   const userId = useSelector(userIdentity);

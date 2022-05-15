@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { TripContext } from '../Trip/Trip';
 import { switchDirection, getDirectionChoice } from '../../store/slice/directionSlice';
 import './Arrow.css';
+import pathImg from '../../img/icons_itinerary.png';
 
 const Arrow = ({ index }) => {
   const dispatch = useDispatch();
@@ -67,9 +68,8 @@ const Arrow = ({ index }) => {
     <div
       className={arrowClassName}
       id={index}
-      onClick={e => handelDirection(e)}
     >
-      <div>&#8595;</div>
+      <img className='path-icon' src={pathImg} onClick={e => handelDirection(e)}/>
       {/* <div>{way}</div>
       <div>{time}</div> */}
     </div>

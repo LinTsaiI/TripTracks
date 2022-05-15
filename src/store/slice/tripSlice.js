@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getTrackData, addToPinList, deleteSelectedPin, saveMapCenter } from '../../API';
+import { getTrackData, addToPinList, deleteSelectedPin, saveMap } from '../../API';
 
-export const fetchDayTrack = createAsyncThunk('trip/fetchDayTrack', async (trackId) => {
-  const dayTrack = await getTrackData(trackId);
+export const fetchDayTrack = createAsyncThunk('trip/fetchDayTrack', async (targetTrack) => {
+  const { tripId, trackIndex } = targetTrack;
+  const dayTrack = await getTrackData(tripId, trackIndex);
   return dayTrack;
 });
 
@@ -12,32 +13,29 @@ export const addNewPin = createAsyncThunk('trip/addNewPin', async (pinInfo) => {
 });
 
 export const deletePin = createAsyncThunk('trip/deletePin', async (pinInfo) => {
-  const deleteTarget = await deleteSelectedPin(pinInfo);
-  return deleteTarget;
+  const newPins = await deleteSelectedPin(pinInfo);
+  return newPins;
 });
 
 export const updateMapCenter = createAsyncThunk('trip/updateMapCenter', async (mapInfo) => {
-  const mapCenter = await saveMapCenter(mapInfo);
+  const mapCenter = await saveMap(mapInfo);
   return mapCenter;
 });
 
 export const tripSlice = createSlice({
   name: 'trip',
   initialState: {
+    tripId: null,
     trackId: null,
     mapCenter: null,
     zoom: null,
-    pinId: [],
+    pinIds: [],
     pinList: [],
     directions: []
   },
   reducers: {
-    setTrackId: (state, action) => {
-      console.log(action.payload);
-      state.trackId = action.payload;
-    },
-    initTrackDate: (state, action) => {
-      const { mapCenter, zoom, pinId, pinList, directions } = action.payload;
+    initTrackData: (state, action) => {
+      const { tripId, trackId, mapCenter, zoom, pinIds, pinList, directions } = action.payload;
       if (mapCenter && zoom) {
         state.mapCenter = mapCenter;
         state.zoom = zoom;
@@ -45,13 +43,12 @@ export const tripSlice = createSlice({
         state.mapCenter = { lat: 23.247797913420555, lng: 119.4327646617118 };
         state.zoom = 3;
       }
-      state.pinId = pinId
+      state.tripId = tripId;
+      state.trackId = trackId;
+      state.pinIds = pinIds;
       state.pinList = pinList;
       state.directions = directions;
-    },
-    savePreviousTrackState: (state, actions) => {
-      console.log('save previous dayTrack state, target: ', state.trackId);
-    },
+    }
   },
   extraReducers: builder => {
     builder
@@ -61,7 +58,7 @@ export const tripSlice = createSlice({
       })
       .addCase(fetchDayTrack.fulfilled, (state, action) => {
         console.log('dayTrack data fetch success');
-        const { mapCenter, zoom, pinId, pinList, directions } = action.payload;
+        const { tripId, trackId, mapCenter, zoom, pinIds, pinList, directions } = action.payload;
         console.log(action.payload);
         if (mapCenter && zoom) {
           state.mapCenter = mapCenter;
@@ -70,7 +67,9 @@ export const tripSlice = createSlice({
           state.mapCenter = { lat: 23.247797913420555, lng: 119.4327646617118 };
           state.zoom = 3;
         }
-        state.pinId = pinId;
+        state.tripId =  tripId;
+        state.trackId = trackId;
+        state.pinIds = pinIds;
         state.pinList = pinList;
         state.directions = directions;
       })
@@ -79,27 +78,25 @@ export const tripSlice = createSlice({
       })
       .addCase(addNewPin.fulfilled, (state, action) => {
         const { pinId, pinContent } = action.payload;
-        state.pinId.push(pinId);
+        state.pinIds.push(pinId);
         state.pinList.push(pinContent);
       })
       .addCase(deletePin.pending, (state, action) => {
         console.log('delete pin pending');
       })
       .addCase(deletePin.fulfilled, (state, action) => {
-        const { newPinIdList, targetIndex } = action.payload;
-        state.pinId = newPinIdList;
-        state.pinList.splice(targetIndex, 1);
+        const { newPinIds, newPinList } = action.payload;
+        state.pinIds = newPinIds;
+        state.pinList = newPinList;
       })
       .addCase(updateMapCenter.pending, (state, action) => {
         console.log('save map center pending');
       })
       .addCase(updateMapCenter.fulfilled, (state, action) => {
-        console.log(action.payload);
-        state.mapCenter = action.payload.mapCenter;
-        state.zoom = action.payload.zoom;
+        console.log('save map center success', action.payload);
       })
   }
 });
 
-export const { setTrackId, initTrackDate, savePreviousTrackState } = tripSlice.actions;
+export const { initTrackData } = tripSlice.actions;
 export default tripSlice.reducer;

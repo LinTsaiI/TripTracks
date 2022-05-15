@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { signOut } from "firebase/auth";
 import { auth } from '../../firebase';
-import { userIdentity, setUser } from '../../store/slice/userSlice';
+import { userIdentity } from '../../store/slice/userSlice';
 import { getTripList } from '../../API';
 import TripCard from './TripCard';
 import NewTrip from '../NewTrip/NewTrip';
@@ -43,7 +43,11 @@ const Dashboard = () => {
           <button className='sign-out-btn' onClick={() => signOut(auth)}>Sign Out</button>
         </div>
         <div className='collections'>
-          <TripCard tripList={tripList} openModal={setIsModalShown} isLoading={isTripListLoading}/>
+          <TripCard
+            tripList={tripList}
+            openModal={setIsModalShown}
+            isLoading={isTripListLoading}
+          />
         </div>
       </div>
       {
