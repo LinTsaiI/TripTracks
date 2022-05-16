@@ -1,12 +1,15 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { deletePin } from '../../store/slice/tripSlice';
+import { deletePin, reOrderPinList } from '../../store/slice/tripSlice';
 import { MapContext, TripContext } from '../Trip/Trip';
 import Arrow from './Arrow';
 import './Pin.css';
 import trashCanIcon from '../../img/icons_trashcan.png';
 
 const Pin = () => {
+  const [isPinDropt, setIsPinDropt] = useState(false);
+  const dragPin = useRef();
+  const dragOverPin = useRef();
   const dispatch = useDispatch();
   const dayTrack = useSelector(state => state.trip);
   const mapValue = useContext(MapContext);
@@ -52,19 +55,58 @@ const Pin = () => {
   const deleteSelectedPin = (e) => {
     setIsNoteOpen(false);
     setIsDirectionOpen(false);
+    const restPinIds = [...dayTrack.pinIds];
+    restPinIds.splice(e.target.parentNode.id, 1);
     dispatch(deletePin({
       tripId: dayTrack.tripId,
       trackId: dayTrack.trackId,
       pinId: dayTrack.pinIds[e.target.parentNode.id],
+      restPinIds: restPinIds
     }));
   };
+
+  const dragStart = (e, position) => {
+    dragPin.current = position;
+  };
+
+  const dragEnter = (e, position) => {
+    dragOverPin.current = position;
+  }
+
+  const dropt = () => {
+    setIsPinDropt(true);
+    const pinIds = [...dayTrack.pinIds];
+    const dragPinId = pinIds[dragPin.current];
+    pinIds.splice(dragPin.current, 1);
+    pinIds.splice(dragOverPin.current, 0, dragPinId);
+    dispatch(reOrderPinList({
+      tripId: dayTrack.tripId,
+      trackId: dayTrack.trackId,
+      newPinIds: pinIds
+    }))
+  };
+
+  useEffect(() => {
+    if (isPinDropt) {
+      dragPin.current = null;
+      dragOverPin.current = null;
+      setIsPinDropt(false);
+    }
+  }, [isPinDropt]);
 
   return !dayTrack.pinList ? <div>Loading...</div> : (
     <div className='pin-collection'>
       { 
         dayTrack.pinList.map((pin, index) => {
           return (
-            <div key={index} className='pin-container'> 
+            <div className='pin-container'
+              key={index}
+              draggable
+              onDragOver={e => e.preventDefault()}
+              onDragStart={e => dragStart(e, index)}
+              onDragEnter={e => dragEnter(e, index)}
+              onDragEnd={dropt}
+            > 
               <div className='pin-block'>
                 <div
                   id={index}

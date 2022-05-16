@@ -47,6 +47,7 @@ const SearchBar = ({ setFocusInfoWindow }) => {
           dispatch(addNewPin({
             tripId: dayTrack.tripId,
             trackId: dayTrack.trackId,
+            currentPinListLength: dayTrack.pinList.length,
             placeName: placeInfo.name,
             lat: placeInfo.geometry.location.lat(),
             lng: placeInfo.geometry.location.lng(),

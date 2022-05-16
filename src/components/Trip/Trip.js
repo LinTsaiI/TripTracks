@@ -209,10 +209,13 @@ const Trip = () => {
     let infoWindowListener = infoWindow.addListener('domready', () => {
       const deleteBtn = document.getElementById('deleteBtn');
       deleteBtn.addEventListener('click', () => {
+        const restPinIds = [...dayTrack.pinIds];
+        restPinIds.splice(index, 1);
         dispatch(deletePin({
           tripId: tripId,
           trackId: dayTrack.trackId,
           pinId: dayTrack.pinIds[index],
+          restPinIds: restPinIds
         }));
         infoWindow.close();
       });

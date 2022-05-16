@@ -1,6 +1,6 @@
 import { auth, db, provider } from './firebase';
 import { sendSignInLinkToEmail, signInWithPopup  } from 'firebase/auth';
-import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, getDocs, query, where, deleteDoc } from 'firebase/firestore';
+import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, getDocs, query, where, deleteDoc, orderBy } from 'firebase/firestore';
 
 
 // 使用者身份相關（進入每個頁面都要驗證身份）
@@ -155,7 +155,8 @@ export const getTrackData = async (tripId, trackIndex) => {
     });
     const targetTrackId = trackIds[trackIndex];
     const { mapCenter, zoom } = trackInfos[trackIndex];
-    const pinSnap = await getDocs(collection(db, 'trips', tripId, 'tracks', targetTrackId, 'pins'));
+    const condition = query(collection(db, 'trips', tripId, 'tracks', targetTrackId, 'pins'), orderBy('index'));
+    const pinSnap = await getDocs(condition);
     let pinIds = [];
     let pinList = [];
     pinSnap.forEach(pin => {
@@ -181,9 +182,11 @@ export const getTrackData = async (tripId, trackIndex) => {
 
 // 將景點加入 pinList
 export const addToPinList = async (pinInfo) => {
-  const { tripId, trackId, placeName, lat, lng, address, photo } = pinInfo;
+  const { tripId, trackId, currentPinListLength, placeName, lat, lng, address, photo } = pinInfo;
   try {
+    const index = currentPinListLength ? currentPinListLength : 0;
     const pinContent = {
+      index: index,
       name: placeName,
       position: { lat: lat, lng: lng },
       address: address,
@@ -201,11 +204,16 @@ export const addToPinList = async (pinInfo) => {
 
 // 刪除指定的Pin
 export const deleteSelectedPin = async (pinInfo) => {
-  console.log(pinInfo)
-  const { tripId, trackId, pinId } = pinInfo;
+  const { tripId, trackId, pinId, restPinIds } = pinInfo;
   try {
     await deleteDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId));
-    const pinSnap = await getDocs(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'));
+    restPinIds.forEach((pinId, index) => {
+      updateDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId), {
+        index: index
+      });
+    });
+    const condition = query(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), orderBy('index'));
+    const pinSnap = await getDocs(condition);
     let newPinIds = [];
     let newPinList = [];
     pinSnap.forEach(pin => {
@@ -229,6 +237,29 @@ export const saveMap = async (mapInfo) => {
     });
   } catch (err) {
     console.log('Error saving mapCenter', err);
+  }
+};
+
+// 更新 pinList 中 pin 的順序
+export const updatePinListOrder = async (dndInfo) => {
+  const { tripId, trackId, newPinIds } = dndInfo;
+  try {
+    newPinIds.forEach((pinId, index) => {
+      updateDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId), {
+        index: index
+      });
+    })
+    const condition = query(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), orderBy('index'));
+    const pinSnap = await getDocs(condition);
+    let pinIds = [];
+    let newPinList = [];
+    pinSnap.forEach(pin => {
+      pinIds.push(pin.id);
+      newPinList.push(pin.data());
+    });
+    return { newPinIds: pinIds, newPinList: newPinList };    
+  } catch (err) {
+    console.log('Error updating pinList order', err);
   }
 };
 

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getTrackData, addToPinList, deleteSelectedPin, saveMap } from '../../API';
+import { getTrackData, addToPinList, deleteSelectedPin, saveMap, updatePinListOrder } from '../../API';
 
 export const fetchDayTrack = createAsyncThunk('trip/fetchDayTrack', async (targetTrack) => {
   const { tripId, trackIndex } = targetTrack;
@@ -20,6 +20,11 @@ export const deletePin = createAsyncThunk('trip/deletePin', async (pinInfo) => {
 export const updateMapCenter = createAsyncThunk('trip/updateMapCenter', async (mapInfo) => {
   const mapCenter = await saveMap(mapInfo);
   return mapCenter;
+});
+
+export const reOrderPinList = createAsyncThunk('trip/reOrderPinList', async (newPinListInfo) => {
+  const newPins = await updatePinListOrder(newPinListInfo);
+  return newPins;
 });
 
 export const tripSlice = createSlice({
@@ -51,7 +56,10 @@ export const tripSlice = createSlice({
     },
     clearPinList: (state) => {
       state.pinList = [];
-    }
+    },
+    // reOrderPinList: (state, payload) => {
+
+    // }
   },
   extraReducers: builder => {
     builder
@@ -88,6 +96,15 @@ export const tripSlice = createSlice({
         console.log('delete pin pending');
       })
       .addCase(deletePin.fulfilled, (state, action) => {
+        const { newPinIds, newPinList } = action.payload;
+        state.pinIds = newPinIds;
+        state.pinList = newPinList;
+      })
+      .addCase(reOrderPinList.pending, (state, action) => {
+        console.log('update pinList order');
+      })
+      .addCase(reOrderPinList.fulfilled, (state, action) => {
+        console.log(action.payload);
         const { newPinIds, newPinList } = action.payload;
         state.pinIds = newPinIds;
         state.pinList = newPinList;
