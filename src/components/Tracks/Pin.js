@@ -7,7 +7,6 @@ import './Pin.css';
 import trashCanIcon from '../../img/icons_trashcan.png';
 
 const Pin = () => {
-  const [isPinDropt, setIsPinDropt] = useState(false);
   const dragPin = useRef();
   const dragOverPin = useRef();
   const dispatch = useDispatch();
@@ -67,14 +66,15 @@ const Pin = () => {
 
   const dragStart = (e, position) => {
     dragPin.current = position;
+    console.log(dragPin.current);
   };
 
   const dragEnter = (e, position) => {
     dragOverPin.current = position;
+    console.log(dragOverPin.current);
   }
 
   const dropt = () => {
-    setIsPinDropt(true);
     const pinIds = [...dayTrack.pinIds];
     const dragPinId = pinIds[dragPin.current];
     pinIds.splice(dragPin.current, 1);
@@ -83,16 +83,10 @@ const Pin = () => {
       tripId: dayTrack.tripId,
       trackId: dayTrack.trackId,
       newPinIds: pinIds
-    }))
+    }));
+    dragPin.current = null;
+    dragOverPin.current = null;
   };
-
-  useEffect(() => {
-    if (isPinDropt) {
-      dragPin.current = null;
-      dragOverPin.current = null;
-      setIsPinDropt(false);
-    }
-  }, [isPinDropt]);
 
   return !dayTrack.pinList ? <div>Loading...</div> : (
     <div className='pin-collection'>
