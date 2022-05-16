@@ -9,13 +9,14 @@ import SearchBar from '../searchBar/searchBar';
 import Notes from '../Notes/Notes';
 import Direction from '../Direction/Direction';
 import Footer from '../Footer/Footer';
-import markerImg from '../../img/icons_marker_2.png';
+import markerImg from '../../img/icons_marker.png';
 import './Trip.css';
 import trashCanIcon from '../../img/icons_trashcan.png';
-import searchMarker from '../../img/icons_searchMarker_2.png';
+import searchMarker from '../../img/icons_searchMarker.png';
 
 export const TripContext = createContext();
 export const MapContext = createContext();
+export const DirectionContext = createContext();
 
 const Trip = () => {
   const params = useParams();
@@ -38,6 +39,8 @@ const Trip = () => {
   const [isDirectionOpen, setIsDirectionOpen] = useState(false);
   const [currentFocusNote, setCurrentFocusNote] = useState(null);
   const [currentFocusDirection, setCurrentFocusDirection] = useState(null);
+  const [estimatedDistance, setEstimatedDistance] = useState([]);
+  const [estimatedDuration, setEstimatedDuration] = useState([]);
 
   const mapLoader = new Loader({
     apiKey: process.env.REACT_GOOGLE_MAP_API_KEY,
@@ -106,6 +109,33 @@ const Trip = () => {
       });
       setPath(pinPath);
       pinPath.setMap(map);
+      const directionsService = new google.maps.DirectionsService();
+      // let distance = [];
+      // let duration = [];
+      for (let i = 0; i < pinLatLng.length-1; i++) {
+        const directionRequest = {
+          origin: pinLatLng[i],
+          destination: pinLatLng[i+1],
+          travelMode: 'DRIVING',
+          // transitOptions: TransitOptions,
+          drivingOptions: {
+            departureTime: new Date(Date.now()),
+            trafficModel: 'pessimistic'
+          },
+          unitSystem: google.maps.UnitSystem.METRIC,
+          provideRouteAlternatives: true,
+        };
+        directionsService.route(directionRequest, (result, status) => {
+          if (status == 'OK') {
+            setEstimatedDistance(origin => [...origin, result.routes[0].legs[0].distance.text]);
+            setEstimatedDuration(origin => [...origin, result.routes[0].legs[0].duration.text])
+            // distance.push(result.routes[0].legs[0].distance.text);
+            // duration.push(result.routes[0].legs[0].duration.text);
+          }
+        });
+      }
+      // setEstimatedDistance(distance);
+      // setEstimatedDuration(duration);
     }
   }, [pinLatLng]);
 
@@ -261,10 +291,15 @@ const Trip = () => {
           setPinMarkerList: setPinMarkerList,
           setFocusInfoWindow: setFocusInfoWindow
         }}>
-          <Tracks tripInfo={tripInfo} setFocusInfoWindow={setFocusInfoWindow} />
-          <SearchBar setFocusInfoWindow={setFocusInfoWindow} />
-          <Notes />
-          <Direction />
+          <DirectionContext.Provider value={{
+            distance: estimatedDistance,
+            duration: estimatedDuration
+          }}>
+            <Tracks tripInfo={tripInfo} setFocusInfoWindow={setFocusInfoWindow} />
+            <SearchBar setFocusInfoWindow={setFocusInfoWindow} />
+            <Notes />
+            <Direction />
+          </DirectionContext.Provider>
         </TripContext.Provider>
         <div className='map-region' ref={mapRegin}/>
       </MapContext.Provider>

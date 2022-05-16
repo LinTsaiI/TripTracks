@@ -1,16 +1,20 @@
 import React, { useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { TripContext } from '../Trip/Trip';
+import { TripContext, DirectionContext } from '../Trip/Trip';
 import { switchDirection, getDirectionChoice } from '../../store/slice/directionSlice';
 import './Arrow.css';
 import pathImg from '../../img/icons_itinerary.png';
+import carImg from '../../img/icons_car.png';
 
 const Arrow = ({ index }) => {
   const dispatch = useDispatch();
   const pinList = useSelector(state => state.trip.pinList);
-  const value = useContext(TripContext);
-  const { setIsNoteOpen, setIsDirectionOpen, currentFocusDirection, setCurrentFocusDirection } = value;
+  const tripValue = useContext(TripContext);
+  const { setIsNoteOpen, setIsDirectionOpen, currentFocusDirection, setCurrentFocusDirection } = tripValue;
+  const directionValue = useContext(DirectionContext);
+  const { distance, duration } = directionValue;
 
+  let optimizedDrivingPath;
   let arrowClassName;
   let way;
   let time;
@@ -31,6 +35,7 @@ const Arrow = ({ index }) => {
     // latB = null;
     // lngB = null;
   } else {
+    optimizedDrivingPath = `${distance[index]}, ${duration[index]}`
     arrowClassName = 'arrow';
     pinAName = pinList[index].name;
     pinBName = pinList[index+1].name;
@@ -70,8 +75,8 @@ const Arrow = ({ index }) => {
       id={index}
     >
       <img className='path-icon' src={pathImg} onClick={e => handelDirection(e)}/>
-      {/* <div>{way}</div>
-      <div>{time}</div> */}
+      <img src={carImg} className='car-icon'/>
+      <div className='direction'>{optimizedDrivingPath}</div>
     </div>
   )
 }

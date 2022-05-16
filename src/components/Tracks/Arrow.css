@@ -1,5 +1,7 @@
 .arrow {
   margin: 0 auto 0 10px;
+  display: flex;
+  align-items: center;
 }
 
 .arrow-display-none {
@@ -8,4 +10,16 @@
 
 .path-icon {
   cursor: pointer;
+}
+
+.car-icon {
+  margin: 0 5px;
+  height: 25px;
+  width: 25px;
+}
+
+.direction {
+  font-style: italic;
+  color: #969696;
+  font-size: 12px;
 }
