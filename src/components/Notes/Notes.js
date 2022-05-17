@@ -3,11 +3,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getNotes, saveNotes } from '../../API';
 import { TripContext } from '../Trip/Trip';
 import './Notes.css';
+import savingLoadingImg from '../../img/icons_loading_circle.gif';
 
 const Notes = () => {
   const [notes, setNotes] = useState('');
   const [saveBtnClassName, setSaveBtnClassName] = useState('display-none');
   const [savedClassName, setSavedClassName] = useState('display-none');
+  const [savingLoadingClassName, setSavingLoadingClassName] = useState('display-none');
   const [isSaved, setIsSaved] = useState(false);
   const dayTrack = useSelector(state => state.trip);
   const value = useContext(TripContext);
@@ -17,7 +19,6 @@ const Notes = () => {
 
   useEffect(() => {
     if (focusIndex && isNoteOpen) {
-      console.log('get notes')
       getNotes({
         tripId: dayTrack.tripId,
         trackId: dayTrack.trackId,
@@ -35,9 +36,11 @@ const Notes = () => {
     }
     setSavedClassName('display-none');
     setSaveBtnClassName('display-none');
+    setSavingLoadingClassName('display-none');
   }, [currentFocusNote, isNoteOpen]);
 
   const handelInputChange = (e) => {
+    setSavedClassName('display-none');
     setNotes(e.target.value);
     setSaveBtnClassName('save-note-btn');
   };
@@ -45,6 +48,7 @@ const Notes = () => {
   const handelSubmit = (e) => {
     e.preventDefault();
     setSaveBtnClassName('display-none');
+    setSavingLoadingClassName('saving');
     saveNotes({
       tripId: dayTrack.tripId,
       trackId: dayTrack.trackId,
@@ -53,6 +57,7 @@ const Notes = () => {
     })
       .then(() => {
         setIsSaved(true);
+        setSavingLoadingClassName('display-none')
         setSavedClassName('saved');
       })
   };
@@ -64,16 +69,20 @@ const Notes = () => {
       <div className={notesClassName}>
         <div onClick={() => setIsNoteOpen(false)} className='close-btn'>&#215;</div>
         <div className='notes-top-part'>
-          <div className='notes-title'>
+          <div className='notes-title-block'>
             <div className='notes-icon'/>
-            <div>Notes</div>
+            <div className='notes-title'>Notes</div>
           </div>
           <div className='notes-pin-name'>{dayTrack.pinList[focusIndex].name}</div>
         </div>
-        <form onSubmit={handelSubmit}>
-          <textarea type='textarea' className='notes-input-field' placeholder='Take some notes!' value={notes} onChange={handelInputChange}/>
-          <input type='submit' value='Save' className={saveBtnClassName}/>
-          <div className={savedClassName}>Saved</div>
+        <form onSubmit={handelSubmit} className='notes-field-block'>
+          <textarea type='textarea' className='notes-input-field' placeholder='Take some notes!' value={notes} onChange={handelInputChange}>
+          </textarea>
+          <div className='note-save-bock'>
+            <input type='submit' value='Save' className={saveBtnClassName}/>
+            <img src={savingLoadingImg} className={savingLoadingClassName}/>
+            <div className={savedClassName}>&#10003; Saved</div>
+          </div>
         </form>
       </div>
     );

@@ -16,10 +16,11 @@ const Direction = () => {
   } else if (dayTrack.pinList.length > 1) {
     return (
       <div className={directionClassName}>
+        <div onClick={() => setIsDirectionOpen(false)} className='close-btn'>&#215;</div>
         <div className='direction-top-part'>
-          <div className='direction-title'>
+          <div className='direction-title-block'>
             <div className='direction-img'/>
-            <div>Direction</div>
+            <div className='direction-title'>Direction</div>
           </div>
           <div className='direction-pin-name'>{dayTrack.pinList[startIndex].name}</div>
           <div className='direction-arrow'>&#8595;</div>

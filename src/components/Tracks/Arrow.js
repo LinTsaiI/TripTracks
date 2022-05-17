@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { TripContext, DirectionContext } from '../Trip/Trip';
-import { switchDirection, getDirectionChoice } from '../../store/slice/directionSlice';
 import './Arrow.css';
 import pathImg from '../../img/icons_itinerary.png';
 import carImg from '../../img/icons_car.png';
@@ -17,26 +16,9 @@ const Arrow = ({ index }) => {
 
   const directionLoadingIconClassName = (!distance[index] || !duration[index]) ? 'direction-fetching-icon' : 'arrow-display-none '
   const optimizedDrivingPath = (!distance[index] || !duration[index]) ? '' : `${distance[index]}, ${duration[index]}`;
-  let arrowClassName;
-  let way;
-  let time;
-  let pinAName;
-  let pinBName;
-  let latA;
-  let lngA;
-  let latB;
-  let lngB;
-  if (index == pinList.length - 1 ) {   // 若為最後一個箭頭，不顯示
-    arrowClassName = 'arrow-display-none';
-  } else {
-    arrowClassName = 'arrow';
-    pinAName = pinList[index].name;
-    pinBName = pinList[index+1].name;
-    latA = pinList[index].lat;
-    lngA = pinList[index].lng;
-    latB = pinList[index+1].lat;
-    lngB = pinList[index+1].lng;
-  }
+  // 若為最後一個箭頭，不顯示
+  const arrowClassName = (index == pinList.length - 1 ) ? 'arrow-display-none' : 'arrow';
+  
   const handelDirection = (e) => {
     setIsNoteOpen(false);
     if (currentFocusDirection == null || currentFocusDirection == e.target.parentNode.id) {

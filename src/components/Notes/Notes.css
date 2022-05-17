@@ -2,26 +2,32 @@
   position: absolute;
   right: 0;
   width: 300px;
-  height: 350px;
+  height: 400px;
   background-color: #F8F5F2;
   opacity: 0.9;
   z-index: 1;
   margin: 10px;
-  padding: 20px 10px;
+  padding: 10px;
   border-radius: 10px;
   box-shadow: 2px 4px 2px rgb(0 0 0 / 20%);
+  display: flex;
+  flex-direction: column;
 }
 
 .notes-top-part {
-  height: 30%;
   border-bottom: 1px solid #9F9C9C;
-  font-size: 32px;
   font-weight: bold;
-  padding: 0 10px;
+  padding: 10px;
+}
+
+.notes-title-block {
+  display: inline-flex;
+  align-items: center;
 }
 
 .notes-title {
-  display: inline-flex;
+  margin: 0 10px;
+  font-size: 30px;
 }
 
 .notes-icon {
@@ -33,26 +39,57 @@
 }
 
 .notes-pin-name {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: bold;
+  margin-top: 10px;
+}
+
+.notes-field-block {
+  width: 100%;
+  flex: 1
 }
 
 .notes-input-field {
-  width: 100%;
-  height: 70%;
   background-color: transparent;
   border: none;
   padding: 10px;
   outline: none;
   font-size: 16px;
-  overflow: auto;
   resize: none;
+  height: calc(100% - 35px);
+  width: 100%;
 }
 
 .display-none {
   display: none;
 }
 
+.note-save-bock {
+  position: absolute;
+  width: calc(100% - 20px);
+  height: 35px;
+  bottom: 10px;
+}
+
+.save-note-btn {
+  font-size: 14px;
+  width: 50px;
+  height: 35px;
+  border-radius: 20px;
+  float: right;
+}
+
+.saving {
+  width: 30px;
+  height: 30px;
+  float: right;
+  margin-right: 5px;
+}
+
 .saved {
-  color:rgb(17, 165, 116);
+  color: #3a9c8a;
+  font-weight: bold;
+  float: right;
+  line-height: 35px;
+  margin-right: 5px;
 }

@@ -215,24 +215,24 @@ const Trip = () => {
 
   const getDefaultDirections = () => {
     for (let i = 0; i < pinLatLng.length-1; i++) {
-      const directionRequest = {
-        origin: pinLatLng[i],
-        destination: pinLatLng[i+1],
-        travelMode: 'DRIVING',
-        // transitOptions: TransitOptions,
-        drivingOptions: {
-          departureTime: new Date(Date.now()),
-          trafficModel: 'pessimistic'
-        },
-        unitSystem: google.maps.UnitSystem.METRIC,
-        provideRouteAlternatives: true,
-      };
-      directionsService.route(directionRequest, (result, status) => {
-        if (status == 'OK') {
-          setEstimatedDistance(origin => [...origin, result.routes[0].legs[0].distance.text]);
-          setEstimatedDuration(origin => [...origin, result.routes[0].legs[0].duration.text])
-        }
-      });
+      // const directionRequest = {
+      //   origin: pinLatLng[i],
+      //   destination: pinLatLng[i+1],
+      //   travelMode: 'DRIVING',
+      //   // transitOptions: TransitOptions,
+      //   drivingOptions: {
+      //     departureTime: new Date(Date.now()),
+      //     trafficModel: 'pessimistic'
+      //   },
+      //   unitSystem: google.maps.UnitSystem.METRIC,
+      //   provideRouteAlternatives: true,
+      // };
+      // directionsService.route(directionRequest, (result, status) => {
+      //   if (status == 'OK') {
+      //     setEstimatedDistance(origin => [...origin, result.routes[0].legs[0].distance.text]);
+      //     setEstimatedDuration(origin => [...origin, result.routes[0].legs[0].duration.text])
+      //   }
+      // });
     }
   };
 
