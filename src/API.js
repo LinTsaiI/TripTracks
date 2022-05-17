@@ -37,9 +37,7 @@ export const googleSignIn = () => {
 export const creatUserIfNew = async (userId, username, email) => {
   try {
     const userSnap = await getDoc(doc(db, 'user', userId));
-    if (userSnap.exists()) {
-      console.log(userSnap.data());
-    } else {
+    if (!userSnap.exists()) {
       try {
         await setDoc(doc(db, 'user', userId), {
           name: username,
@@ -89,30 +87,6 @@ export const createNewTrip = async (newTrip) => {
   }
 };
 
-// 建立新 trip，同時依天數建立空的 track 文件
-// export const createNewTrack = async (userId, tripId, duration) => {
-//   try {
-//     const docContent = {
-//       userId: userId,
-//       tripId: tripId,
-//       mapCenter: {lat: 0, lng: 0},
-//       zoom: 0,
-//       pins: [],
-//       directions: []
-//     };
-//     for (let i = 0; i < duration; i++) {
-//       const docRef = await addDoc(collection(db, 'tracks'), docContent);
-//       if (docRef.id) {
-//         updateDoc(doc(db, 'trips', tripId), {
-//           trackId: arrayUnion(docRef.id)
-//         });
-//       }
-//     }
-//   } catch (err) {
-//     console.log('Error adding document: ', err);
-//   }
-// };
-
 // 取得使用者已建立的所有行程，用以在 Dashboard 顯示行程名稱/日期區間
 export const getTripList = async (userId) => {
   const condition = query(collection(db, 'trips'), where('userId', '==', userId));
@@ -135,7 +109,6 @@ export const getTripData = async (tripId) => {
   try {
     const tripSnap = await getDoc(doc(db, 'trips', tripId));
     if (tripSnap.exists()) {
-      console.log(tripSnap.data());
       return tripSnap.data();
     }
   } catch (err) {

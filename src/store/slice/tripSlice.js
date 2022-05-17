@@ -57,9 +57,9 @@ export const tripSlice = createSlice({
     clearPinList: (state) => {
       state.pinList = [];
     },
-    // reOrderPinList: (state, payload) => {
-
-    // }
+    upDateDirections: (state, action) => {
+      state.directions = action.payload;
+    }
   },
   extraReducers: builder => {
     builder
@@ -104,7 +104,6 @@ export const tripSlice = createSlice({
         console.log('update pinList order');
       })
       .addCase(reOrderPinList.fulfilled, (state, action) => {
-        console.log(action.payload);
         const { newPinIds, newPinList } = action.payload;
         state.pinIds = newPinIds;
         state.pinList = newPinList;
@@ -112,5 +111,5 @@ export const tripSlice = createSlice({
   }
 });
 
-export const { initTrackData, clearPinList } = tripSlice.actions;
+export const { initTrackData, clearPinList, upDateDirections } = tripSlice.actions;
 export default tripSlice.reducer;

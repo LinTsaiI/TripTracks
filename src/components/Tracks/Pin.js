@@ -66,12 +66,10 @@ const Pin = () => {
 
   const dragStart = (e, position) => {
     dragPin.current = position;
-    console.log(dragPin.current);
   };
 
   const dragEnter = (e, position) => {
     dragOverPin.current = position;
-    console.log(dragOverPin.current);
   }
 
   const dropt = () => {

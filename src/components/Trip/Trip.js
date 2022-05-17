@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
-import { fetchDayTrack, initTrackData, clearPinList, deletePin } from '../../store/slice/tripSlice';
+import { fetchDayTrack, initTrackData, clearPinList, deletePin, upDateDirections } from '../../store/slice/tripSlice';
 import { getTripData, getTrackData, saveMap } from '../../API';
 import Tracks from '../Tracks/Tracks';
 import SearchBar from '../searchBar/searchBar';
@@ -31,6 +31,7 @@ const Trip = () => {
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [infoWindow, setInfoWindow] = useState(null);
+  const [directionsService, setDirectionsService] = useState(null);
   const [pinMarkerList, setPinMarkerList] = useState([]);
   const [pinLatLng, setPinLatLng] = useState([]);
   const [path, setPath] = useState(null);
@@ -59,21 +60,23 @@ const Trip = () => {
           console.log('map init')
           const center = trackData.mapCenter ? trackData.mapCenter : { lat: 23.247797913420555, lng: 119.4327646617118 };
           const zoom = trackData.zoom ? trackData.zoom : 3
-          let map = new google.maps.Map(mapRegin.current, {
+          const map = new google.maps.Map(mapRegin.current, {
             mapId: '6fe2140f54e6c7b3',
             mapTypeControl: false,
             center: center,
             zoom: zoom
           });
-          let marker = new google.maps.Marker({
+          const marker = new google.maps.Marker({
             map: map,
             visible: false,
             icon: searchMarker
           });
-          let infoWindow = new google.maps.InfoWindow();
+          const infoWindow = new google.maps.InfoWindow();
+          const directionsService = new google.maps.DirectionsService();
           setMap(map);
           setMarker(marker);
           setInfoWindow(infoWindow);
+          setDirectionsService(directionsService);
           let markerList = [];
           let latLngList = [];
           trackData.pinList.forEach((pin, index) => {
@@ -99,6 +102,8 @@ const Trip = () => {
   }, []);
 
   useEffect(() => {
+    setEstimatedDistance([]);
+    setEstimatedDuration([]);
     if (pinLatLng && map) {
       const pinPath = new google.maps.Polyline({
         path: pinLatLng,
@@ -109,33 +114,7 @@ const Trip = () => {
       });
       setPath(pinPath);
       pinPath.setMap(map);
-      const directionsService = new google.maps.DirectionsService();
-      // let distance = [];
-      // let duration = [];
-      for (let i = 0; i < pinLatLng.length-1; i++) {
-        const directionRequest = {
-          origin: pinLatLng[i],
-          destination: pinLatLng[i+1],
-          travelMode: 'DRIVING',
-          // transitOptions: TransitOptions,
-          drivingOptions: {
-            departureTime: new Date(Date.now()),
-            trafficModel: 'pessimistic'
-          },
-          unitSystem: google.maps.UnitSystem.METRIC,
-          provideRouteAlternatives: true,
-        };
-        directionsService.route(directionRequest, (result, status) => {
-          if (status == 'OK') {
-            setEstimatedDistance(origin => [...origin, result.routes[0].legs[0].distance.text]);
-            setEstimatedDuration(origin => [...origin, result.routes[0].legs[0].duration.text])
-            // distance.push(result.routes[0].legs[0].distance.text);
-            // duration.push(result.routes[0].legs[0].duration.text);
-          }
-        });
-      }
-      // setEstimatedDistance(distance);
-      // setEstimatedDuration(duration);
+      getDefaultDirections();
     }
   }, [pinLatLng]);
 
@@ -233,6 +212,29 @@ const Trip = () => {
       }
     }
   }, [focusInfoWindow]);
+
+  const getDefaultDirections = () => {
+    for (let i = 0; i < pinLatLng.length-1; i++) {
+      const directionRequest = {
+        origin: pinLatLng[i],
+        destination: pinLatLng[i+1],
+        travelMode: 'DRIVING',
+        // transitOptions: TransitOptions,
+        drivingOptions: {
+          departureTime: new Date(Date.now()),
+          trafficModel: 'pessimistic'
+        },
+        unitSystem: google.maps.UnitSystem.METRIC,
+        provideRouteAlternatives: true,
+      };
+      directionsService.route(directionRequest, (result, status) => {
+        if (status == 'OK') {
+          setEstimatedDistance(origin => [...origin, result.routes[0].legs[0].distance.text]);
+          setEstimatedDuration(origin => [...origin, result.routes[0].legs[0].duration.text])
+        }
+      });
+    }
+  };
 
   const showPinInfoWindow = (pinMarker, index) => {
     map.panTo(dayTrack.pinList[index].position);

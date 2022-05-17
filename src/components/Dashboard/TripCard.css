@@ -80,7 +80,7 @@
   text-align: center;
   margin: 20px;
   line-height: 250px;
-  background: #ffffff url('../../img/icons_loading.gif') no-repeat center center;
+  background: #ffffff url('../../img/icons_loading_circle.gif') no-repeat center center;
 }
 
 .display-none {
