@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getTrackData, addToPinList, deleteSelectedPin, saveMap, updatePinListOrder } from '../../API';
+import { getTrackData, addToPinList, deleteSelectedPin, saveMap, updatePinListOrder, updateDirection } from '../../API';
 
 export const fetchDayTrack = createAsyncThunk('trip/fetchDayTrack', async (targetTrack) => {
   const { tripId, trackIndex } = targetTrack;
@@ -25,6 +25,11 @@ export const updateMapCenter = createAsyncThunk('trip/updateMapCenter', async (m
 export const reOrderPinList = createAsyncThunk('trip/reOrderPinList', async (newPinListInfo) => {
   const newPins = await updatePinListOrder(newPinListInfo);
   return newPins;
+});
+
+export const changeDirectionChoice = createAsyncThunk('trip/updateDirectionChoice', async (newDirectionChoice) => {
+  const newDirections = await updateDirection(newDirectionChoice);
+  return newDirections;
 });
 
 export const tripSlice = createSlice({
@@ -108,6 +113,13 @@ export const tripSlice = createSlice({
         state.pinIds = newPinIds;
         state.pinList = newPinList;
       })
+      .addCase(changeDirectionChoice.pending, (state, action) => {
+        console.log('change direction choice pending');
+      })
+      .addCase(changeDirectionChoice.fulfilled, (state, action) => {
+        console.log('update directions success');
+        state.directions = action.payload;
+      });
   }
 });
 

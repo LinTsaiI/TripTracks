@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getDirection } from '../../API';
 
 export const directionSlice = createSlice({
   name: 'direction',

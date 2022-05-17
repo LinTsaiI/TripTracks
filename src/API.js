@@ -78,6 +78,7 @@ export const createNewTrip = async (newTrip) => {
         await addDoc(collection(db, 'trips', docRef.id, 'tracks'), {
           mapCenter: {lat: 0, lng: 0},
           zoom: 0,
+          directions: []
         });
       }
       return docRef.id;
@@ -127,7 +128,7 @@ export const getTrackData = async (tripId, trackIndex) => {
       trackInfos.push(track.data());
     });
     const targetTrackId = trackIds[trackIndex];
-    const { mapCenter, zoom } = trackInfos[trackIndex];
+    const { mapCenter, zoom, directions } = trackInfos[trackIndex];
     const condition = query(collection(db, 'trips', tripId, 'tracks', targetTrackId, 'pins'), orderBy('index'));
     const pinSnap = await getDocs(condition);
     let pinIds = [];
@@ -136,9 +137,9 @@ export const getTrackData = async (tripId, trackIndex) => {
       pinIds.push(pin.id);
       pinList.push(pin.data());
     });
-    const directionSnap = await getDocs(collection(db, 'trips', tripId, 'tracks', targetTrackId, 'directions'));
-    let directions = [];
-    directionSnap.forEach(direction => directions.push(direction.data()));
+    // const directionSnap = await getDocs(collection(db, 'trips', tripId, 'tracks', targetTrackId, 'directions'));
+    // let directions = [];
+    // directionSnap.forEach(direction => directions.push(direction.data()));
     return {
       tripId: tripId,
       trackId: targetTrackId,
@@ -262,23 +263,17 @@ export const saveNotes = async (notesInfo) => {
 };
 
 // 路線規劃相關
-// 初次生成箭頭，自動產生最佳的路線選擇，回傳方式(用來顯示對應的icon)及所需時間
-export const getDirection = (latitudeA, longitudeA, latitudeB, longitudeB) => {
-  // 傳入前後兩點的經緯度，回傳建議的路線
-  // 先return經緯度測試
-  if (latitudeA == null || longitudeA == null || latitudeB == null || longitudeB == null) {
-    return 'this is the last arrow, won\'t show any data';
+// 更新交通方式
+export const updateDirection = async (newDirectionInfo) => {
+  const { tripId, trackId, directions } = newDirectionInfo;
+  try {
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
+      directions: directions
+    });
+    return directions;
+  } catch (err) {
+    console.log('Error updating directions', err);
   }
-  return `${latitudeA}, ${longitudeA}, ${latitudeB}, ${longitudeB}`;
-};
-
-// 取得最近一次規劃路線選擇的方式＆所需時間（e.g. 步行，五分鐘），顯示在箭頭旁
-export const getDirectionHistory = (tripName, day, id) => {
-  // 先取得目前箭頭的狀態，若沒有先前儲存的路線紀錄，response null，有則顯示出來
-  let data = getTripData(tripName);
-  let directionList = data.dayTrack[day].directionList;
-  let directionInfo = directionList[id];
-  return directionInfo;
 };
 
 // 再次點擊路線規劃按鈕，取得該路線上一次紀錄的交通方式顯示出來（e.g. 步行，但google direction動態生成，因此可能實際內容會有改變）

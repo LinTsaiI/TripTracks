@@ -64,12 +64,12 @@ const Pin = () => {
     }));
   };
 
-  const dragStart = (e, position) => {
-    dragPin.current = position;
+  const dragStart = (e, index) => {
+    dragPin.current = index;
   };
 
-  const dragEnter = (e, position) => {
-    dragOverPin.current = position;
+  const dragEnter = (e, index) => {
+    dragOverPin.current = index;
   }
 
   const dropt = () => {

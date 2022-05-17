@@ -39,6 +39,7 @@ const Trip = () => {
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [isDirectionOpen, setIsDirectionOpen] = useState(false);
   const [currentFocusNote, setCurrentFocusNote] = useState(null);
+  const [openedDropdownMenu, setOpenedDropdownMenu] = useState(null);
   const [currentFocusDirection, setCurrentFocusDirection] = useState(null);
   const [estimatedDistance, setEstimatedDistance] = useState([]);
   const [estimatedDuration, setEstimatedDuration] = useState([]);
@@ -153,6 +154,7 @@ const Trip = () => {
       setCurrentFocusNote(null);
       setIsDirectionOpen(false);
       setCurrentFocusDirection(null);
+      openedDropdownMenu.className = 'display-none';
     }
   }, [trackIndex]);
 
@@ -215,24 +217,24 @@ const Trip = () => {
 
   const getDefaultDirections = () => {
     for (let i = 0; i < pinLatLng.length-1; i++) {
-      // const directionRequest = {
-      //   origin: pinLatLng[i],
-      //   destination: pinLatLng[i+1],
-      //   travelMode: 'DRIVING',
-      //   // transitOptions: TransitOptions,
-      //   drivingOptions: {
-      //     departureTime: new Date(Date.now()),
-      //     trafficModel: 'pessimistic'
-      //   },
-      //   unitSystem: google.maps.UnitSystem.METRIC,
-      //   provideRouteAlternatives: true,
-      // };
-      // directionsService.route(directionRequest, (result, status) => {
-      //   if (status == 'OK') {
-      //     setEstimatedDistance(origin => [...origin, result.routes[0].legs[0].distance.text]);
-      //     setEstimatedDuration(origin => [...origin, result.routes[0].legs[0].duration.text])
-      //   }
-      // });
+      const directionRequest = {
+        origin: pinLatLng[i],
+        destination: pinLatLng[i+1],
+        travelMode: 'DRIVING',
+        // transitOptions: TransitOptions,
+        drivingOptions: {
+          departureTime: new Date(Date.now()),
+          trafficModel: 'pessimistic'
+        },
+        unitSystem: google.maps.UnitSystem.METRIC,
+        provideRouteAlternatives: true,
+      };
+      directionsService.route(directionRequest, (result, status) => {
+        if (status == 'OK') {
+          setEstimatedDistance(origin => [...origin, result.routes[0].legs[0].distance.text]);
+          setEstimatedDuration(origin => [...origin, result.routes[0].legs[0].duration.text])
+        }
+      });
     }
   };
 
@@ -287,6 +289,8 @@ const Trip = () => {
           setIsDirectionOpen: setIsDirectionOpen,
           currentFocusNote: currentFocusNote,
           setCurrentFocusNote: setCurrentFocusNote,
+          openedDropdownMenu: openedDropdownMenu,
+          setOpenedDropdownMenu: setOpenedDropdownMenu,
           currentFocusDirection: currentFocusDirection,
           setCurrentFocusDirection: setCurrentFocusDirection,
           pinMarkerList: pinMarkerList,

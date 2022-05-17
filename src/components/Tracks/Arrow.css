@@ -1,4 +1,5 @@
 .arrow {
+  position: relative;
   margin: 0 auto 0 10px;
   display: flex;
   align-items: center;
@@ -12,10 +13,10 @@
   cursor: pointer;
 }
 
-.car-icon {
+.default-direction-icon {
   margin: 0 5px;
-  height: 25px;
-  width: 25px;
+  height: 20px;
+  width: 20px;
 }
 
 .direction {
@@ -26,4 +27,38 @@
 
 .direction-fetching-icon {
   width: 25px;
+}
+
+.dropdown-icon{
+  width: 10px;
+  height: 10px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.dropdownModal {
+  position: absolute;
+  top: 30px;
+  left: 10px;
+  background-color: white;
+  box-shadow: 0px 4px 12px rgb(0 0 0 / 20%);
+  font-size: 12px;
+  color: #6c757d;
+  border-radius: 10px;
+}
+
+.other-direction-choice {
+  display: flex;
+  padding: 8px 16px;
+}
+
+.other-direction-choice:hover {
+  background-color: #e4e4e4;
+  cursor: pointer;
+}
+
+.other-direction-icon {
+  margin-right: 5px;
+  width: 20px;
+  height: 20px;
 }
