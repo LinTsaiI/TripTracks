@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { TripContext, DirectionContext } from '../Trip/Trip';
 import './Arrow.css';
@@ -12,16 +12,18 @@ import icons_triangle from '../../img/icons_triangle.png';
 const Arrow = ({ index }) => {
   const dispatch = useDispatch();
   const pinList = useSelector(state => state.trip.pinList);
+  const directions = useSelector(state => state.trip.directions);
   const tripValue = useContext(TripContext);
   const { openedDropdownMenu, setOpenedDropdownMenu, setIsNoteOpen, setIsDirectionOpen, currentFocusDirection, setCurrentFocusDirection } = tripValue;
   const directionValue = useContext(DirectionContext);
-  const { distance, duration } = directionValue;
+  const { directionsService, distance, duration } = directionValue;
   const dropdownMenu = useRef();
+  const [otherDirectionChoices, setOtherDirectionChoices] = useState([]);
 
-  const directionLoadingIconClassName = (!distance[index] || !duration[index]) ? 'direction-fetching-icon' : 'arrow-display-none '
-  const optimizedDrivingPath = (!distance[index] || !duration[index]) ? '' : `${distance[index]}, ${duration[index]}`;
+  const directionLoadingIconClassName = (!distance[index] || !duration[index]) ? 'direction-fetching-icon' : 'display-none ';
+  const directionInfo = (!distance[index] || !duration[index]) ? '' : `${distance[index]}・${duration[index]}`;
   // 若為最後一個箭頭，不顯示
-  const arrowClassName = (index == pinList.length - 1 ) ? 'arrow-display-none' : 'arrow';
+  const arrowClassName = (index == pinList.length - 1 ) ? 'display-none' : 'arrow';
 
   const handelDirection = (e) => {
     setIsNoteOpen(false);
@@ -34,40 +36,103 @@ const Arrow = ({ index }) => {
     }
   }
 
-  const switchDropdownModal = () => {
+  const switchDropdownModal = (e) => {
     if (!openedDropdownMenu) {
-      console.log('first open')
       dropdownMenu.current.className = 'dropdownModal';
       setOpenedDropdownMenu(dropdownMenu.current);
+      getOtherDirections(e.target.parentNode.id);
     } else if(openedDropdownMenu == dropdownMenu.current) {
-      dropdownMenu.current.className = dropdownMenu.current.className == 'dropdownModal' ? 'display-none' : 'dropdownModal';
+      if (dropdownMenu.current.className == 'dropdownModal') {  
+        setOtherDirectionChoices([]);
+        dropdownMenu.current.className = 'display-none';
+      } else {
+        dropdownMenu.current.className = 'dropdownModal';
+        getOtherDirections(e.target.parentNode.id);
+      }
     } else {
+      setOtherDirectionChoices([]);
       openedDropdownMenu.className = 'display-none';
       dropdownMenu.current.className = 'dropdownModal';
       setOpenedDropdownMenu(dropdownMenu.current);
+      getOtherDirections(e.target.parentNode.id);
     }
   }
+
+  const getOtherDirections = (index) => {
+    const start = pinList[index].position;
+    const end = pinList[parseInt(index)+1].position;
+    let otherTravelMode = [];
+    let icons = [];
+    if (directions[index] == '' || 'DRIVING') {
+      otherTravelMode = ['TRANSIT', 'WALKING'];
+      icons = [trainIcon, walkIcon];
+    } else if (directions[index] == 'TRANSIT') {
+      otherTravelMode = ['DRIVING', 'WALKING'];
+      icons = [carIcon, walkIcon];
+    } else {
+      otherTravelMode = ['DRIVING', 'TRANSIT'];
+    }
+    otherTravelMode.forEach((mode, index) => {
+      const directionRequest = {
+        origin: start,
+        destination: end,
+        travelMode: mode,
+        drivingOptions: {
+          departureTime: new Date(Date.now()),
+          trafficModel: 'pessimistic'
+        },
+        transitOptions: {
+          modes: ['BUS', 'RAIL', 'SUBWAY', 'TRAIN', 'TRAM'],
+          routingPreference: 'FEWER_TRANSFERS'
+        },
+        unitSystem: google.maps.UnitSystem.METRIC,
+      };
+      directionsService.route(directionRequest, (result, status) => {
+        if (status == 'OK') {
+          console.log(result)
+          const distance = result.routes[0].legs[0].distance.text;
+          const duration = result.routes[0].legs[0].duration.text;
+          setOtherDirectionChoices(current => [...current, {
+            value: `${distance}・${duration}`,
+            icon: icons[index]
+          }]);
+        } else if (status == 'ZERO_RESULTS') {
+          console.log(result)
+          setOtherDirectionChoices(current => [...current, {
+            value: 'No results',
+            icon: icons[index]
+          }]);
+        }
+      });
+    });
+  };
 
   return (
     <div
       className={arrowClassName}
-      id={index}
+      onClick={switchDropdownModal}
     >
-      <img className='path-icon' src={pathIcon} onClick={e => handelDirection(e)}/>
-      <img src={carIcon} className='default-direction-icon'/>
-      <img src={directionLoadingIcon} className={directionLoadingIconClassName}></img>
-      <div className='direction'>{optimizedDrivingPath}</div>
-      <img src={icons_triangle} className='dropdown-icon' onClick={switchDropdownModal}/>
-      <div className='display-none' ref={dropdownMenu}>
-        <div className='other-direction-choice'>
-          <img src={trainIcon} className='other-direction-icon'/>
-          <div>8 min by transit</div>
-          <div>・6km</div>
-        </div>
-        <div className='other-direction-choice'>
-          <img src={walkIcon} className='other-direction-icon'/>
-          <div>18 min walk</div>
-          <div>・1.2km</div>
+      <div className='arrow-content' id={index}>
+        <img className='path-icon' src={pathIcon} onClick={e => handelDirection(e)}/>
+        <img src={carIcon} className='default-direction-icon'/>
+        <img src={directionLoadingIcon} className={directionLoadingIconClassName}/>
+        <div className='direction'>{directionInfo}</div>
+        <img src={icons_triangle} className='dropdown-icon'/>
+        <div className='display-none' ref={dropdownMenu}>
+          { 
+            otherDirectionChoices.length == 0
+            ? <img src={directionLoadingIcon} className='other-direction-fetching-icon'/>
+            : (
+              otherDirectionChoices.map((choice, index) => {
+                return (
+                  <div className='other-direction-choice' key={index}>
+                    <img src={choice.icon} className='other-direction-icon'/>
+                    <div>{choice.value}</div>
+                  </div>
+                )
+              })
+            )
+          }
         </div>
       </div>
     </div>

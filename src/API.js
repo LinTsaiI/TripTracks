@@ -1,6 +1,7 @@
 import { auth, db, provider } from './firebase';
 import { sendSignInLinkToEmail, signInWithPopup  } from 'firebase/auth';
 import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, getDocs, query, where, deleteDoc, orderBy } from 'firebase/firestore';
+import { async } from '@firebase/util';
 
 
 // 使用者身份相關（進入每個頁面都要驗證身份）
@@ -275,9 +276,6 @@ export const updateDirection = async (newDirectionInfo) => {
     console.log('Error updating directions', err);
   }
 };
-
-// 再次點擊路線規劃按鈕，取得該路線上一次紀錄的交通方式顯示出來（e.g. 步行，但google direction動態生成，因此可能實際內容會有改變）
-
 
 // 當景點list上的先後順序改變，重新生成連線
 

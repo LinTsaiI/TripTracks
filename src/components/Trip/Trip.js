@@ -115,7 +115,7 @@ const Trip = () => {
       });
       setPath(pinPath);
       pinPath.setMap(map);
-      getDefaultDirections();
+      getDirections();
     }
   }, [pinLatLng]);
 
@@ -215,19 +215,20 @@ const Trip = () => {
     }
   }, [focusInfoWindow]);
 
-  const getDefaultDirections = () => {
+  const getDirections = () => {
     for (let i = 0; i < pinLatLng.length-1; i++) {
       const directionRequest = {
         origin: pinLatLng[i],
         destination: pinLatLng[i+1],
-        travelMode: 'DRIVING',
-        // transitOptions: TransitOptions,
+        travelMode: dayTrack.directions[i] ? dayTrack.directions[i] : 'DRIVING',
         drivingOptions: {
           departureTime: new Date(Date.now()),
           trafficModel: 'pessimistic'
         },
+        transitOptions: {
+          routingPreference: 'FEWER_TRANSFERS'
+        },
         unitSystem: google.maps.UnitSystem.METRIC,
-        provideRouteAlternatives: true,
       };
       directionsService.route(directionRequest, (result, status) => {
         if (status == 'OK') {
@@ -283,6 +284,7 @@ const Trip = () => {
         infoWindow: infoWindow
       }}>
         <TripContext.Provider value={{
+          pinMarkerList: pinMarkerList,
           isNoteOpen: isNoteOpen,
           setIsNoteOpen: setIsNoteOpen,
           isDirectionOpen: isDirectionOpen,
@@ -293,11 +295,11 @@ const Trip = () => {
           setOpenedDropdownMenu: setOpenedDropdownMenu,
           currentFocusDirection: currentFocusDirection,
           setCurrentFocusDirection: setCurrentFocusDirection,
-          pinMarkerList: pinMarkerList,
           setPinMarkerList: setPinMarkerList,
           setFocusInfoWindow: setFocusInfoWindow
         }}>
           <DirectionContext.Provider value={{
+            directionsService: directionsService,
             distance: estimatedDistance,
             duration: estimatedDuration
           }}>

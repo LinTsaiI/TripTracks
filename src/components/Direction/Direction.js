@@ -26,7 +26,7 @@ const Direction = () => {
           <div className='direction-arrow'>&#8595;</div>
           <div className='direction-pin-name'>{dayTrack.pinList[endIndex].name}</div>
         </div>
-        <div className='direction-choice'>Here embed Google Direction results:{dayTrack.directions.way}</div>
+        <div className='direction-choice'>Here embed Google Direction results:{dayTrack.directions}</div>
       </div>
     );
   }
