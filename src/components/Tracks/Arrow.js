@@ -16,9 +16,13 @@ const Arrow = ({ index }) => {
   const tripValue = useContext(TripContext);
   const { openedDropdownMenu, setOpenedDropdownMenu, setIsNoteOpen, setIsDirectionOpen, currentFocusDirection, setCurrentFocusDirection } = tripValue;
   const directionValue = useContext(DirectionContext);
-  const { directionsService, distance, duration } = directionValue;
+  const { directionsService, distance, duration, otherDirectionChoices, setOtherDirectionChoices } = directionValue;
   const dropdownMenu = useRef();
-  const [otherDirectionChoices, setOtherDirectionChoices] = useState([]);
+  const travelMode = [
+    { mode: 'DRIVING', icon: carIcon },
+    { mode: 'TRANSIT', icon: trainIcon },
+    { mode: 'WALKING', icon: walkIcon }
+  ]
 
   const directionLoadingIconClassName = (!distance[index] || !duration[index]) ? 'direction-fetching-icon' : 'display-none ';
   const directionInfo = (!distance[index] || !duration[index]) ? '' : `${distance[index]}・${duration[index]}`;
@@ -59,52 +63,49 @@ const Arrow = ({ index }) => {
   }
 
   const getOtherDirections = (index) => {
-    const start = pinList[index].position;
-    const end = pinList[parseInt(index)+1].position;
-    let otherTravelMode = [];
-    let icons = [];
-    if (directions[index] == '' || 'DRIVING') {
-      otherTravelMode = ['TRANSIT', 'WALKING'];
-      icons = [trainIcon, walkIcon];
-    } else if (directions[index] == 'TRANSIT') {
-      otherTravelMode = ['DRIVING', 'WALKING'];
-      icons = [carIcon, walkIcon];
-    } else {
-      otherTravelMode = ['DRIVING', 'TRANSIT'];
-    }
-    otherTravelMode.forEach((mode, index) => {
-      const directionRequest = {
-        origin: start,
-        destination: end,
-        travelMode: mode,
-        drivingOptions: {
-          departureTime: new Date(Date.now()),
-          trafficModel: 'pessimistic'
-        },
-        transitOptions: {
-          modes: ['BUS', 'RAIL', 'SUBWAY', 'TRAIN', 'TRAM'],
-          routingPreference: 'FEWER_TRANSFERS'
-        },
-        unitSystem: google.maps.UnitSystem.METRIC,
-      };
-      directionsService.route(directionRequest, (result, status) => {
-        if (status == 'OK') {
-          console.log(result)
-          const distance = result.routes[0].legs[0].distance.text;
-          const duration = result.routes[0].legs[0].duration.text;
-          setOtherDirectionChoices(current => [...current, {
-            value: `${distance}・${duration}`,
-            icon: icons[index]
-          }]);
-        } else if (status == 'ZERO_RESULTS') {
-          console.log(result)
-          setOtherDirectionChoices(current => [...current, {
-            value: 'No results',
-            icon: icons[index]
-          }]);
-        }
+    if (pinList) {
+      const start = pinList[index].position;
+      const end = pinList[parseInt(index)+1].position;
+      let otherTravelMode;
+      if (directions[index] == '' || 'DRIVING') {
+        otherTravelMode = travelMode.filter(item => item.mode != 'DRIVING');
+      } else if (directions[index] == 'TRANSIT') {
+        otherTravelMode = travelMode.filter(item => item.mode != 'TRANSIT');
+      } else {
+        otherTravelMode = travelMode.filter(item => item.mode != 'WALKING');
+      }
+      otherTravelMode.forEach(item => {
+        const directionRequest = {
+          origin: start,
+          destination: end,
+          travelMode: item.mode,
+          drivingOptions: {
+            departureTime: new Date(Date.now()),
+            trafficModel: 'pessimistic'
+          },
+          transitOptions: {
+            modes: ['BUS', 'RAIL', 'SUBWAY', 'TRAIN', 'TRAM'],
+            routingPreference: 'FEWER_TRANSFERS'
+          },
+          unitSystem: google.maps.UnitSystem.METRIC,
+        };
+        directionsService.route(directionRequest, (result, status) => {
+          if (status == 'OK') {
+            const distance = result.routes[0].legs[0].distance.text;
+            const duration = result.routes[0].legs[0].duration.text;
+            setOtherDirectionChoices(current => [...current, {
+              value: `${distance}・${duration}`,
+              icon: item.icon
+            }]);
+          } else if (status == 'ZERO_RESULTS') {
+            setOtherDirectionChoices(current => [...current, {
+              value: 'No results',
+              icon: item.icon
+            }]);
+          }
+        });
       });
-    });
+    }
   };
 
   return (
@@ -133,6 +134,9 @@ const Arrow = ({ index }) => {
               })
             )
           }
+          <div className='direction-anchor'>
+            <a onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&origin=${pinList[index].position.lat},${pinList[index].position.lng}&destination=${pinList[parseInt(index)+1].position.lat},${pinList[parseInt(index)+1].position.lng}`)}>Find Details</a>
+          </div>
         </div>
       </div>
     </div>

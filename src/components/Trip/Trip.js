@@ -40,6 +40,7 @@ const Trip = () => {
   const [isDirectionOpen, setIsDirectionOpen] = useState(false);
   const [currentFocusNote, setCurrentFocusNote] = useState(null);
   const [openedDropdownMenu, setOpenedDropdownMenu] = useState(null);
+  const [otherDirectionChoices, setOtherDirectionChoices] = useState([]);
   const [currentFocusDirection, setCurrentFocusDirection] = useState(null);
   const [estimatedDistance, setEstimatedDistance] = useState([]);
   const [estimatedDuration, setEstimatedDuration] = useState([]);
@@ -155,6 +156,7 @@ const Trip = () => {
       setIsDirectionOpen(false);
       setCurrentFocusDirection(null);
       openedDropdownMenu.className = 'display-none';
+      setOtherDirectionChoices([]);
     }
   }, [trackIndex]);
 
@@ -301,7 +303,9 @@ const Trip = () => {
           <DirectionContext.Provider value={{
             directionsService: directionsService,
             distance: estimatedDistance,
-            duration: estimatedDuration
+            duration: estimatedDuration,
+            otherDirectionChoices: otherDirectionChoices,
+            setOtherDirectionChoices: setOtherDirectionChoices,
           }}>
             <Tracks tripInfo={tripInfo} setFocusInfoWindow={setFocusInfoWindow} />
             <SearchBar setFocusInfoWindow={setFocusInfoWindow} />

@@ -66,3 +66,18 @@
   width: 20px;
   height: 20px;
 }
+
+.direction-anchor {
+  padding: 6px 16px;
+  border-top: 1px solid #cecece;
+  text-align: center;
+}
+
+.direction-anchor > a {
+  color: #6c757d;
+}
+
+.direction-anchor > a:hover {
+  color: #555a5e;
+  font-weight: 500;
+}
