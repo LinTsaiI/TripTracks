@@ -1,6 +1,6 @@
 import { auth, db, provider } from './firebase';
 import { sendSignInLinkToEmail, signInWithPopup  } from 'firebase/auth';
-import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, getDocs, query, where, deleteDoc, orderBy } from 'firebase/firestore';
+import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, arrayRemove, getDocs, query, where, deleteDoc, orderBy } from 'firebase/firestore';
 import { async } from '@firebase/util';
 
 
@@ -58,6 +58,23 @@ export const creatUserIfNew = async (userId, username, email) => {
 
 
 // 行程資訊相關
+// 取得使用者已建立的所有行程，用以在 Dashboard 顯示行程名稱/日期區間
+export const getTripList = async (userId) => {
+  const condition = query(collection(db, 'trips'), where('userId', '==', userId));
+  const querySnapshot = await getDocs(condition);
+  let tripList = [];
+  querySnapshot.forEach(doc => {
+    let trip = {
+      tripId: doc.id,
+      tripName: doc.data().tripName,
+      startDate: doc.data().startDate,
+      endDate: doc.data().endDate
+    };
+    tripList.push(trip);
+  });
+  return tripList;
+};
+
 // 點擊 start to plan 新增空白行程
 export const createNewTrip = async (newTrip) => {
   const { userId, tripName, startDate, endDate } = newTrip;
@@ -89,22 +106,21 @@ export const createNewTrip = async (newTrip) => {
   }
 };
 
-// 取得使用者已建立的所有行程，用以在 Dashboard 顯示行程名稱/日期區間
-export const getTripList = async (userId) => {
-  const condition = query(collection(db, 'trips'), where('userId', '==', userId));
-  const querySnapshot = await getDocs(condition);
-  let tripList = [];
-  querySnapshot.forEach(doc => {
-    let trip = {
-      tripId: doc.id,
-      tripName: doc.data().tripName,
-      startDate: doc.data().startDate,
-      endDate: doc.data().endDate
-    };
-    tripList.push(trip);
-  });
-  return tripList;
+// 刪除指定的整個行程
+export const deleteSelectPlan = async (planInfo) => {
+  const { userId, tripId } = planInfo;
+  try {
+    await deleteDoc(doc(db, 'trips', tripId));
+    await updateDoc(doc(db, 'user', userId), {
+      tripId: arrayRemove(tripId)
+    });
+    const newTripList = await getTripList(userId);
+    return newTripList;
+  } catch (err) {
+    console.log('Error updating pinList', err);
+  }
 };
+
 
 // 取得特定 tripId 的所有資訊，進入 /trip/tripId 時用以顯示行程名稱/天數/日期區間
 export const getTripData = async (tripId) => {
@@ -138,9 +154,6 @@ export const getTrackData = async (tripId, trackIndex) => {
       pinIds.push(pin.id);
       pinList.push(pin.data());
     });
-    // const directionSnap = await getDocs(collection(db, 'trips', tripId, 'tracks', targetTrackId, 'directions'));
-    // let directions = [];
-    // directionSnap.forEach(direction => directions.push(direction.data()));
     return {
       tripId: tripId,
       trackId: targetTrackId,

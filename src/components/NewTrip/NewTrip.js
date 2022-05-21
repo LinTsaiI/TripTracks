@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { asyncCreateNewTrip } from '../../store/slice/newTripSlice';
+import { asyncCreateNewTrip } from '../../store/slice/dashboardSlice';
 import './NewTrip.css';
 
 const getDate = (daysFromToday) => {
@@ -26,7 +26,7 @@ const NewTrip = ({ openModal }) => {
   const [disabled, setDisabled] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const newTrip = useSelector(state => state.newTrip);
+  const newTrip = useSelector(state => state.dashboard);
 
   useEffect(() => {
     if (newTrip.isNewTrip) {

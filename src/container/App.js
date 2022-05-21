@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase';
-import { userIdentity, setUser } from '../store/slice/userSlice';
+import { setUser } from '../store/slice/userSlice';
 import { creatUserIfNew } from '../API';
 import Home from '../components/Home/Home';
 import Dashboard from '../components/Dashboard/Dashboard';
@@ -11,7 +11,7 @@ import Trip from '../components/Trip/Trip';
 import Footer from '../components/Footer/Footer';
 
 const App = () => {
-  const userId = useSelector(userIdentity);
+  const userId = useSelector(state => state.user.userId);
   const dispatch = useDispatch();
   useEffect(() => {
     onAuthStateChanged(auth, user => {

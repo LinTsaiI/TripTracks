@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
-import { resetNewTrip } from '../../store/slice/newTripSlice';
+import { resetNewTrip } from '../../store/slice/dashboardSlice';
 import { fetchDayTrack, initTrackData, clearPinList, deletePin } from '../../store/slice/tripSlice';
 import { getTripData, getTrackData, saveMap } from '../../API';
 import Tracks from '../Tracks/Tracks';
@@ -26,7 +26,7 @@ const Trip = () => {
   const day = searchParams.get('day');
   const trackIndex = day ? day-1 : 0;
   const dispatch = useDispatch();
-  const newTrip = useSelector(state => state.newTrip);
+  const newTrip = useSelector(state => state.dashboard);
   const dayTrack = useSelector(state => state.trip);
   const mapRegin = useRef();
   const [tripInfo, setTripInfo] = useState(null);

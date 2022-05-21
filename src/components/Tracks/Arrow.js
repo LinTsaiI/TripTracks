@@ -9,7 +9,7 @@ import carIcon from '../../img/icons_car.png';
 import trainIcon from '../../img/icons_train.png';
 import walkIcon from '../../img/icons_walk.png';
 import directionLoadingIcon from '../../img/icons_loading.gif';
-import icons_triangle from '../../img/icons_triangle.png';
+import triangleIcon from '../../img/icons_triangle.png';
 
 const Arrow = ({ index }) => {
   const dispatch = useDispatch();
@@ -80,13 +80,9 @@ const Arrow = ({ index }) => {
       setOpenedDropdownMenu(dropdownMenu.current);
       getOtherDirections(e.target.parentNode.id);
     } else if(openedDropdownMenu == dropdownMenu.current) {
-      if (dropdownMenu.current.className == 'dropdownModal') {  
         setOtherDirectionOptions([]);
+        setOpenedDropdownMenu(null);
         dropdownMenu.current.className = 'display-none';
-      } else {
-        dropdownMenu.current.className = 'dropdownModal';
-        getOtherDirections(e.target.parentNode.id);
-      }
     } else {
       setOtherDirectionOptions([]);
       openedDropdownMenu.className = 'display-none';
@@ -167,7 +163,7 @@ const Arrow = ({ index }) => {
         <img src={directionIcon} className='default-direction-icon'/>
         <img src={directionLoadingIcon} className={directionLoadingIconClassName}/>
         <div className='direction'>{directionInfo}</div>
-        <img src={icons_triangle} className='dropdown-icon'/>
+        <img src={triangleIcon} className='dropdown-icon'/>
         <div className='display-none' ref={dropdownMenu}>
           { 
             otherDirectionOptions.length == 0
