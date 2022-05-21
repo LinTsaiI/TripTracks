@@ -1,7 +1,6 @@
 .pin-collection {
   width: 310px;
   padding: 10px 0 20px 0;
-  margin-bottom: 40px;
   overflow-y: auto;
 }
 
@@ -63,4 +62,11 @@
 
 .delete-btn:hover {
   opacity: 1;
+}
+
+.updating-pinList {
+  height: 50px;
+  background: url('../../img/icons_loading_circle.gif') no-repeat center center;
+  background-size: 30px;
+  margin: 20px;
 }

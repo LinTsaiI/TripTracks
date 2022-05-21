@@ -44,6 +44,7 @@ const SearchBar = ({ setFocusInfoWindow }) => {
       let infoWindowListener = infoWindow.addListener('domready', () => {
         const addBtn = document.getElementById('addBtn');
         addBtn.addEventListener('click', () => {
+          const newDirectionOptions = [...dayTrack.directions, 'DRIVING'];
           dispatch(addNewPin({
             tripId: dayTrack.tripId,
             trackId: dayTrack.trackId,
@@ -52,7 +53,8 @@ const SearchBar = ({ setFocusInfoWindow }) => {
             lat: placeInfo.geometry.location.lat(),
             lng: placeInfo.geometry.location.lng(),
             address: placeInfo.formatted_address,
-            photo: placeInfo.photos[0].getUrl()
+            photo: placeInfo.photos[0].getUrl(),
+            newDirections: newDirectionOptions
           }));
           setIsNoteOpen(false);
           setIsDirectionOpen(false);

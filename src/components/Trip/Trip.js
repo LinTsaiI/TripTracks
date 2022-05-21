@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
-import { fetchDayTrack, initTrackData, clearPinList, deletePin, upDateDirections } from '../../store/slice/tripSlice';
+import { resetNewTrip } from '../../store/slice/newTripSlice';
+import { fetchDayTrack, initTrackData, clearPinList, deletePin } from '../../store/slice/tripSlice';
 import { getTripData, getTrackData, saveMap } from '../../API';
 import Tracks from '../Tracks/Tracks';
 import SearchBar from '../searchBar/searchBar';
@@ -25,13 +26,13 @@ const Trip = () => {
   const day = searchParams.get('day');
   const trackIndex = day ? day-1 : 0;
   const dispatch = useDispatch();
+  const newTrip = useSelector(state => state.newTrip);
   const dayTrack = useSelector(state => state.trip);
   const mapRegin = useRef();
   const [tripInfo, setTripInfo] = useState(null);
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [infoWindow, setInfoWindow] = useState(null);
-  const [directionsService, setDirectionsService] = useState(null);
   const [pinMarkerList, setPinMarkerList] = useState([]);
   const [pinLatLng, setPinLatLng] = useState([]);
   const [path, setPath] = useState(null);
@@ -40,15 +41,22 @@ const Trip = () => {
   const [isDirectionOpen, setIsDirectionOpen] = useState(false);
   const [currentFocusNote, setCurrentFocusNote] = useState(null);
   const [openedDropdownMenu, setOpenedDropdownMenu] = useState(null);
-  const [otherDirectionChoices, setOtherDirectionChoices] = useState([]);
   const [currentFocusDirection, setCurrentFocusDirection] = useState(null);
-  const [estimatedDistance, setEstimatedDistance] = useState([]);
-  const [estimatedDuration, setEstimatedDuration] = useState([]);
+  const [estimatedDirection, setEstimatedDirection] = useState([]);
+  const dataFetchingClassName = dayTrack.isFetching ? 'fetching-data' : 'display-none';
+  const pathUpdatingClassName = dayTrack.isPathUpdating ? 'path-updating' : 'display-none';
 
   const mapLoader = new Loader({
     apiKey: process.env.REACT_GOOGLE_MAP_API_KEY,
     libraries: ['places']
   });
+
+  useEffect(() => {
+    if (newTrip.isNewTrip) {
+      dispatch(resetNewTrip());
+    }
+  }, []);
+
 
   useEffect(() => {
     getTripData(tripId)
@@ -74,11 +82,9 @@ const Trip = () => {
             icon: searchMarker
           });
           const infoWindow = new google.maps.InfoWindow();
-          const directionsService = new google.maps.DirectionsService();
           setMap(map);
           setMarker(marker);
           setInfoWindow(infoWindow);
-          setDirectionsService(directionsService);
           let markerList = [];
           let latLngList = [];
           trackData.pinList.forEach((pin, index) => {
@@ -104,8 +110,7 @@ const Trip = () => {
   }, []);
 
   useEffect(() => {
-    setEstimatedDistance([]);
-    setEstimatedDuration([]);
+    setEstimatedDirection([]);
     if (pinLatLng && map) {
       const pinPath = new google.maps.Polyline({
         path: pinLatLng,
@@ -151,12 +156,6 @@ const Trip = () => {
         tripId: tripId,
         trackIndex: trackIndex,
       }));
-      setIsNoteOpen(false);
-      setCurrentFocusNote(null);
-      setIsDirectionOpen(false);
-      setCurrentFocusDirection(null);
-      openedDropdownMenu.className = 'display-none';
-      setOtherDirectionChoices([]);
     }
   }, [trackIndex]);
 
@@ -218,24 +217,29 @@ const Trip = () => {
   }, [focusInfoWindow]);
 
   const getDirections = () => {
+    const directionsService = new google.maps.DirectionsService();
     for (let i = 0; i < pinLatLng.length-1; i++) {
       const directionRequest = {
         origin: pinLatLng[i],
         destination: pinLatLng[i+1],
-        travelMode: dayTrack.directions[i] ? dayTrack.directions[i] : 'DRIVING',
+        travelMode: dayTrack.directions[i],
         drivingOptions: {
           departureTime: new Date(Date.now()),
           trafficModel: 'pessimistic'
         },
         transitOptions: {
+          modes: ['BUS', 'RAIL', 'SUBWAY', 'TRAIN', 'TRAM'],
           routingPreference: 'FEWER_TRANSFERS'
         },
         unitSystem: google.maps.UnitSystem.METRIC,
       };
       directionsService.route(directionRequest, (result, status) => {
         if (status == 'OK') {
-          setEstimatedDistance(origin => [...origin, result.routes[0].legs[0].distance.text]);
-          setEstimatedDuration(origin => [...origin, result.routes[0].legs[0].duration.text])
+          const distance = result.routes[0].legs[0].distance.text;
+          const duration = result.routes[0].legs[0].duration.text;
+          setEstimatedDirection(origin => [...origin, `${distance}・${duration}`]);
+        } else {
+          setEstimatedDirection(current => [...current, 'No results']);
         }
       });
     }
@@ -248,11 +252,15 @@ const Trip = () => {
       deleteBtn.addEventListener('click', () => {
         const restPinIds = [...dayTrack.pinIds];
         restPinIds.splice(index, 1);
+        const newDirectionOptions = [...dayTrack.directions];
+        const directionOptionRemoveTarget = (index == dayTrack.pinList.length) ? index - 1 : index;
+        newDirectionOptions.splice(directionOptionRemoveTarget, 1);
         dispatch(deletePin({
           tripId: tripId,
           trackId: dayTrack.trackId,
           pinId: dayTrack.pinIds[index],
-          restPinIds: restPinIds
+          restPinIds: restPinIds,
+          newDirections: newDirectionOptions
         }));
         infoWindow.close();
       });
@@ -278,46 +286,49 @@ const Trip = () => {
     });
   };
 
-  return !tripInfo ? <div>Loading...</div> : (
-    <div className='trip-container'>
-      <MapContext.Provider value={{
-        map: map,
-        marker: marker,
-        infoWindow: infoWindow
-      }}>
-        <TripContext.Provider value={{
-          pinMarkerList: pinMarkerList,
-          isNoteOpen: isNoteOpen,
-          setIsNoteOpen: setIsNoteOpen,
-          isDirectionOpen: isDirectionOpen,
-          setIsDirectionOpen: setIsDirectionOpen,
-          currentFocusNote: currentFocusNote,
-          setCurrentFocusNote: setCurrentFocusNote,
-          openedDropdownMenu: openedDropdownMenu,
-          setOpenedDropdownMenu: setOpenedDropdownMenu,
-          currentFocusDirection: currentFocusDirection,
-          setCurrentFocusDirection: setCurrentFocusDirection,
-          setPinMarkerList: setPinMarkerList,
-          setFocusInfoWindow: setFocusInfoWindow
+  if (tripInfo) {
+    return (
+      <div className='trip-container'>
+        <div className={dataFetchingClassName}></div>
+        <MapContext.Provider value={{
+          map: map,
+          marker: marker,
+          infoWindow: infoWindow
         }}>
-          <DirectionContext.Provider value={{
-            directionsService: directionsService,
-            distance: estimatedDistance,
-            duration: estimatedDuration,
-            otherDirectionChoices: otherDirectionChoices,
-            setOtherDirectionChoices: setOtherDirectionChoices,
+          <TripContext.Provider value={{
+            pinMarkerList: pinMarkerList,
+            isNoteOpen: isNoteOpen,
+            setIsNoteOpen: setIsNoteOpen,
+            isDirectionOpen: isDirectionOpen,
+            setIsDirectionOpen: setIsDirectionOpen,
+            currentFocusNote: currentFocusNote,
+            setCurrentFocusNote: setCurrentFocusNote,
+            openedDropdownMenu: openedDropdownMenu,
+            setOpenedDropdownMenu: setOpenedDropdownMenu,
+            currentFocusDirection: currentFocusDirection,
+            setCurrentFocusDirection: setCurrentFocusDirection,
+            setPinMarkerList: setPinMarkerList,
+            setFocusInfoWindow: setFocusInfoWindow
           }}>
-            <Tracks tripInfo={tripInfo} setFocusInfoWindow={setFocusInfoWindow} />
-            <SearchBar setFocusInfoWindow={setFocusInfoWindow} />
-            <Notes />
-            <Direction />
-          </DirectionContext.Provider>
-        </TripContext.Provider>
-        <div className='map-region' ref={mapRegin}/>
-      </MapContext.Provider>
-      <Footer />
-    </div>
-  );
+            <DirectionContext.Provider value={{
+              estimatedDirection: estimatedDirection,
+              setEstimatedDirection: setEstimatedDirection,
+            }}>
+              <Tracks tripInfo={tripInfo} setFocusInfoWindow={setFocusInfoWindow} />
+              <SearchBar setFocusInfoWindow={setFocusInfoWindow} />
+              <Notes />
+              <Direction />
+            </DirectionContext.Provider>
+          </TripContext.Provider>
+          <div className='map-region'>
+            <div className={pathUpdatingClassName}/>
+            <div className='map' ref={mapRegin}/>
+          </div>          
+        </MapContext.Provider>
+        <Footer />
+      </div>
+    );
+  }
 }
 
 export default Trip;

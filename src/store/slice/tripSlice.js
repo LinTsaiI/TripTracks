@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getTrackData, addToPinList, deleteSelectedPin, saveMap, updatePinListOrder, updateDirection } from '../../API';
+import { getTrackData, addToPinList, deleteSelectedPin, saveMap, updatePinListOrder, updateDirectionOptions } from '../../API';
 
 export const fetchDayTrack = createAsyncThunk('trip/fetchDayTrack', async (targetTrack) => {
   const { tripId, trackIndex } = targetTrack;
@@ -27,14 +27,17 @@ export const reOrderPinList = createAsyncThunk('trip/reOrderPinList', async (new
   return newPins;
 });
 
-export const changeDirectionChoice = createAsyncThunk('trip/updateDirectionChoice', async (newDirectionChoice) => {
-  const newDirections = await updateDirection(newDirectionChoice);
+export const changeDirectionOptions = createAsyncThunk('trip/changeDirectionOptions', async (newDirectionInfo) => {
+  const newDirections = await updateDirectionOptions(newDirectionInfo);
   return newDirections;
 });
 
 export const tripSlice = createSlice({
   name: 'trip',
   initialState: {
+    isFetching: true,
+    isPinUpdating: false,
+    isPathUpdating: false,
     tripId: null,
     trackId: null,
     mapCenter: null,
@@ -58,6 +61,7 @@ export const tripSlice = createSlice({
       state.pinIds = pinIds;
       state.pinList = pinList;
       state.directions = directions;
+      state.isFetching = false;
     },
     clearPinList: (state) => {
       state.pinList = [];
@@ -69,8 +73,7 @@ export const tripSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(fetchDayTrack.pending, (state, action) => {
-        console.log('fetch day track pending');
-        // state.status = 'loading'
+        state.isFetching = true;
       })
       .addCase(fetchDayTrack.fulfilled, (state, action) => {
         console.log('dayTrack data fetch success');
@@ -88,35 +91,41 @@ export const tripSlice = createSlice({
         state.pinIds = pinIds;
         state.pinList = pinList;
         state.directions = directions;
+        state.isFetching = false;
       })
-      .addCase(addNewPin.pending, (state, action) => {
-        console.log('add new pin pending');
+      .addCase(addNewPin.pending, (state) => {
+        state.isPinUpdating = true;
       })
       .addCase(addNewPin.fulfilled, (state, action) => {
-        const { pinId, pinContent } = action.payload;
+        const { pinId, pinContent, newDirections } = action.payload;
         state.pinIds.push(pinId);
         state.pinList.push(pinContent);
+        state.directions = newDirections;
+        state.isPinUpdating = false;
       })
-      .addCase(deletePin.pending, (state, action) => {
-        console.log('delete pin pending');
+      .addCase(deletePin.pending, (state) => {
+        state.isPinUpdating = true;
       })
       .addCase(deletePin.fulfilled, (state, action) => {
-        const { newPinIds, newPinList } = action.payload;
+        const { newPinIds, newPinList, newDirections } = action.payload;
         state.pinIds = newPinIds;
         state.pinList = newPinList;
+        state.directions = newDirections;
+        state.isPinUpdating = false;
       })
-      .addCase(reOrderPinList.pending, (state, action) => {
-        console.log('update pinList order');
+      .addCase(reOrderPinList.pending, (state) => {
+        state.isPathUpdating = true;
       })
       .addCase(reOrderPinList.fulfilled, (state, action) => {
         const { newPinIds, newPinList } = action.payload;
         state.pinIds = newPinIds;
         state.pinList = newPinList;
+        state.isPathUpdating = false;
       })
-      .addCase(changeDirectionChoice.pending, (state, action) => {
+      .addCase(changeDirectionOptions.pending, (state, action) => {
         console.log('change direction choice pending');
       })
-      .addCase(changeDirectionChoice.fulfilled, (state, action) => {
+      .addCase(changeDirectionOptions.fulfilled, (state, action) => {
         console.log('update directions success');
         state.directions = action.payload;
       });

@@ -157,7 +157,7 @@ export const getTrackData = async (tripId, trackIndex) => {
 
 // 將景點加入 pinList
 export const addToPinList = async (pinInfo) => {
-  const { tripId, trackId, currentPinListLength, placeName, lat, lng, address, photo } = pinInfo;
+  const { tripId, trackId, currentPinListLength, placeName, lat, lng, address, photo, newDirections } = pinInfo;
   try {
     const index = currentPinListLength ? currentPinListLength : 0;
     const pinContent = {
@@ -169,8 +169,11 @@ export const addToPinList = async (pinInfo) => {
       notes: ''
     }
     const pinDocRef = await addDoc(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), pinContent);
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
+      directions: newDirections
+    });
     if (pinDocRef.id) {
-      return { pinId: pinDocRef.id, pinContent: pinContent };
+      return { pinId: pinDocRef.id, pinContent: pinContent, newDirections: newDirections };
     }
   } catch (err) {
     console.log('Error updating pinList', err);
@@ -179,9 +182,12 @@ export const addToPinList = async (pinInfo) => {
 
 // 刪除指定的Pin
 export const deleteSelectedPin = async (pinInfo) => {
-  const { tripId, trackId, pinId, restPinIds } = pinInfo;
+  const { tripId, trackId, pinId, restPinIds, newDirections } = pinInfo;
   try {
     await deleteDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId));
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
+      directions: newDirections
+    });
     restPinIds.forEach((pinId, index) => {
       updateDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId), {
         index: index
@@ -195,7 +201,7 @@ export const deleteSelectedPin = async (pinInfo) => {
       newPinIds.push(pin.id);
       newPinList.push(pin.data());
     });
-    return { newPinIds: newPinIds, newPinList: newPinList };
+    return { newPinIds: newPinIds, newPinList: newPinList, newDirections: newDirections };
   } catch (err) {
     console.log('Error updating pinList', err);
   }
@@ -265,13 +271,13 @@ export const saveNotes = async (notesInfo) => {
 
 // 路線規劃相關
 // 更新交通方式
-export const updateDirection = async (newDirectionInfo) => {
-  const { tripId, trackId, directions } = newDirectionInfo;
+export const updateDirectionOptions = async (newDirectionInfo) => {
+  const { tripId, trackId, newDirections } = newDirectionInfo;
   try {
     await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
-      directions: directions
+      directions: newDirections
     });
-    return directions;
+    return newDirections;
   } catch (err) {
     console.log('Error updating directions', err);
   }

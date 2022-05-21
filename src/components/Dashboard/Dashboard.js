@@ -12,8 +12,11 @@ import './Dashboard.css';
 const Dashboard = () => {
   const [isModalShown, setIsModalShown] = useState(false);
   const userId = useSelector(userIdentity);
+  const userName = useSelector(state => state.user.username);
+  const isNewTripCreating = useSelector(state => state.newTrip.isCreating)
   const [tripList, setTripList] = useState([]);
   const [isTripListLoading, setIsTripListLoading] = useState(true);
+  const creatingLoadingClassName = isNewTripCreating ? 'creating-new-trip' : 'display-none';
 
   useEffect(() => {
     getTripList(userId)
@@ -25,20 +28,12 @@ const Dashboard = () => {
       });
   }, []);
 
-  // const userSignOut = () => {
-  //   signOut(auth).then(() => {
-  //     dispatch(setUser({
-  //       userId: null
-  //     }));
-  //   }).catch(error => console.log(error))
-
-  // }
-
   return !tripList ? <div>Loading...</div> : (
     <div>
       <div className='dashboard-container'>
+        <div className={creatingLoadingClassName}></div>
         <div className='dashboard-menu'>
-          <div className='dashboard-avatar'>A</div>
+          <div className='dashboard-avatar'>{userName[0]}</div>
           <div className='menu-item'>My trips</div>
           <button className='sign-out-btn' onClick={() => signOut(auth)}>Sign Out</button>
         </div>
@@ -49,10 +44,10 @@ const Dashboard = () => {
             isLoading={isTripListLoading}
           />
         </div>
+        {
+          isModalShown ? <NewTrip openModal={setIsModalShown} /> : <div/>
+        }
       </div>
-      {
-        isModalShown ? <NewTrip openModal={setIsModalShown} /> : <div/>
-      }
       <Footer />
     </div>
   )

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { asyncCreateNewTrip } from '../../store/slice/newTripSlice';
@@ -23,16 +23,25 @@ const NewTrip = ({ openModal }) => {
   const [tripName, setTripName] = useState('');
   const [startDate, setStartDate] = useState(currentDate);
   const [endDate, setEndDate] = useState(defaultEndDate);
+  const [disabled, setDisabled] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const newTrip = useSelector(state => state.newTrip);
 
   useEffect(() => {
-    if (newTrip.isCreatedSuccessfully) {
+    if (newTrip.isNewTrip) {
       navigate(`/trip/${newTrip.newtTripId}`);
       openModal(false);
     }
-  }, [newTrip.isCreatedSuccessfully]);
+  }, [newTrip.isNewTrip]);
+
+  useEffect(() => {
+    if (tripName) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
+    }
+  }, [tripName]);
 
   const handelSubmit = (e) => {
     e.preventDefault();
@@ -62,12 +71,7 @@ const NewTrip = ({ openModal }) => {
             <label htmlFor='end-date' className='label-value'>End Date </label>
             <input type='date' id='end-date' placeholder='End on' defaultValue={currentDate} onChange={e => setEndDate(e.target.value)}/>
           </div>
-
-          {/* <div className='style-on-line'>
-            <label htmlFor='duration' className='label-value'>Duration </label>
-            <input type='number' id='duration' min='1' max='25' defaultValue='1' placeholder='How many days do you plan to stay' onChange={e => setDuration(e.target.value)}/>
-          </div> */}
-          <input type='submit' value='Start to Plan' className='create-btn'/>
+          <input type='submit' value='Start to Plan' className='create-btn' disabled={disabled}/>
         </form>
       </div>
     </div>
@@ -75,6 +79,3 @@ const NewTrip = ({ openModal }) => {
 }
 
 export default NewTrip;
-
-// Start Date 預設當天日期
-// 當點擊 Start to Plan => call API => 驗證資料 => 將輸入資訊儲存到資料庫 => response ok => navigate 到 `/trip/${tripName}`

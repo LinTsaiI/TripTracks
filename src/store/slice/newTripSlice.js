@@ -10,21 +10,29 @@ export const newTripSlice = createSlice({
   name: 'newTrip',
   initialState: {
     newtTripId: null,
-    isCreatedSuccessfully: false
+    isCreating: false,
+    isNewTrip: false
+  },
+  reducers: {
+    resetNewTrip: (state) => {
+      state.isNewTrip = false;
+      console.log(state.isNewTrip)
+    }
   },
   extraReducers: builder => {
     builder
       .addCase(asyncCreateNewTrip.pending, (state, action) => {
         console.log('create new trip pending');
-        // state.status = 'loading'
+        state.isCreating = true;
       })
       .addCase(asyncCreateNewTrip.fulfilled, (state, action) => {
         console.log('create new trip success');
         state.newtTripId = action.payload;
-        state.isCreatedSuccessfully = true;
+        state.isCreating = false;
+        state.isNewTrip = true;
       });
   }
 });
 
-export const { initTrackData, savePreviousTrackState } = newTripSlice.actions;
+export const { resetNewTrip } = newTripSlice.actions;
 export default newTripSlice.reducer;

@@ -1,11 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { getNotes, saveNotes } from '../../API';
 import { TripContext } from '../Trip/Trip';
 import './Notes.css';
 import savingLoadingImg from '../../img/icons_loading_circle.gif';
 
 const Notes = () => {
+  const [searchParams] = useSearchParams();
+  const day = searchParams.get('day');
+  const trackIndex = day ? day-1 : 0;
   const [notes, setNotes] = useState('');
   const [saveBtnClassName, setSaveBtnClassName] = useState('display-none');
   const [savedClassName, setSavedClassName] = useState('display-none');
@@ -13,9 +17,14 @@ const Notes = () => {
   const [isSaved, setIsSaved] = useState(false);
   const dayTrack = useSelector(state => state.trip);
   const value = useContext(TripContext);
-  const { isNoteOpen, setIsNoteOpen, currentFocusNote, isDirectionOpen } = value;
+  const { isNoteOpen, setIsNoteOpen, currentFocusNote, setCurrentFocusNote, isDirectionOpen } = value;
   const focusIndex = currentFocusNote ? currentFocusNote : 0;
   const notesClassName  = isNoteOpen ? 'notes-container' : 'display-none';
+
+  useEffect(() => {
+    setIsNoteOpen(false);
+    setCurrentFocusNote(null);
+  }, [trackIndex]);
 
   useEffect(() => {
     if (focusIndex && isNoteOpen) {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useRef, useEffect, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deletePin, reOrderPinList } from '../../store/slice/tripSlice';
 import { MapContext, TripContext } from '../Trip/Trip';
@@ -15,6 +15,7 @@ const Pin = () => {
   const { map, infoWindow } = mapValue;
   const tripValue = useContext(TripContext);
   const { setIsNoteOpen, setIsDirectionOpen, currentFocusNote, setCurrentFocusNote, pinMarkerList, setFocusInfoWindow } = tripValue;
+  const pinUpdatingClassName = dayTrack.isPinUpdating ? 'updating-pinList' : 'display-none';
 
   const switchToPin = (e) => {
     setFocusInfoWindow(null);
@@ -55,12 +56,17 @@ const Pin = () => {
     setIsNoteOpen(false);
     setIsDirectionOpen(false);
     const restPinIds = [...dayTrack.pinIds];
-    restPinIds.splice(e.target.parentNode.id, 1);
+    const deleteTargetIndex = e.target.parentNode.id;
+    restPinIds.splice(deleteTargetIndex, 1);
+    const newDirectionOptions = [...dayTrack.directions];
+    const directionOptionRemoveTarget = (deleteTargetIndex == dayTrack.pinList.length) ? deleteTargetIndex - 1 : deleteTargetIndex;
+    newDirectionOptions.splice(directionOptionRemoveTarget, 1);
     dispatch(deletePin({
       tripId: dayTrack.tripId,
       trackId: dayTrack.trackId,
       pinId: dayTrack.pinIds[e.target.parentNode.id],
-      restPinIds: restPinIds
+      restPinIds: restPinIds,
+      newDirections: newDirectionOptions
     }));
   };
 
@@ -115,6 +121,7 @@ const Pin = () => {
           )
         })
       }
+      <div className={pinUpdatingClassName}></div>
     </div>
   )
 }
