@@ -25,13 +25,11 @@ export const emailSignIn = (email) => {
 
 // Sign in with Google
 export const googleSignIn = () => {
-  signInWithPopup(auth, provider)
-  .then(result => {
-    let userId = result.user.uid;
-    console.log(userId);
-  }).catch((error) => {
-    console.log(error);
-  });
+  try {
+    signInWithPopup(auth, provider);
+  } catch (err) {
+    console.log('google sign in err', error);
+  }
 };
 
 // Add user to user collection database

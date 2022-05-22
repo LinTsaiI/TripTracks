@@ -28,7 +28,7 @@
   height: 150px;
   margin: 20px;
   border-radius: 75px;
-  background-color: #EAE1D7;
+  background-color: #F1EBE4;
   line-height: 150px;
   text-align: center;
   font-size: 36px;
@@ -39,7 +39,7 @@
 
 .menu-item {
   font-size: 24px;
-  color: #F8F5F2;
+  color: #F1EBE4;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
   margin-bottom: auto;
 }
@@ -47,8 +47,8 @@
 
 .sign-out-btn {
   margin: 20px;
-  background-color: #F8F5F2;
-  color: #666666;
+  background-color: #F1EBE4;
+  color: #3f3f3f;
   width: 120px;
   height: 50px;
   padding: 10px;

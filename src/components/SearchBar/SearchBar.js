@@ -27,6 +27,7 @@ const SearchBar = ({ setFocusInfoWindow }) => {
         let autocomplete = new window.google.maps.places.Autocomplete(input, autocompleteOptions);
         autocomplete.bindTo('bounds', map);
         autocomplete.addListener('place_changed', () => {
+          setInput(null);
           const place = autocomplete.getPlace();
           setPlaceInfo(place);
           showMarker(place.geometry.location);
@@ -115,6 +116,7 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   };
 
   const searchPlace = () => {
+    setInput(null);
     infoWindow.close();
     const service = new google.maps.places.PlacesService(map);
     let request = {

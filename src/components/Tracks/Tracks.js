@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Pin from './Pin';
 import './Tracks.css';
 import calendar from '../../img/icons_calendar.png';
@@ -13,6 +13,7 @@ const displayDate = (start, end) => {
 };
 
 const Tracks = ({ tripInfo }) => {
+  const username = useSelector(state => state.user.username);
   const tripId = useSelector(state => state.trip.tripId);
   const tripDuration = displayDate(tripInfo.startDate, tripInfo.endDate);
   const startDate = new Date(tripInfo.startDate);
@@ -58,7 +59,7 @@ const Tracks = ({ tripInfo }) => {
         </div>
         <NavLink to='/dashboard'>
           <div className='header-avatar'>
-            <div className='header-avatar-circle'>A</div>
+            <div className='header-avatar-circle'>{username[0]}</div>
           </div>
         </NavLink>
       </div>

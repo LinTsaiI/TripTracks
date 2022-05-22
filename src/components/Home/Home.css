@@ -1,7 +1,5 @@
 .home-outer-container {
-  height: 100vh;
-  width: 100vw;
-  background: linear-gradient(#EAE1D7 10%, #173d36);
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -10,26 +8,145 @@
   font-weight: bold;
 }
 
+.home-hero {
+  height: 100vh;
+  width: 100vw;
+  background: url('../../img/hero.jpeg') no-repeat center center;
+  background-size: cover;
+  opacity: 0.9;
+}
+
 .home-title {
-  font-size: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  margin: 80px;
+  color: #3A554B;
   text-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
 }
 
-.website-slogan {
-  font-size: 22px;
-  text-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+.home-title > img {
+  width: 48px;
+  height: 48px;
+}
+
+.home-slogan {
+  width: fit-content;
+  margin: auto;
+  padding: 20px 40px;
+  border-radius: 10px;
+  background-color: rgb(255 255 255 / 70%);
+}
+
+.home-slogan > h1 {
+  text-align: center;
+  color: #24493b;
+  text-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
+}
+
+.home-slogan-p {
+  max-width: 500px;
+}
+
+.home-slogan-p > h3 {
+  color: #585858;
+}
+
+.home-slogan-p > button {
+  width: 160px;
+  height: 45px;
+  border-radius: 30px;
+  border: none;
+  background-color: #bf6017;
+  color: #F1EBE4;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.home-description {
+  width: 1200px;
+}
+
+.home-part1, .home-part3 {
+  display: flex;
+  align-items: center;
+  padding: 40px 60px;
+}
+
+.home-part1 > img {
+  width: 35%;
+  border-radius: 10px;
+  margin: 0 60px;
+}
+
+.home-part1-text > h3,
+.home-part3-text > h3 {
+  color: #9c9c9c;
+}
+
+.home-part1-text > h2,
+.home-part2 > h2,
+.home-part3-text > h2 {
+  text-align: center;
+  color: #3A554B;
+}
+
+.home-part2-imgs {
+  display: flex;
+  justify-content: center;
+}
+
+.home-part2-imgs > img {
+  width: 30%;
+}
+
+.home-part3 > img {
+  width: 50%;
+}
+
+.sign-modal {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  top: 0;
+  width: 100vw;
+  height: 100%;
+  background-color: rgb(0 0 0 / 50%);
 }
 
 .sign-container {
+  position: fixed;
+  top: 80px;
   min-width: 300px;
   width: 400px;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 20px;
-  background: #F8F5F2;
-  box-shadow: 2px 2px 6px rgb(0 0 0 / 40%);
-  color: #666666;
-  font-size: 20px;
+  border-radius: 20px;
+  padding: 30px 40px 20px 40px;
+  background: #F1EBE4;
+  box-shadow: 0px 4px 12px rgb(0 0 0 / 20%);
+  color: #3f3f3f;
+}
+
+.sign-title {
+  font-size: 24px;
+  text-align: center;
+}
+
+.sign-container > form {
+  margin: 20px 0;
+}
+
+.sign-separate-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;  font-size: 16px;
+  text-align: center;
+}
+
+.straight-line {
+  border-top: 1px solid #9c9c9c;
+  width: 100px;
+  margin: 0 10px;
 }
 
 .sign-button-container {
@@ -43,29 +160,41 @@
   text-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
 }
 
-.sign-in {
-  padding: 0 20px;
-}
-
 .sign-form > input {
   height: 45px;
   width: 100%;
-  font-size: 18px;
   border: none;
   outline: none;
-  border-radius: 5px;
+  border-radius: 10px;
   margin: 10px 0;
+  box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+  font-size: 18px;
+  padding: 10px;
+}
+
+.sign-form > input[type='submit'] {
+  background-color: #24493b;
+  color: #F1EBE4;
+  border-radius: 20px;
+}
+
+.google-auth {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 10px 20px;
+  margin: 25px 0 10px 0;
+  font-size: 18px;
   box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
 }
 
-.sign-in-email, .google-auth {
-  width: auto;
-  cursor: pointer;
-  background-color: #557771;
-  border: 0;
-  color: #F8F5F2;
-  border-radius: 20px;
-  padding: 10px 20px;
-  margin: 10px 0;
-  box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+.google-auth > img {
+  position: absolute;
+  left: 20px;
+  width: 32px;
+  height: 32px;
 }

@@ -32,7 +32,6 @@ const Dashboard = () => {
             <button className='sign-out-btn' onClick={() => signOut(auth)}>Sign Out</button>
           </div>
           <div className='collections'>
-            {/* <div className={loadingIcon} key='loading'/> */}
             {
               tripList.map((trip, index) => {
                 return <TripCard

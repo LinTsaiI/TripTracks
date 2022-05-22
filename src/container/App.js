@@ -38,7 +38,7 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/dashboard' element={userId ? <Dashboard /> : <Navigate to='/' />} />
-          <Route path='/trip/:tripId' element={<Trip />}>
+          <Route path='/trip/:tripId' element={userId ? <Trip /> : <Navigate to='/' />}>
           </Route>
           <Route
               path='*'
