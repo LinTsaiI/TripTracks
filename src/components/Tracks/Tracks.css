@@ -7,7 +7,7 @@
   position: relative;
   width: 100%;
   display: flex;
-  background-color: #557771;
+  background-color: #134161;
   padding: 10px 20px;
   align-items: center;
   z-index: 1;
@@ -18,7 +18,8 @@
 }
 
 .header-plan-place {
-  font-size: 36px;
+  font-size: 24px;
+  margin-bottom: 10px;
   color: #F8F5F2;
   font-weight: bold;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
@@ -36,6 +37,18 @@
   font-size: 24px;
   font-weight: bold;
   box-shadow: 2px 4px 2px rgb(0 0 0 / 20%);
+}
+
+.header-avatar-loading-background {
+  background: #EAE1D7 url('../../img/icons_loading_circle.gif') no-repeat center center;
+  background-size: 30px;
+}
+
+.header-avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  border: 6px solid white;
 }
 
 .header-plan-date {

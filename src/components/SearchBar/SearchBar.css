@@ -1,6 +1,10 @@
+.search-bar {
+  position: relative;
+  display: flex;
+}
+
 .search-input-block {
   position: absolute;
-  left: 360px;
   margin: 20px;
   width: 280px;
   height: 40px;
@@ -25,7 +29,7 @@
 .search-button {
   float: right;
   border: 0;
-  background-color: #557771;
+  background-color: #134161;
   background-image: url('/src/img/icons_search.png');
   background-size: 30px;
   background-repeat: no-repeat;
@@ -34,4 +38,27 @@
   height: 100%;
   border-radius: 0 5px 5px 0;
   cursor: pointer;
+}
+
+.draw-btn {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: max-content;
+  top: 15px;
+  left: 310px;
+  padding: 5px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  z-index: 1;
+  box-shadow: 2px 2px 6px rgb(0 0 0 / 20%);  background-color: #ececec;
+}
+
+.draw-btn:hover {
+  background-color: #ffffff;
+}
+
+.draw-btn-icon {
+  width: 36px;
 }

@@ -1,11 +1,19 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { db } from '../../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+
+export const getAvatarRef = createAsyncThunk('user/getAvatar', async (userId) => {
+  const userSnap = await getDoc(doc(db, 'user', userId));
+  return userSnap.data().avatar;
+}); 
 
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
     userId: null,
     username: null,
-    email: null
+    email: null,
+    avatar: null
   },
   reducers: {
     // signIn: (state, action) => {
@@ -39,9 +47,18 @@ export const userSlice = createSlice({
       state.userId = userId;
       state.username = username;
       state.email = email;
+    },
+    changeAvatar: (state, action) => {
+      state.avatar = action.payload;
     }
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(getAvatarRef.fulfilled, (state, action) => {
+        state.avatar = action.payload;
+      })
   }
 });
 
-export const { signIn, signUp, signOut, setUser } = userSlice.actions;
+export const { signIn, signUp, signOut, setUser, changeAvatar } = userSlice.actions;
 export default userSlice.reducer;

@@ -24,13 +24,22 @@ const TripCard = ({ trip, index, openedTripCardOptionModal, setOpenedTripCardOpt
 
   const openTripCardOptions = () => {
     if (!openedTripCardOptionModal) {
+      tripCardOptionModal.current.parentNode.className = 'trip-card-option-opened';
       tripCardOptionModal.current.className = 'trip-card-option-modal';
       setOpenedTripCardOptionModal(tripCardOptionModal.current);
     } else if (openedTripCardOptionModal == tripCardOptionModal.current) {
-      tripCardOptionModal.current.className = (tripCardOptionModal.current.className == 'trip-card-option-modal') ? 'display-none' : 'trip-card-option-modal';
+      if (tripCardOptionModal.current.className == 'trip-card-option-modal') {
+        tripCardOptionModal.current.parentNode.className = 'trip-card-option';
+        tripCardOptionModal.current.className = 'display-none';
+      } else {
+        tripCardOptionModal.current.parentNode.className = 'trip-card-option-opened';
+        tripCardOptionModal.current.className = 'trip-card-option-modal';
+      }
     } else {
+      openedTripCardOptionModal.parentNode.className = 'trip-card-option';
       openedTripCardOptionModal.className = 'display-none';
       tripCardOptionModal.current.className = 'trip-card-option-modal';
+      tripCardOptionModal.current.parentNode.className = 'trip-card-option-opened';
       setOpenedTripCardOptionModal(tripCardOptionModal.current);
     }
   };
@@ -59,7 +68,7 @@ const TripCard = ({ trip, index, openedTripCardOptionModal, setOpenedTripCardOpt
           </div>
         </div>
         <img
-          src={tripCardCover}
+          src={trip.cover}
           className='trip-card-img'
           onClick={() => navigate(`/trip/${trip.tripId}`)}
         />
@@ -76,65 +85,6 @@ const TripCard = ({ trip, index, openedTripCardOptionModal, setOpenedTripCardOpt
       </div>
     </div>
   );
-
-  // let tripCards = [loading];
-  // for (let i = 0; i < tripList.length; i++) {
-  //   const startDate = new Date(tripList[i].startDate);
-  //   const endDate = new Date(tripList[i].endDate);
-  //   const startDateMMM = startDate.toDateString().split(' ')[1];
-  //   const startDateDD = startDate.toDateString().split(' ')[2];
-  //   const endDateMMM = endDate.toDateString().split(' ')[1];
-  //   const endDateDD = endDate.toDateString().split(' ')[2];
-  //   const displayDate = `${startDateMMM} ${startDateDD} - ${endDateMMM} ${endDateDD}`;
-    
-  //   tripCards.push(
-  //     <div
-  //       key={i} className='trip-card'>
-  //       <div className='trip-card-cover'>
-  //         <div
-  //           className='trip-card-option'
-  //           onClick={openTripCardOptions}
-  //         >
-  //           <img id={i} src={dotsIcon}/>
-  //         </div>
-  //         <div className='trip-card-option-modal'
-  //           ref={tripCardOptionModal}
-  //           onClick={deleteProject}
-  //         >
-  //           <img src={trashCanIcon}/>
-  //           <div id={tripList[i].tripId}>Delete</div>
-  //         </div>
-  //         <img
-  //           src={tripCardCover}
-  //           className='trip-card-img'
-  //           onClick={() => navigate(`/trip/${tripList[i].tripId}`)}
-  //         />
-  //       </div>
-  //       <div
-  //         className='trip-card-content'
-  //         onClick={() => navigate(`/trip/${tripList[i].tripId}`)}
-  //       >
-  //         <div className='trip-name'>{tripList[i].tripName}</div>
-  //         <div className='trip-card-date'>
-  //           <img className='calendar-icon' src={calendar}/>
-  //           <div className='duration'>{displayDate}</div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-  // tripCards.push(
-  //   <div
-  //     key={tripCards.length}
-  //     className='trip-card'
-  //     onClick={() => openModal(true)}
-  //   >
-  //     <div className='new-trip'>
-  //       <div className='plus-icon'>+</div>
-  //     </div>
-  //   </div>
-  // )
-  // return tripCards;
 }
 
 export default TripCard;

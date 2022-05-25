@@ -44,6 +44,7 @@ module.exports = (env, argv) => {
       new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
         template: path.join(__dirname, 'src', 'index.html'),
+        favicon: './src/img/icon_triptracks.png'
       }),
       new MiniCssExtractPlugin(),
       new Dotenv({

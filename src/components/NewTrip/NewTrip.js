@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { asyncCreateNewTrip } from '../../store/slice/dashboardSlice';
@@ -43,7 +43,18 @@ const NewTrip = ({ openModal }) => {
     }
   }, [tripName]);
 
-  const handelSubmit = (e) => {
+  const randomGetPhoto = () => {
+    fetch(`https://api.unsplash.com/photos/random?query='travel'&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
+      .then(response => response.json()) 
+      .then(result => {
+        return result[0].urls.small;
+      })
+      .catch(e => {
+        console.log('err', e);
+      })
+  }
+
+  const handelSubmit = async (e) => {
     e.preventDefault();
     dispatch(asyncCreateNewTrip({
       userId: userId,
@@ -69,7 +80,7 @@ const NewTrip = ({ openModal }) => {
           </div>
           <div className='style-in-line'>
             <label htmlFor='end-date' className='label-value'>End Date </label>
-            <input type='date' id='end-date' placeholder='End on' defaultValue={currentDate} className='create-form-input' onChange={e => setEndDate(e.target.value)}/>
+            <input type='date' id='end-date' placeholder='End on' defaultValue={defaultEndDate} className='create-form-input' onChange={e => setEndDate(e.target.value)}/>
           </div>
           <input type='submit' value='Start to Plan' className='create-btn' disabled={disabled}/>
         </form>

@@ -1,8 +1,7 @@
-import { auth, db, provider } from './firebase';
+import { auth, db, provider, storage } from './firebase';
 import { sendSignInLinkToEmail, signInWithPopup  } from 'firebase/auth';
 import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, arrayRemove, getDocs, query, where, deleteDoc, orderBy } from 'firebase/firestore';
-import { async } from '@firebase/util';
-
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 // 使用者身份相關（進入每個頁面都要驗證身份）
 // 登入
@@ -42,7 +41,8 @@ export const creatUserIfNew = async (userId, username, email) => {
           name: username,
           email: email,
           tripId: [],
-          FirstEntryTime: serverTimestamp()
+          FirstEntryTime: serverTimestamp(),
+          avatar: 'default'
         });
         console.log('create user successfully');
       } catch (err) {
@@ -66,22 +66,34 @@ export const getTripList = async (userId) => {
       tripId: doc.id,
       tripName: doc.data().tripName,
       startDate: doc.data().startDate,
-      endDate: doc.data().endDate
+      endDate: doc.data().endDate,
+      cover: doc.data().cover
     };
     tripList.push(trip);
   });
   return tripList;
 };
 
+const randomGetPhoto = () => {
+  return fetch(`https://api.unsplash.com/photos/random?query='travel-nature'&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
+    .then(response => response.json()) 
+    .then(result => result[0].urls.small)
+    .catch(e => {
+      console.log('err', e);
+    });
+}
+
 // 點擊 start to plan 新增空白行程
 export const createNewTrip = async (newTrip) => {
   const { userId, tripName, startDate, endDate } = newTrip;
+  const coverImg = await randomGetPhoto();
   try {
     const docRef = await addDoc(collection(db, 'trips'), {
       userId: userId,
       tripName: tripName,
       startDate: startDate,
       endDate: endDate,
+      cover: coverImg
     });
     if (docRef.id) {
       updateDoc(doc(db, 'user', userId), {
@@ -118,7 +130,6 @@ export const deleteSelectPlan = async (planInfo) => {
     console.log('Error updating pinList', err);
   }
 };
-
 
 // 取得特定 tripId 的所有資訊，進入 /trip/tripId 時用以顯示行程名稱/天數/日期區間
 export const getTripData = async (tripId) => {
@@ -294,7 +305,7 @@ export const updateDirectionOptions = async (newDirectionInfo) => {
   }
 };
 
-// 當景點list上的先後順序改變，重新生成連線
+
 
 
 // 載入 Google map
@@ -330,9 +341,4 @@ export const showMarker = (marker, map, position) => {
       marker.setVisible(true);
     }, 500);
   }
-};
-
-// 顯示 infoWindow
-export const showInfoWindow = () => {
-
 };

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -11,22 +11,26 @@ import Trip from '../components/Trip/Trip';
 import Footer from '../components/Footer/Footer';
 
 const App = () => {
-  const userId = useSelector(state => state.user.userId);
+  const [userId, setUserId] = useState(null);
+  // const userId = useSelector(state => state.user.userId);
   const dispatch = useDispatch();
+
   useEffect(() => {
     onAuthStateChanged(auth, user => {
       if (user) {
+        setUserId(user.uid);
         dispatch(setUser({
           userId: user.uid,
           username: user.displayName,
-          email: user.email
+          email: user.email,
         }));
         creatUserIfNew(user.uid, user.displayName, user.email);
       } else {
+        setUserId(null);
         dispatch(setUser({
           userId: null,
           username: null,
-          email: null
+          email: null,
         }));
       }
     });

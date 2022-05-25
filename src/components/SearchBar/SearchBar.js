@@ -3,11 +3,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import { MapContext, TripContext } from '../Trip/Trip';
 import { addNewPin } from '../../store/slice/tripSlice';
 import './SearchBar.css';
-import pinImg from '../../img/icons_pin.png';
+import addPinIcon from '../../img/icons_pin.png';
+import drawingIcon from '../../img/icons_drawing.png';
+import stopDrawingIcon from '../../img/icons_stop_drawing.png';
+import { current } from '@reduxjs/toolkit';
 
 const SearchBar = ({ setFocusInfoWindow }) => {
-  const [input, setInput] = useState(null);
+  const [inputValue, setInputValue] = useState('');
+  const [inputTarget, setInputTarget] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [drawingObject, setDrawingObject] = useState(null);
+  const drawingClassName = isDrawing ? 'display-none' : 'draw-btn';
+  const stopDrawingClassName = isDrawing ? 'draw-btn' : 'display-none';
   const dayTrack = useSelector(state => state.trip);
   const dispatch = useDispatch();
   const mapValue = useContext(MapContext);
@@ -22,19 +30,24 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   };
 
   useEffect(() => {
+    console.log(inputValue)
+  }, [inputValue]);
+
+  useEffect(() => {
     setTimeout(() => {
       if (map) {
-        let autocomplete = new window.google.maps.places.Autocomplete(input, autocompleteOptions);
+        let autocomplete = new window.google.maps.places.Autocomplete(inputTarget, autocompleteOptions);
         autocomplete.bindTo('bounds', map);
         autocomplete.addListener('place_changed', () => {
-          setInput(null);
+          setInputTarget(current => current.value = '');
+          setInputValue('');
           const place = autocomplete.getPlace();
           setPlaceInfo(place);
           showMarker(place.geometry.location);
         });
       }
     }, 1500);
-  }, [input]);
+  }, [inputTarget]);
 
   useEffect(() => {
     if (marker) {
@@ -104,7 +117,7 @@ const SearchBar = ({ setFocusInfoWindow }) => {
           </div>
           <div style='width: 40%; margin: 10px; background: #ffffff url("${placeInfo.photos[0].getUrl()}") no-repeat center center; background-size: cover'></div>
         </div>
-        <img id='addBtn' src=${pinImg} style='float: right; width: 28px; height: 28px; margin: 0 10px; cursor: pointer;'/>
+        <img id='addBtn' src=${addPinIcon} style='float: right; width: 28px; height: 28px; margin: 0 10px; cursor: pointer;'/>
       </div>
     `);
     infoWindow.open({
@@ -116,11 +129,12 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   };
 
   const searchPlace = () => {
-    setInput(null);
+    setInputTarget(current => current.value = '');
+    setInputValue('');
     infoWindow.close();
     const service = new google.maps.places.PlacesService(map);
     let request = {
-      query: input.value,
+      query: inputTarget.value,
       fields: placeReturnField,
     };
     service.findPlaceFromQuery(request, (results, status) => {
@@ -131,12 +145,82 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     });
   };
 
+  const enableDrawing = () => {
+    console.log('enable map drawing');
+    setIsDrawing(true);
+    map.setOptions({ draggable: false });
+    map.addListener('mousedown', () => drawFreeRegion());
+  }
+
+  const drawFreeRegion = () => {
+    console.log('mouse down, start drawing')
+    const poly = new google.maps.Polyline({
+      clickable: false,
+      map: map,
+      strokeColor: "#42A5F5",
+      strokeWeight: 3,
+    });
+    map.addListener('mousemove', (e) => {
+      poly.getPath().push(e.latLng);
+    });
+    map.addListener('mouseup', () => {
+      console.log('mouse up')
+      const path = poly.getPath();
+      poly.setMap(null);
+      const region = new google.maps.Polygon({
+        clickable: false,
+        fillColor: '#42A5F5',
+        fillOpacity: 0.25,
+        geodesic: true,
+        map: map,
+        path: path.getArray(),
+        strokeColor: '#42A5F5',
+        strokeWeight: 3
+      });
+      setDrawingObject(region);
+    });
+  }
+
+  useEffect(() => {
+    if (drawingObject) {
+      console.log('complete drawing, remove listener, trigger some other events');
+      map.setOptions({ draggable: true });
+      google.maps.event.clearListeners(map, 'mousedown');
+      google.maps.event.clearListeners(map, 'mousemove');
+      google.maps.event.clearListeners(map, 'mouseup');
+      
+      // const paths = drawingObject.getPaths();
+
+
+    }
+  }, [drawingObject]);
+
+  const stopDrawing = () => {
+    console.log('stop drawing');
+    setIsDrawing(false);
+    map.setOptions({ draggable: true });
+    if (drawingObject) {
+      drawingObject.setMap(null);
+      setDrawingObject(null);
+    }
+  }
+
   return(
-    <div className='search-input-block'>
-      <input type='text' className='search-input' onChange={(e) => setInput(e.target)}/>
-      <input type='button' className='search-button' onClick={() => searchPlace()}/>
+    <div className='search-bar'>
+      <div className='search-input-block'>
+        <input type='text' className='search-input' onChange={(e) => setInputValue(e.target.value)} onClick={(e) => setInputTarget(e.target)}/>
+        <input type='button' className='search-button' onClick={() => searchPlace()}/>
+      </div>
+      <button className={drawingClassName} onClick={enableDrawing}>
+        <img src={drawingIcon} className='draw-btn-icon'/>
+        Draw a region
+      </button>
+      <button className={stopDrawingClassName} onClick={stopDrawing}>
+        <img src={stopDrawingIcon} className='draw-btn-icon'/>
+        Stop Drawing
+      </button>
     </div>
-  )
+    )
 }
 
 export default SearchBar;

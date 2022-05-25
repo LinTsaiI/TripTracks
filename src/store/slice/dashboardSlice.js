@@ -22,7 +22,7 @@ export const dashboardSlice = createSlice({
     tripList: [],
     newtTripId: null,
     isProcessing: false,
-    isNewTrip: false
+    isNewTrip: false,
   },
   reducers: {
     resetNewTrip: (state) => {

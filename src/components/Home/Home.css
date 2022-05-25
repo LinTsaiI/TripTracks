@@ -9,31 +9,34 @@
 }
 
 .home-hero {
+  display: flex;
   height: 100vh;
   width: 100vw;
-  background: url('../../img/hero.jpeg') no-repeat center center;
+  background: url('../../img/hero.png') no-repeat center center;
   background-size: cover;
   opacity: 0.9;
 }
 
 .home-title {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  font-size: 3rem;
-  margin: 80px;
-  color: #3A554B;
+  position: absolute;
+  font-size: 1.8rem;
+  top: 10px;
+  right: 30px;
+  color: #134161;
   text-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
 }
 
 .home-title > img {
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
 }
 
 .home-slogan {
   width: fit-content;
-  margin: auto;
+  margin: auto 60px auto auto;
   padding: 20px 40px;
   border-radius: 10px;
   background-color: rgb(255 255 255 / 70%);
@@ -41,7 +44,7 @@
 
 .home-slogan > h1 {
   text-align: center;
-  color: #24493b;
+  color: #134161;
   text-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
 }
 
@@ -58,8 +61,8 @@
   height: 45px;
   border-radius: 30px;
   border: none;
-  background-color: #bf6017;
-  color: #F1EBE4;
+  background-color: #e8891b;
+  color: #ffffff;
   font-size: 16px;
   cursor: pointer;
 }
@@ -173,7 +176,7 @@
 }
 
 .sign-form > input[type='submit'] {
-  background-color: #24493b;
+  background-color: #134161;
   color: #F1EBE4;
   border-radius: 20px;
 }

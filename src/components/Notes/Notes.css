@@ -77,6 +77,14 @@
   height: 35px;
   border-radius: 20px;
   float: right;
+  background-color: #ffffff;
+  border: none;
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 30%);
+  cursor: pointer;
+}
+
+.save-note-btn:hover {
+  background-color: #dedede;
 }
 
 .saving {

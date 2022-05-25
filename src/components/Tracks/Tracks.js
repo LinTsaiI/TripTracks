@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { storage } from '../../firebase';
+import { ref, getDownloadURL } from "firebase/storage";
 import Pin from './Pin';
 import './Tracks.css';
 import calendar from '../../img/icons_calendar.png';
+import defaultAvatar from '../../img/blank_profile_avatar.png';
 
 const displayDate = (start, end) => {
   const [startY, startM, startD] = start.split('-');
@@ -13,9 +16,11 @@ const displayDate = (start, end) => {
 };
 
 const Tracks = ({ tripInfo }) => {
-  const username = useSelector(state => state.user.username);
+  const user = useSelector(state => state.user);
   const tripId = useSelector(state => state.trip.tripId);
   const tripDuration = displayDate(tripInfo.startDate, tripInfo.endDate);
+  const [avatar, setAvatar] = useState(null);
+  const avatarFetchingClassName = user.avatar ? 'header-avatar-circle' : 'header-avatar-circle header-avatar-loading-background';
   const startDate = new Date(tripInfo.startDate);
   const endDate = new Date(tripInfo.endDate);
   const date = [];
@@ -45,6 +50,22 @@ const Tracks = ({ tripInfo }) => {
     index++;
   }
 
+  useEffect(() => {
+    if (user.avatar) {
+      if (user.avatar == 'default') {
+        setAvatar(defaultAvatar);
+      } else {
+          getDownloadURL(ref(storage, user.avatar))
+            .then(url => {
+              setAvatar(url);
+            })
+            .catch(err => {
+              console.log('Something goes wrong', err);
+            });
+      }
+    }
+  }, [user.avatar]);
+
   return (
     <div className='side-bar'>
       <div className='header'>
@@ -59,7 +80,9 @@ const Tracks = ({ tripInfo }) => {
         </div>
         <NavLink to='/dashboard'>
           <div className='header-avatar'>
-            <div className='header-avatar-circle'>{username[0]}</div>
+            <div className={avatarFetchingClassName}>
+              <img src={avatar} className='header-avatar-img'/>
+            </div>
           </div>
         </NavLink>
       </div>
