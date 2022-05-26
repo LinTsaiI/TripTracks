@@ -10,8 +10,8 @@ import SearchBar from '../searchBar/searchBar';
 import Notes from '../Notes/Notes';
 import Direction from '../Direction/Direction';
 import Footer from '../Footer/Footer';
-import markerImg from '../../img/icons_marker.png';
 import './Trip.css';
+import pinMarker from '../../img/icons_marker.png';
 import trashCanIcon from '../../img/icons_trashcan.png';
 import searchMarker from '../../img/icons_searchMarker.png';
 
@@ -91,7 +91,7 @@ const Trip = () => {
             const markerOptions = {
               map: map,
               position: pin.position,
-              icon: markerImg,
+              icon: pinMarker,
               label: {
                 text: (index+1).toString(),
                 className: 'marker-label',
@@ -181,7 +181,7 @@ const Trip = () => {
         const markerOptions = {
           map: map,
           position: pin.position,
-          icon: markerImg,
+          icon: pinMarker,
           label: {
             text: (index+1).toString(),
             className: 'marker-label',

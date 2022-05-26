@@ -3,17 +3,18 @@ import { useSelector, useDispatch } from 'react-redux';
 import { MapContext, TripContext } from '../Trip/Trip';
 import { addNewPin } from '../../store/slice/tripSlice';
 import './SearchBar.css';
-import addPinIcon from '../../img/icons_pin.png';
+import addPinIcon from '../../img/icons_pin2.png';
 import drawingIcon from '../../img/icons_drawing.png';
-import stopDrawingIcon from '../../img/icons_stop_drawing.png';
-import { current } from '@reduxjs/toolkit';
+import eraserIcon from '../../img/icons_eraser.png';
+import searchMarker from '../../img/icons_searchMarker.png';
 
 const SearchBar = ({ setFocusInfoWindow }) => {
   const [inputValue, setInputValue] = useState('');
   const [inputTarget, setInputTarget] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [drawingObject, setDrawingObject] = useState(null);
+  const [area, setArea] = useState(null);
+  const [drawingAreaMarkers, setDrawingAreaMarkers] = useState([]);
   const drawingClassName = isDrawing ? 'display-none' : 'draw-btn';
   const stopDrawingClassName = isDrawing ? 'draw-btn' : 'display-none';
   const dayTrack = useSelector(state => state.trip);
@@ -146,62 +147,104 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   };
 
   const enableDrawing = () => {
-    console.log('enable map drawing');
     setIsDrawing(true);
+    document.body.style.cursor = "url('../../img/icons_drawing.png'), crosshair";
     map.setOptions({ draggable: false });
     map.addListener('mousedown', () => drawFreeRegion());
   }
 
   const drawFreeRegion = () => {
-    console.log('mouse down, start drawing')
     const poly = new google.maps.Polyline({
       clickable: false,
       map: map,
-      strokeColor: "#42A5F5",
+      strokeColor: '#2D658C',
       strokeWeight: 3,
     });
     map.addListener('mousemove', (e) => {
       poly.getPath().push(e.latLng);
     });
     map.addListener('mouseup', () => {
-      console.log('mouse up')
       const path = poly.getPath();
       poly.setMap(null);
       const region = new google.maps.Polygon({
         clickable: false,
-        fillColor: '#42A5F5',
+        fillColor: '#2D658C',
         fillOpacity: 0.25,
         geodesic: true,
         map: map,
         path: path.getArray(),
-        strokeColor: '#42A5F5',
+        strokeColor: '#2D658C',
         strokeWeight: 3
       });
-      setDrawingObject(region);
+      setArea(region);
     });
   }
 
   useEffect(() => {
-    if (drawingObject) {
-      console.log('complete drawing, remove listener, trigger some other events');
+    if (area) {
       map.setOptions({ draggable: true });
       google.maps.event.clearListeners(map, 'mousedown');
       google.maps.event.clearListeners(map, 'mousemove');
       google.maps.event.clearListeners(map, 'mouseup');
       
-      // const paths = drawingObject.getPaths();
-
-
+      const service = new google.maps.places.PlacesService(map);
+      const paths = area.getPaths();
+      let pathLatLng = [];
+      paths.forEach(path => {
+        const latLngArr = path.getArray();
+        latLngArr.forEach(latLng => {
+          const lat = latLng.lat();
+          const lng = latLng.lng();
+          pathLatLng.push({
+            lat: lat,
+            lng: lng
+          });
+        });
+      });
+      const maxLat = Math.max(...pathLatLng.map(latLng => latLng.lat));
+      const minLat = Math.min(...pathLatLng.map(latLng => latLng.lat));
+      const maxLng = Math.max(...pathLatLng.map(latLng => latLng.lng));
+      const minLng = Math.min(...pathLatLng.map(latLng => latLng.lng));
+      const southWest = new google.maps.LatLng({ lat: minLat, lng: minLng});
+      const northEast = new google.maps.LatLng({ lat: maxLat, lng: maxLng});
+      const areaCenter = new google.maps.LatLng({
+        lat: (maxLat+minLat)/2,
+        lng: (maxLng+minLng)/2
+      })
+      const bounds = new google.maps.LatLngBounds(southWest, northEast);
+      let request = {
+        bounds: bounds,
+        type: ['restaurant'],
+        fields: placeReturnField,
+      };
+      service.nearbySearch(request, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          let markers = [];
+          results.forEach(result => {
+            const markerOptions = {
+              map: map,
+              position: result.geometry.location,
+              icon: searchMarker
+            }
+            let marker = new google.maps.Marker(markerOptions);
+            markers.push(marker);
+          });
+          map.panTo(areaCenter);
+          setDrawingAreaMarkers(markers);
+        }
+      });
     }
-  }, [drawingObject]);
+  }, [area]);
 
   const stopDrawing = () => {
     console.log('stop drawing');
     setIsDrawing(false);
     map.setOptions({ draggable: true });
-    if (drawingObject) {
-      drawingObject.setMap(null);
-      setDrawingObject(null);
+    if (area) {
+      area.setMap(null);
+      setArea(null);
+      drawingAreaMarkers.forEach(marker => marker.setMap(null));
+      setDrawingAreaMarkers([]);
     }
   }
 
@@ -213,14 +256,23 @@ const SearchBar = ({ setFocusInfoWindow }) => {
       </div>
       <button className={drawingClassName} onClick={enableDrawing}>
         <img src={drawingIcon} className='draw-btn-icon'/>
-        Draw a region
+        Draw an area
       </button>
       <button className={stopDrawingClassName} onClick={stopDrawing}>
-        <img src={stopDrawingIcon} className='draw-btn-icon'/>
-        Stop Drawing
+        <img src={eraserIcon} className='draw-btn-icon'/>
+        Remove area
       </button>
     </div>
     )
 }
 
 export default SearchBar;
+
+/*
+tourist_attraction
+restaurant
+bar
+cafe
+lodging
+store
+*/
