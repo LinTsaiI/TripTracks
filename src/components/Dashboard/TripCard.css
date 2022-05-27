@@ -12,7 +12,7 @@
 }
 
 .trip-card:hover {
-  box-shadow: 2px 2px 6px rgb(0 0 0 / 40%);
+  box-shadow: 2px 4px 12px rgb(0 0 0 / 30%);
 }
 
 .trip-card-cover {

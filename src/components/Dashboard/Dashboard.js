@@ -26,7 +26,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     dispatch(asyncFetchTripList(user.userId));
-    dispatch(getAvatarRef(user.userId));
   }, []);
 
   useEffect(() => {
@@ -34,13 +33,13 @@ const Dashboard = () => {
       if (user.avatar == 'default') {
         setAvatar(defaultAvatar);
       } else {
-          getDownloadURL(ref(storage, user.avatar))
-            .then(url => {
-              setAvatar(url);
-            })
-            .catch(err => {
-              console.log('Something goes wrong', err);
-            });
+        getDownloadURL(ref(storage, user.avatar))
+          .then(url => {
+            setAvatar(url);
+          })
+          .catch(err => {
+            console.log('Something goes wrong', err);
+          });
       }
     }
   }, [user.avatar]);

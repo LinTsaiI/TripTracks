@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { MapContext, TripContext } from '../Trip/Trip';
 import { addNewPin } from '../../store/slice/tripSlice';
@@ -6,7 +6,14 @@ import './SearchBar.css';
 import addPinIcon from '../../img/icons_pin2.png';
 import drawingIcon from '../../img/icons_drawing.png';
 import eraserIcon from '../../img/icons_eraser.png';
-import searchMarker from '../../img/icons_searchMarker.png';
+import searchMarker from '../../img/icons_hotelPin.png';
+import attractionIcon from '../../img/icons_attractions.png';
+import restaurantIcon from '../../img/icons_restaurant.png';
+import cafeIcon from '../../img/icons_cafe.png';
+import barIcon from '../../img/icons_bar.png';
+import shopIcon from '../../img/icons_shop.png';
+import hotelIcon from '../../img/icons_hotel.png';
+
 
 const SearchBar = ({ setFocusInfoWindow }) => {
   const [inputValue, setInputValue] = useState('');
@@ -15,6 +22,10 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [area, setArea] = useState(null);
   const [drawingAreaMarkers, setDrawingAreaMarkers] = useState([]);
+  const [isDrawBtnDisabled, setIsDrawBtnDisabled] = useState(true);
+  const [drawingOption, setDrawingOption] = useState(null);
+  const checkedOption = useRef();
+  const [focusedDrawingAreaMarker, setFocusedDrawingAreaMarker] = useState(null);
   const drawingClassName = isDrawing ? 'display-none' : 'draw-btn';
   const stopDrawingClassName = isDrawing ? 'draw-btn' : 'display-none';
   const dayTrack = useSelector(state => state.trip);
@@ -23,16 +34,12 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   const { map, marker, infoWindow } = mapValue;
   const tripValue = useContext(TripContext);
   const { setIsNoteOpen, setIsDirectionOpen } = tripValue;
-  const placeReturnField = ['name', 'geometry', 'formatted_address', 'photos'];
+  const placeReturnField = ['name', 'types', 'geometry', 'formatted_address', 'photos', 'place_id', 'rating', 'user_ratings_total'];
   const autocompleteOptions = {
     fields: placeReturnField,
     strictBounds: false,
     types: ['establishment'],
   };
-
-  useEffect(() => {
-    console.log(inputValue)
-  }, [inputValue]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -51,9 +58,11 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   }, [inputTarget]);
 
   useEffect(() => {
-    if (marker) {
+    const focusedMarker = focusedDrawingAreaMarker ? focusedDrawingAreaMarker : marker;
+    if (focusedMarker) {
       infoWindow.close();
-      marker.addListener('click', () => {
+      focusedMarker.addListener('click', () => {
+        console.log(placeInfo)
         showInfoWindow();
       });
       let infoWindowListener = infoWindow.addListener('domready', () => {
@@ -73,7 +82,7 @@ const SearchBar = ({ setFocusInfoWindow }) => {
           }));
           setIsNoteOpen(false);
           setIsDirectionOpen(false);
-          marker.setVisible(false);
+          focusedMarker.setVisible(false);
           infoWindow.close();
         });
       });
@@ -108,21 +117,69 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   };
 
   const showInfoWindow = () => {
+    const placeName = placeInfo.name;
+    const address = placeInfo.formatted_address ? placeInfo.formatted_address : placeInfo.vicinity;
+    const photo = placeInfo.photos[0].getUrl();
+    const place_id = placeInfo.place_id;
+    const rating = placeInfo.rating;
+    const voteNumber = placeInfo.user_ratings_total ? `(${placeInfo.user_ratings_total})` : '';
+    let type;
+    let icon;
+    switch (drawingOption) {
+      case 'tourist_attraction':
+        type = 'Attraction';
+        icon = attractionIcon;
+        break;
+      case 'restaurant':
+        type = 'Restaurant';
+        icon = restaurantIcon;
+        break;
+      case 'cafe':
+        type = 'Cafe';
+        icon = cafeIcon;
+        break;
+      case 'bar':
+        type = 'Bar';
+        icon = barIcon;
+        break;
+      case 'store':
+        type = 'Shop';
+        icon = shopIcon;
+        break;
+      case 'lodging':
+        type = 'Hotel';
+        icon = hotelIcon;
+        break;
+      default:
+        type = placeInfo.types[0];
+        icon = searchMarker;
+    }
+
     map.panTo(placeInfo.geometry.location);
     infoWindow.setContent(`
       <div style='width: 300px'>
         <div style='width: 100%; display: flex'>
           <div style='width: 60%'>
-            <h2>${placeInfo.name}</h2>
-            <h5>${placeInfo.formatted_address}</h5>
+            <h2>${placeName}</h2>
+            <div style='display: flex; align-items: center'>
+              <img src=${icon} style='width: 20px'>
+              <div style='font-size: 16px; margin: 0 3px'>${type}</div>
+            </div>
+            <h3>${address}</h3>
           </div>
-          <div style='width: 40%; margin: 10px; background: #ffffff url("${placeInfo.photos[0].getUrl()}") no-repeat center center; background-size: cover'></div>
+          <div style='width: 40%; margin: 10px; background: #ffffff url("${photo}") no-repeat center center; background-size: cover'></div>
         </div>
-        <img id='addBtn' src=${addPinIcon} style='float: right; width: 28px; height: 28px; margin: 0 10px; cursor: pointer;'/>
+        <div style='width: 100%; display: flex; align-items: end'>
+          <div>
+            <h4 style='margin: 5px 0'>${rating} ${voteNumber}</h4>
+            <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${place_id}' target='_blank'>Find on google map</a>
+          </div>
+          <img id='addBtn' src=${addPinIcon} style='width: 28px; height: 28px; margin: 0 10px 0 auto; cursor: pointer;'/>
+        </div>
       </div>
     `);
     infoWindow.open({
-      anchor: marker,
+      anchor: focusedDrawingAreaMarker ? focusedDrawingAreaMarker : marker,
       map: map,
       shouldFocus: true,
       maxWidth: 350
@@ -146,10 +203,9 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     });
   };
 
-  const enableDrawing = () => {
+  const enableDrawing = (e) => {
+    e.preventDefault();
     setIsDrawing(true);
-    document.body.style.cursor = "url('../../img/icons_drawing.png'), crosshair";
-    map.setOptions({ draggable: false });
     map.addListener('mousedown', () => drawFreeRegion());
   }
 
@@ -157,10 +213,11 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     const poly = new google.maps.Polyline({
       clickable: false,
       map: map,
-      strokeColor: '#2D658C',
+      strokeColor: '#848484',
       strokeWeight: 3,
     });
     map.addListener('mousemove', (e) => {
+      // document.body.style.cursor = "url('../../img/icons_drawing.png'), crosshair";
       poly.getPath().push(e.latLng);
     });
     map.addListener('mouseup', () => {
@@ -168,12 +225,12 @@ const SearchBar = ({ setFocusInfoWindow }) => {
       poly.setMap(null);
       const region = new google.maps.Polygon({
         clickable: false,
-        fillColor: '#2D658C',
-        fillOpacity: 0.25,
+        fillColor: '#848484',
+        fillOpacity: 0.3,
         geodesic: true,
         map: map,
         path: path.getArray(),
-        strokeColor: '#2D658C',
+        strokeColor: '#848484',
         strokeWeight: 3
       });
       setArea(region);
@@ -214,19 +271,23 @@ const SearchBar = ({ setFocusInfoWindow }) => {
       const bounds = new google.maps.LatLngBounds(southWest, northEast);
       let request = {
         bounds: bounds,
-        type: ['restaurant'],
+        type: [drawingOption],
         fields: placeReturnField,
       };
       service.nearbySearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
           let markers = [];
-          results.forEach(result => {
+          results.forEach((result) => {
             const markerOptions = {
               map: map,
               position: result.geometry.location,
-              icon: searchMarker
+              icon: searchMarker,
             }
             let marker = new google.maps.Marker(markerOptions);
+            marker.addListener('click', () => {
+              setFocusedDrawingAreaMarker(marker);
+              setPlaceInfo(result);
+            });
             markers.push(marker);
           });
           map.panTo(areaCenter);
@@ -236,9 +297,12 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     }
   }, [area]);
 
-  const stopDrawing = () => {
-    console.log('stop drawing');
+  const stopDrawing = (e) => {
+    e.preventDefault();
+    checkedOption.current.checked = false;
     setIsDrawing(false);
+    setIsDrawBtnDisabled(true);
+    setDrawingOption(null);
     map.setOptions({ draggable: true });
     if (area) {
       area.setMap(null);
@@ -248,31 +312,66 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     }
   }
 
+  const handelSearchOptionInput = (e) => {
+    map.setOptions({ draggable: false });
+    checkedOption.current = e.target;
+    setIsDrawBtnDisabled(false);
+    setDrawingOption(e.target.value);
+    setFocusedDrawingAreaMarker(null);
+  };
+
   return(
-    <div className='search-bar'>
+    <div>
       <div className='search-input-block'>
         <input type='text' className='search-input' onChange={(e) => setInputValue(e.target.value)} onClick={(e) => setInputTarget(e.target)}/>
         <input type='button' className='search-button' onClick={() => searchPlace()}/>
       </div>
-      <button className={drawingClassName} onClick={enableDrawing}>
-        <img src={drawingIcon} className='draw-btn-icon'/>
-        Draw an area
-      </button>
-      <button className={stopDrawingClassName} onClick={stopDrawing}>
-        <img src={eraserIcon} className='draw-btn-icon'/>
-        Remove area
-      </button>
+      <form className='drawing-search-option' onChange={handelSearchOptionInput}>
+        <div title='Attraction'>
+          <input type='radio' id='tourist_attraction' value='tourist_attraction' name='search-option'/>
+          <label htmlFor='tourist_attraction'>
+            <img src={attractionIcon} className='drawing-search-option-icon'/>
+          </label>
+        </div>
+        <div title='Restaurant'>
+          <input type='radio' value='restaurant' id='restaurant' name='search-option'/>
+          <label htmlFor='restaurant'>
+            <img src={restaurantIcon} className='drawing-search-option-icon'/>
+          </label>
+        </div>
+        <div title='Cafe'>
+          <input type='radio' value='cafe' id='cafe' name='search-option'/>
+          <label htmlFor='cafe'>
+            <img src={cafeIcon} className='drawing-search-option-icon'/>
+          </label>
+        </div>
+        <div title='Bar'>
+          <input type='radio' value='bar' id='bar' name='search-option'/>
+          <label htmlFor='bar'>
+            <img src={barIcon} className='drawing-search-option-icon'/>
+          </label>
+        </div>
+        <div title='Shop'>
+          <input type='radio' value='store' id='store' name='search-option'/>
+          <label htmlFor='store'>
+            <img src={shopIcon} className='drawing-search-option-icon'/>
+          </label>
+        </div>
+        <div title='Hotel'>
+          <input type='radio' value='lodging' id='lodging' name='search-option'/>
+          <label htmlFor='lodging'>
+            <img src={hotelIcon} className='drawing-search-option-icon'/>
+          </label>
+        </div>
+        <button className={drawingClassName} onClick={enableDrawing} title='Choose a type, draw an area to search places!' disabled={isDrawBtnDisabled}>
+          <img src={drawingIcon} className='draw-btn-icon'/>
+        </button>
+        <button className={stopDrawingClassName} onClick={stopDrawing} title='Remove area/Stop drawing'>
+          <img src={eraserIcon} className='draw-btn-icon'/>
+        </button>
+      </form>
     </div>
     )
 }
 
 export default SearchBar;
-
-/*
-tourist_attraction
-restaurant
-bar
-cafe
-lodging
-store
-*/

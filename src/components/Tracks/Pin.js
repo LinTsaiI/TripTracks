@@ -113,7 +113,7 @@ const Pin = () => {
                 >{pin.name}</div>
                 <div className='pin-btns' id={index}>
                   <button className='notes-btn' onClick={handelNotes}/>
-                  <button className='delete-btn' onClick={deleteSelectedPin}/>
+                  <button className='delete-btn' onClick={deleteSelectedPin} title='Delete'/>
                 </div>
               </div>
               <Arrow index={index} />

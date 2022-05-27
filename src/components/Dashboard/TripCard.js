@@ -62,6 +62,7 @@ const TripCard = ({ trip, index, openedTripCardOptionModal, setOpenedTripCardOpt
           <div className='display-none'
             ref={tripCardOptionModal}
             onClick={() => deleteProject(trip.tripId)}
+            title='Delete'
           >
             <img src={trashCanIcon}/>
             <div>Delete</div>

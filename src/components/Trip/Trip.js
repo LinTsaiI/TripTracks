@@ -79,7 +79,8 @@ const Trip = () => {
           const marker = new google.maps.Marker({
             map: map,
             visible: false,
-            icon: searchMarker
+            icon: searchMarker,
+            zIndex: 2
           });
           const infoWindow = new google.maps.InfoWindow();
           setMap(map);
@@ -137,13 +138,6 @@ const Trip = () => {
     if (tripInfo) {
       const mapCenter = map.getCenter();
       const zoom = map.getZoom();
-      saveMap({
-        tripId: tripId,
-        trackId: dayTrack.trackId,
-        lat: mapCenter.lat(),
-        lng: mapCenter.lng(),
-        zoom: zoom
-      });
       path.setMap(null);
       if (pinMarkerList) {
         let currentMarkerList = [...pinMarkerList];
@@ -156,6 +150,15 @@ const Trip = () => {
         tripId: tripId,
         trackIndex: trackIndex,
       }));
+      return () => {
+        saveMap({
+          tripId: tripId,
+          trackId: dayTrack.trackId,
+          lat: mapCenter.lat(),
+          lng: mapCenter.lng(),
+          zoom: zoom
+        });
+      }
     }
   }, [trackIndex]);
 

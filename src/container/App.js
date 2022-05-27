@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase';
-import { setUser } from '../store/slice/userSlice';
+import { setUser, getAvatarRef } from '../store/slice/userSlice';
 import { creatUserIfNew } from '../API';
 import Home from '../components/Home/Home';
 import Dashboard from '../components/Dashboard/Dashboard';
@@ -36,7 +36,13 @@ const App = () => {
     });
   }, []);
 
-  return (
+  useEffect(() => {
+    if (userId) {
+      dispatch(getAvatarRef(userId));
+    }
+  }, [userId]);
+
+  return !userId ? <div>Loading</div> : (
     <div>
       <BrowserRouter>
         <Routes>
