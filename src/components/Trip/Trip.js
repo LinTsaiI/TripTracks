@@ -13,7 +13,6 @@ import Footer from '../Footer/Footer';
 import './Trip.css';
 import pinMarker from '../../img/icons_marker.png';
 import trashCanIcon from '../../img/icons_trashcan.png';
-import searchMarker from '../../img/icons_searchMarker.png';
 
 export const TripContext = createContext();
 export const MapContext = createContext();
@@ -31,7 +30,6 @@ const Trip = () => {
   const mapRegin = useRef();
   const [tripInfo, setTripInfo] = useState(null);
   const [map, setMap] = useState(null);
-  const [marker, setMarker] = useState(null);
   const [infoWindow, setInfoWindow] = useState(null);
   const [pinMarkerList, setPinMarkerList] = useState([]);
   const [pinLatLng, setPinLatLng] = useState([]);
@@ -67,7 +65,6 @@ const Trip = () => {
       .then(trackData => {
         dispatch(initTrackData(trackData));
         mapLoader.load().then(() => {
-          console.log('map init')
           const center = trackData.mapCenter ? trackData.mapCenter : { lat: 23.247797913420555, lng: 119.4327646617118 };
           const zoom = trackData.zoom ? trackData.zoom : 3
           const map = new google.maps.Map(mapRegin.current, {
@@ -76,15 +73,8 @@ const Trip = () => {
             center: center,
             zoom: zoom
           });
-          const marker = new google.maps.Marker({
-            map: map,
-            visible: false,
-            icon: searchMarker,
-            zIndex: 2
-          });
           const infoWindow = new google.maps.InfoWindow();
           setMap(map);
-          setMarker(marker);
           setInfoWindow(infoWindow);
           let markerList = [];
           let latLngList = [];
@@ -285,7 +275,7 @@ const Trip = () => {
       anchor: pinMarker,
       map: map,
       shouldFocus: true,
-      maxWidth: 350
+      maxWidth: 300
     });
   };
 
@@ -295,7 +285,6 @@ const Trip = () => {
         <div className={dataFetchingClassName}></div>
         <MapContext.Provider value={{
           map: map,
-          marker: marker,
           infoWindow: infoWindow
         }}>
           <TripContext.Provider value={{

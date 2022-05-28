@@ -53,7 +53,7 @@
 .draw-btn:disabled {
   background-color: #CCCCCC;
   cursor: not-allowed;
-  opacity: 0.9;
+  opacity: 0.7;
 }
 
 .draw-btn-icon {
