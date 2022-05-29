@@ -47,6 +47,36 @@ const SearchBar = ({ setFocusInfoWindow }) => {
   };
 
   useEffect(() => {
+    if (map) {
+      map.addListener('click', (event) => {
+        if (event.placeId) {
+          event.stop();
+          const service = new google.maps.places.PlacesService(map);
+          const marker = new google.maps.Marker({
+            map: map,
+            icon: singleSearchMarker,
+            zIndex: 99
+          });
+          const request = {
+            placeId: event.placeId,
+            fields: placeReturnField
+          };
+          service.getDetails(request, (result, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+              setPlaceInfo(result);
+              setMarker(marker);
+              marker.addListener('click', () => {
+                showInfoWindow(result, marker);
+              });
+            }
+          });
+        }
+      });
+    }
+  }, [map]);
+
+
+  useEffect(() => {
     setTimeout(() => {
       if (map && inputTarget) {
         let autocomplete = new window.google.maps.places.Autocomplete(inputTarget, autocompleteOptions);
@@ -91,7 +121,7 @@ const SearchBar = ({ setFocusInfoWindow }) => {
 
   useEffect(() => {
     if (placeInfo) {
-      infoWindow.close();
+      // infoWindow.close();
       showInfoWindow();
       let infoWindowListener = infoWindow.addListener('domready', () => {
         const addBtn = document.getElementById('addBtn');

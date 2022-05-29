@@ -77,6 +77,7 @@ const Trip = () => {
           const map = new google.maps.Map(mapRegin.current, {
             mapId: '6fe2140f54e6c7b3',
             mapTypeControl: false,
+            keyboardShortcuts: false,
             center: center,
             zoom: zoom
           });
@@ -108,6 +109,14 @@ const Trip = () => {
   }, []);
 
   useEffect(() => {
+    if (map) {
+      return () => {
+        dispatch(clearPinList());
+      }
+    }
+  }, [map]);
+
+  useEffect(() => {
     setEstimatedDirection([]);
     if (pinLatLng && map) {
       const pinPath = new google.maps.Polyline({
@@ -122,14 +131,6 @@ const Trip = () => {
       getDirections();
     }
   }, [pinLatLng]);
-
-  useEffect(() => {
-    if (map) {
-      return () => {
-        dispatch(clearPinList());
-      }
-    }
-  }, [map]);
 
   useEffect(() => {
     if (tripInfo) {
