@@ -7,17 +7,21 @@ import singleSearchMarker from '../../img/icons_searchMarker.png';
 import addPinIcon from '../../img/icons_pin2.png';
 import drawingIcon from '../../img/icons_drawing.png';
 import eraserIcon from '../../img/icons_eraser.png';
-import drawingSearchMarker from '../../img/icons_hotelPin.png';
+import attractionMarker from '../../img/icons_attractionMarker.png';
+import restaurantMarker from '../../img/icons_restaurantMarker.png';
+import cafeMarker from '../../img/icons_cafeMarker.png';
+import barMarker from '../../img/icons_barMarker.png';
+import shopMarker from '../../img/icons_shopMarker.png';
+import hotelMarker from '../../img/icons_hotelMarker.png';
 import attractionIcon from '../../img/icons_attractions.png';
 import restaurantIcon from '../../img/icons_restaurant.png';
 import cafeIcon from '../../img/icons_cafe.png';
 import barIcon from '../../img/icons_bar.png';
 import shopIcon from '../../img/icons_shop.png';
 import hotelIcon from '../../img/icons_hotel.png';
-
+import star from '../../img/icons_star.png';
 
 const SearchBar = ({ setFocusInfoWindow }) => {
-  // const [inputValue, setInputValue] = useState('');
   const [inputTarget, setInputTarget] = useState(null);
   const [marker, setMarker] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
@@ -80,7 +84,6 @@ const SearchBar = ({ setFocusInfoWindow }) => {
         }, 500)
       }
       return () => {
-        console.log('reset marker')
         marker.setMap(null);
       }
     }
@@ -94,15 +97,28 @@ const SearchBar = ({ setFocusInfoWindow }) => {
         const addBtn = document.getElementById('addBtn');
         addBtn.addEventListener('click', () => {
           const newDirectionOptions = [...dayTrack.directions, 'DRIVING'];
+          const placeName = placeInfo.name;
+          const address = placeInfo.formatted_address ? placeInfo.formatted_address : placeInfo.vicinity;
+          const lat = placeInfo.geometry.location.lat();
+          const lng = placeInfo.geometry.location.lng();
+          const photo = placeInfo.photos[0].getUrl();
+          const place_id = placeInfo.place_id;
+          const placeType = drawingOption ? drawingOption : placeInfo.types[0];
+          const rating = placeInfo.rating;
+          const voteNumber = placeInfo.user_ratings_total ? placeInfo.user_ratings_total : '';
           dispatch(addNewPin({
             tripId: dayTrack.tripId,
             trackId: dayTrack.trackId,
             currentPinListLength: dayTrack.pinList.length,
-            placeName: placeInfo.name,
-            lat: placeInfo.geometry.location.lat(),
-            lng: placeInfo.geometry.location.lng(),
-            address: placeInfo.formatted_address,
-            photo: placeInfo.photos[0].getUrl(),
+            placeName: placeName,
+            address: address,
+            lat: lat,
+            lng: lng,
+            photo: photo,
+            placeId: place_id,
+            placeType: placeType,
+            rating: rating,
+            voteNumber: voteNumber,
             newDirections: newDirectionOptions
           }));
           setIsNoteOpen(false);
@@ -123,8 +139,8 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     const address = place.formatted_address ? place.formatted_address : place.vicinity;
     const photo = place.photos[0].getUrl();
     const place_id = place.place_id;
-    const rating = place.rating;
-    const voteNumber = place.user_ratings_total ? `(${place.user_ratings_total})` : '';
+    const rating = place.rating ? place.rating : '';
+    const voteNumber = place.user_ratings_total ? `(${place.user_ratings_total} Reviews)` : '';
     let type;
     let icon;
     switch (drawingOption) {
@@ -154,7 +170,7 @@ const SearchBar = ({ setFocusInfoWindow }) => {
         break;
       default:
         type = place.types[0];
-        icon = drawingSearchMarker;
+        icon = hotelMarker;
     }
 
     infoWindow.setContent(`
@@ -166,13 +182,16 @@ const SearchBar = ({ setFocusInfoWindow }) => {
               <img src=${icon} style='width: 20px'>
               <div style='font-size: 16px; margin: 0 3px'>${type}</div>
             </div>
-            <h3>${address}</h3>
+            <h4>${address}</h4>
           </div>
           <div style='width: 40%; margin: 10px; background: #ffffff url("${photo}") no-repeat center center; background-size: cover'></div>
         </div>
         <div style='width: 100%; display: flex; align-items: end'>
           <div>
-            <h4 style='margin: 5px 0'>${rating} ${voteNumber}</h4>
+            <div style='display: flex; align-items: center; margin: 5px 0'>
+              <img src=${star} style='width: 15px; height: 15px'/>
+              <p style='margin: 0 3px'>${rating} ${voteNumber}</p>
+            </div>
             <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${place_id}' target='_blank'>Find on google map</a>
           </div>
           <img id='addBtn' src=${addPinIcon} style='width: 28px; height: 28px; margin: 0 10px 0 auto; cursor: pointer;'/>
@@ -212,6 +231,13 @@ const SearchBar = ({ setFocusInfoWindow }) => {
         console.log('no such place');
       }
     });
+  };
+
+  const handelSearchOptionInput = (e) => {
+    map.setOptions({ draggable: false, clickableIcons: false });
+    checkedOption.current = e.target;
+    setIsDrawBtnDisabled(false);
+    setDrawingOption(e.target.value);
   };
 
   const enableDrawing = (e) => {
@@ -293,6 +319,30 @@ const SearchBar = ({ setFocusInfoWindow }) => {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
           map.fitBounds(bounds, 20);
           let markers = [];
+          let drawingSearchMarker;
+          switch (drawingOption) {
+            case 'tourist_attraction':
+              drawingSearchMarker = attractionMarker;
+              break;
+            case 'restaurant':
+              drawingSearchMarker = restaurantMarker;
+              break;
+            case 'cafe':
+              drawingSearchMarker = cafeMarker;
+              break;
+            case 'bar':
+              drawingSearchMarker = barMarker;
+              break;
+            case 'store':
+              drawingSearchMarker = shopMarker;
+              break;
+            case 'lodging':
+              drawingSearchMarker = hotelMarker;
+              break;
+            default:
+              drawingSearchMarker = hotelMarker;
+          }
+
           results.forEach(result => {
             const markerOptions = {
               map: map,
@@ -318,14 +368,13 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     }
   }, [area]);
 
-  const stopDrawing = (e) => {
-    e.preventDefault();
+  const resetDrawingArea = () => {
     checkedOption.current.checked = false;
     setIsDrawing(false);
     setIsDrawBtnDisabled(true);
     setDrawingOption(null);
     infoWindow.close();
-    map.setOptions({ draggable: true });
+    map.setOptions({ draggable: true, clickableIcons: true });
     if (area) {
       area.setMap(null);
       setArea(null);
@@ -334,12 +383,18 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     }
   }
 
-  const handelSearchOptionInput = (e) => {
-    map.setOptions({ draggable: false });
-    checkedOption.current = e.target;
-    setIsDrawBtnDisabled(false);
-    setDrawingOption(e.target.value);
-  };
+  const stopDrawing = (e) => {
+    e.preventDefault();
+    resetDrawingArea();
+  }
+
+  useEffect(() => {
+    if (dayTrack.pinList && checkedOption.current) {
+      return () => {
+        resetDrawingArea();
+      }
+    }
+  }, [dayTrack.pinList]);
 
   return(
     <div>

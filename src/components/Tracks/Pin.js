@@ -5,6 +5,14 @@ import { MapContext, TripContext } from '../Trip/Trip';
 import Arrow from './Arrow';
 import './Pin.css';
 import trashCanIcon from '../../img/icons_trashcan.png';
+import attractionIcon from '../../img/icons_attractions.png';
+import restaurantIcon from '../../img/icons_restaurant.png';
+import cafeIcon from '../../img/icons_cafe.png';
+import barIcon from '../../img/icons_bar.png';
+import shopIcon from '../../img/icons_shop.png';
+import hotelIcon from '../../img/icons_hotel.png';
+import defaultMarker from '../../img/icons_hotelMarker.png';
+import star from '../../img/icons_star.png';
 
 const Pin = () => {
   const dragPin = useRef();
@@ -21,16 +29,68 @@ const Pin = () => {
     setFocusInfoWindow(null);
     const index = e.target.id;
     map.panTo(dayTrack.pinList[index].position);
+    const placeName = dayTrack.pinList[index].name;
+    const address = dayTrack.pinList[index].address;
+    const photo = dayTrack.pinList[index].photo;
+    const placeId = dayTrack.pinList[index].id;
+    const type = dayTrack.pinList[index].type;
+    const rating = dayTrack.pinList[index].rating ? dayTrack.pinList[index].rating : '';
+    const voteNumber = dayTrack.pinList[index].voteNumber ? `(${dayTrack.pinList[index].voteNumber} Reviews)` : '';
+    let displayType;
+    let icon;
+    switch (type) {
+      case 'tourist_attraction':
+        displayType = 'Attraction';
+        icon = attractionIcon;
+        break;
+      case 'restaurant':
+        displayType = 'Restaurant';
+        icon = restaurantIcon;
+        break;
+      case 'cafe':
+        displayType = 'Cafe';
+        icon = cafeIcon;
+        break;
+      case 'bar':
+        displayType = 'Bar';
+        icon = barIcon;
+        break;
+      case 'store':
+        displayType = 'Shop';
+        icon = shopIcon;
+        break;
+      case 'lodging':
+        displayType = 'Hotel';
+        icon = hotelIcon;
+        break;
+      default:
+        displayType = 'Others';
+        icon = defaultMarker;
+    }
+
     infoWindow.setContent(`
       <div style='width: 300px'>
         <div style='width: 100%; display: flex'>
           <div style='width: 60%'>
-            <h2>${dayTrack.pinList[index].name}</h2>
-            <h5>${dayTrack.pinList[index].address}</h5>
+            <h2>${placeName}</h2>
+            <div style='display: flex; align-items: center'>
+              <img src=${icon} style='width: 20px'>
+              <div style='font-size: 16px; margin: 0 3px'>${displayType}</div>
+            </div>
+            <h4>${address}</h4>
           </div>
-          <div style='width: 40%; margin: 0 0 10px 10px; background: #ffffff url("${dayTrack.pinList[index].photo}") no-repeat center center; background-size: cover'></div>
+          <div style='width: 40%; margin: 10px; background: #ffffff url("${photo}") no-repeat center center; background-size: cover'></div>
         </div>
-        <img id='deleteBtn' src=${trashCanIcon} title='Delete' style='float: right; width: 28px; height: 28px; margin: 0 10px; cursor: pointer;'/>
+        <div style='width: 100%; display: flex; align-items: end'>
+          <div>
+            <div style='display: flex; align-items: center; margin: 5px 0'>
+              <img src=${star} style='width: 15px; height: 15px'/>
+              <p style='margin: 0 3px'>${rating} ${voteNumber}</p>
+            </div>
+            <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${placeId}' target='_blank'>Find on google map</a>
+          </div>
+          <img id='deleteBtn' src=${trashCanIcon} style='width: 28px; height: 28px; margin: 0 10px 0 auto; cursor: pointer;'/>
+        </div>
       </div>
     `);
     infoWindow.open({

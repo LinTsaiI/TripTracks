@@ -179,15 +179,19 @@ export const getTrackData = async (tripId, trackIndex) => {
 
 // 將景點加入 pinList
 export const addToPinList = async (pinInfo) => {
-  const { tripId, trackId, currentPinListLength, placeName, lat, lng, address, photo, newDirections } = pinInfo;
+  const { tripId, trackId, currentPinListLength, placeName, address, lat, lng, photo, placeId, placeType, rating, voteNumber, newDirections } = pinInfo;
   try {
     const index = currentPinListLength ? currentPinListLength : 0;
     const pinContent = {
       index: index,
       name: placeName,
-      position: { lat: lat, lng: lng },
       address: address,
+      position: { lat: lat, lng: lng },
       photo: photo,
+      id: placeId,
+      type: placeType,
+      rating: rating,
+      voteNumber: voteNumber,
       notes: ''
     }
     const pinDocRef = await addDoc(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), pinContent);
