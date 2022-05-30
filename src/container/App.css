@@ -1,0 +1,6 @@
+.home-loading {
+  width: 100vw;
+  height: 100vh;
+  background: #ffffff url('../img/icons_dashboard_loading2.gif') no-repeat center center;
+  background-size: 80px;
+}

@@ -1,29 +1,10 @@
 import { auth, db, provider, storage } from './firebase';
-import { sendSignInLinkToEmail, signInWithPopup  } from 'firebase/auth';
+import { signInWithPopup  } from 'firebase/auth';
 import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, arrayRemove, getDocs, query, where, deleteDoc, orderBy } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 
-// 使用者身份相關（進入每個頁面都要驗證身份）
-// 登入
-// Sign in with Email
-const actionCodeSettings = {
-  url: 'http://localhost:3000/dashboard',
-  // This must be true.
-  handleCodeInApp: true,
-};
-export const emailSignIn = (email) => {
-  sendSignInLinkToEmail(auth, email, actionCodeSettings)
-  .then((result) => {
-    console.log(result);
-    window.localStorage.setItem('emailForSignIn', email);
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-};
-
-// Sign in with Google
-export const googleSignIn = () => {
+// Log in / Sign up with Google
+export const googleAuth = () => {
   try {
     signInWithPopup(auth, provider);
   } catch (err) {
@@ -44,7 +25,7 @@ export const creatUserIfNew = async (userId, username, email) => {
           FirstEntryTime: serverTimestamp(),
           avatar: 'default'
         });
-        console.log('create user successfully');
+        console.log('create new user successfully');
       } catch (err) {
         console.error('Error adding document: ', err);
       }

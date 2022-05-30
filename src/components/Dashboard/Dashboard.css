@@ -8,7 +8,8 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background: rgb(255 255 255 / 80%) url('../../img/icons_dashboard_loading.gif') no-repeat center center;
+  background: rgb(255 255 255 / 70%) url('../../img/icons_dashboard_loading2.gif') no-repeat center center;
+  background-size: 80px;
   z-index: 1;
 }
 
