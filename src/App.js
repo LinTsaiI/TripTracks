@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase';
-import { setUser, getAvatarRef } from '../store/slice/userSlice';
-import { creatUserIfNew } from '../API';
-import WelcomeAnimation from '../components/WelcomeAnimation/WelcomeAnimation';
-import Home from '../components/Home/Home';
-import Dashboard from '../components/Dashboard/Dashboard';
-import Trip from '../components/Trip/Trip';
+import { auth } from './firebase';
+import { setUser, getAvatarRef } from './store/slice/userSlice';
+import { creatUserIfNew } from './API';
+import WelcomeAnimation from './components/WelcomeAnimation/WelcomeAnimation';
+import Home from './components/Home/Home';
+import Dashboard from './components/Dashboard/Dashboard';
+import Trip from './components/Trip/Trip';
 import './App.css';
 
 const App = () => {
@@ -29,7 +29,6 @@ const App = () => {
     const userId = window.localStorage.getItem('userId');
     const username = window.localStorage.getItem('username');
     const email = window.localStorage.getItem('email');
-    console.log(userId, username, email)
     if (userId && username && email) {
       dispatch(setUser({
         userId: userId,

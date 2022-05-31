@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { MapContext, TripContext } from '../Trip/Trip';
 import { addNewPin } from '../../store/slice/tripSlice';
-import './SearchBar.css';
+import './Search.css';
 import singleSearchMarker from '../../img/icons_searchMarker.png';
 import addPinIcon from '../../img/icons_pin2.png';
 import drawingIcon from '../../img/icons_drawing.png';
@@ -21,7 +21,7 @@ import shopIcon from '../../img/icons_shop.png';
 import hotelIcon from '../../img/icons_hotel.png';
 import star from '../../img/icons_star.png';
 
-const SearchBar = ({ setFocusInfoWindow }) => {
+const Search = ({ setFocusInfoWindow }) => {
   const [inputTarget, setInputTarget] = useState(null);
   const [marker, setMarker] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
@@ -480,4 +480,4 @@ const SearchBar = ({ setFocusInfoWindow }) => {
     )
 }
 
-export default SearchBar;
+export default Search;

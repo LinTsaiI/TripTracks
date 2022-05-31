@@ -22,7 +22,7 @@ const Pin = () => {
   const mapValue = useContext(MapContext);
   const { map, infoWindow } = mapValue;
   const tripValue = useContext(TripContext);
-  const { setIsNoteOpen, setIsDirectionOpen, currentFocusNote, setCurrentFocusNote, pinMarkerList, setFocusInfoWindow } = tripValue;
+  const { setIsNoteOpen, currentFocusNote, setCurrentFocusNote, pinMarkerList, setFocusInfoWindow } = tripValue;
   const pinUpdatingClassName = dayTrack.isPinUpdating ? 'updating-pinList' : 'display-none';
 
   const switchToPin = (e) => {
@@ -102,7 +102,6 @@ const Pin = () => {
   }
 
   const handelNotes = (e) => {
-    setIsDirectionOpen(false);
     if (currentFocusNote == null || currentFocusNote == e.target.parentNode.id) {
       setCurrentFocusNote(e.target.parentNode.id);
       setIsNoteOpen(currentState => !currentState);
@@ -114,7 +113,6 @@ const Pin = () => {
 
   const deleteSelectedPin = (e) => {
     setIsNoteOpen(false);
-    setIsDirectionOpen(false);
     const restPinIds = [...dayTrack.pinIds];
     const deleteTargetIndex = e.target.parentNode.id;
     restPinIds.splice(deleteTargetIndex, 1);
@@ -152,7 +150,7 @@ const Pin = () => {
     dragOverPin.current = null;
   };
 
-  return !dayTrack.pinList ? <div>Loading...</div> : (
+  return (
     <div className='pin-collection'>
       { 
         dayTrack.pinList.map((pin, index) => {

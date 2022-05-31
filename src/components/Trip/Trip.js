@@ -6,9 +6,8 @@ import { resetNewTrip } from '../../store/slice/dashboardSlice';
 import { fetchDayTrack, initTrackData, clearPinList, deletePin } from '../../store/slice/tripSlice';
 import { getTripData, getTrackData, saveMap } from '../../API';
 import Tracks from '../Tracks/Tracks';
-import SearchBar from '../searchBar/searchBar';
+import Search from '../search/search';
 import Notes from '../Notes/Notes';
-import Direction from '../Direction/Direction';
 import Footer from '../Footer/Footer';
 import './Trip.css';
 import pinMarker from '../../img/icons_marker.png';
@@ -44,7 +43,6 @@ const Trip = () => {
   const [path, setPath] = useState(null);
   const [focusInfoWindow, setFocusInfoWindow] = useState(null);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
-  const [isDirectionOpen, setIsDirectionOpen] = useState(false);
   const [currentFocusNote, setCurrentFocusNote] = useState(null);
   const [openedDropdownMenu, setOpenedDropdownMenu] = useState(null);
   const [currentFocusDirection, setCurrentFocusDirection] = useState(null);
@@ -232,7 +230,6 @@ const Trip = () => {
           modes: ['BUS', 'RAIL', 'SUBWAY', 'TRAIN', 'TRAM'],
           routingPreference: 'FEWER_TRANSFERS'
         },
-        // unitSystem: google.maps.UnitSystem.METRIC,
       };
       directionsService.route(directionRequest, (result, status) => {
         if (status == 'OK') {
@@ -351,8 +348,6 @@ const Trip = () => {
             pinMarkerList: pinMarkerList,
             isNoteOpen: isNoteOpen,
             setIsNoteOpen: setIsNoteOpen,
-            isDirectionOpen: isDirectionOpen,
-            setIsDirectionOpen: setIsDirectionOpen,
             currentFocusNote: currentFocusNote,
             setCurrentFocusNote: setCurrentFocusNote,
             openedDropdownMenu: openedDropdownMenu,
@@ -367,9 +362,8 @@ const Trip = () => {
               setEstimatedDirection: setEstimatedDirection,
             }}>
               <Tracks tripInfo={tripInfo} setFocusInfoWindow={setFocusInfoWindow} />
-              <SearchBar setFocusInfoWindow={setFocusInfoWindow} />
+              <Search setFocusInfoWindow={setFocusInfoWindow} />
               <Notes />
-              <Direction />
             </DirectionContext.Provider>
           </TripContext.Provider>
           <div className='map-region'>

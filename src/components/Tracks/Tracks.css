@@ -1,4 +1,4 @@
-.side-bar {
+.sidebar {
   width: 360px;
   height: 100%;
 }
@@ -56,15 +56,17 @@
   align-items: center;
 }
 
+.header-plan-date > img {
+  width: 20px;
+  height: 20px;
+  margin: 0 5px;
+}
+
 .header-plan-duration {
   font-size: 16px;
   color: #F8F5F2;
   font-weight: bold;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
-}
-
-a {
-  text-decoration: none;
 }
 
 .tracks-container {
@@ -80,6 +82,10 @@ a {
   width: 50px;
   background-color: #F8F5F2;
   overflow-y: auto;
+}
+
+.trip-date > a {
+  text-decoration: none;
 }
 
 .trip-date-block {
@@ -107,6 +113,3 @@ a {
   background-color: #dadada;
 }
 
-.trip-date-focus {
-  background-color: #dadada;
-}

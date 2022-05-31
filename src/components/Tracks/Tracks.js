@@ -67,13 +67,13 @@ const Tracks = ({ tripInfo }) => {
   }, [user.avatar]);
 
   return (
-    <div className='side-bar'>
+    <div className='sidebar'>
       <div className='header'>
         <div className='header-plan'>
           <div>
             <div className='header-plan-place'>{tripInfo.tripName}</div>
             <div className='header-plan-date'>
-              <img className='calendar-icon' src={calendar}/>
+              <img src={calendar}/>
               <div className='header-plan-duration'>{tripDuration}</div>
             </div>
           </div>

@@ -27,7 +27,7 @@ const Home = () => {
   };
 
   return (
-    <div className='home-outer-container'>
+    <div>
       <div className={processingLoading}></div>
       <div className='home-hero'>
         <div className='home-title'>
@@ -36,13 +36,11 @@ const Home = () => {
         </div>
         <div className='home-slogan'>
           <h1>Explore the world with our trip planner</h1>
-          <div className='home-slogan-p'>
-            <h3>
-              Travel needs to be simple
-              Build and map your itineraries in a easier may
-            </h3>
-            <button onClick={startPlanning}>Start planning</button>
+          <div className='home-slogan-text'>
+            <h3>Travel needs to be simple</h3>
+            <h3>Build and map your itineraries in a easier may</h3>
           </div>
+          <button onClick={startPlanning}>Start planning</button>
         </div>
       </div>
       <div className='home-description'>

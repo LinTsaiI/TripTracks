@@ -1,25 +1,14 @@
-.home-outer-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #3f3f3f;
-  font-weight: bold;
-}
-
 .home-hero {
   display: flex;
   height: 100vh;
   width: 100vw;
-  background: url('../../img/hero.jpeg') no-repeat center center;
-  background-size: cover;
+  background: url('../../img/hero.jpeg') no-repeat center left;
+  background-size: auto;
   opacity: 0.9;
 }
 
 .home-title {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   position: absolute;
   font-size: 1.8rem;
@@ -27,6 +16,7 @@
   right: 30px;
   color: #134161;
   text-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
+  font-weight: bold;
 }
 
 .home-title > img {
@@ -35,7 +25,6 @@
 }
 
 .home-slogan {
-  width: fit-content;
   margin: auto 60px auto auto;
   padding: 20px 40px;
   border-radius: 10px;
@@ -43,20 +32,16 @@
 }
 
 .home-slogan > h1 {
-  text-align: center;
   color: #134161;
   text-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
 }
 
-.home-slogan-p {
+.home-slogan-text {
   max-width: 500px;
-}
-
-.home-slogan-p > h3 {
   color: #585858;
 }
 
-.home-slogan-p > button {
+.home-slogan > button {
   width: 160px;
   height: 45px;
   border-radius: 30px;
@@ -65,15 +50,18 @@
   color: #ffffff;
   font-size: 16px;
   cursor: pointer;
-}
-
-.home-description {
-  width: 1200px;
+  margin-bottom: 10px;
+  float: right;
 }
 
 .home-part1, .home-part3 {
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 40px 60px;
+}
+
+.home-part2 {
   padding: 40px 60px;
 }
 
@@ -98,6 +86,7 @@
 .home-part2-imgs {
   display: flex;
   justify-content: center;
+  margin: 30px 0;
 }
 
 .home-part2-imgs > img {
@@ -109,7 +98,7 @@
 }
 
 .auth-modal {
-  position: absolute;
+  position: fixed;
   display: flex;
   justify-content: center;
   top: 0;
@@ -121,7 +110,6 @@
 .auth-container {
   position: fixed;
   top: 80px;
-  min-width: 300px;
   width: 400px;
   border-radius: 20px;
   padding: 30px 40px 20px 40px;
@@ -203,7 +191,7 @@
 
 .google-auth > img {
   position: absolute;
-  left: 20px;
+  left: 10px;
 }
 
 .google-auth:hover {
@@ -242,4 +230,110 @@
   background: rgb(255 255 255 / 70%) url('../../img/icons_dashboard_loading2.gif') no-repeat center center;
   background-size: 80px;
   z-index: 1;
+}
+
+@media only screen and (min-width: 1200.01px) {
+  .home-slogan {
+    width: 40%;
+    min-width: 700px;
+  }
+
+  .home-description {
+    width: 1200px;
+    margin: auto;
+  }
+}
+
+@media only screen and (max-width: 1200px) and (min-width: 600.01px) {
+  .home-hero {
+    background: url('../../img/hero.jpeg') no-repeat top left;
+    background-size: cover;
+  }
+
+  .home-slogan {
+    width: 60%;
+    min-width: 500px;
+  }
+
+  .home-description {
+    width: auto;
+  }
+
+  .home-part1, .home-part3 {
+    flex-wrap: wrap;
+  }
+
+  .home-part1-text {
+    margin: 20px;
+  }
+
+}
+
+@media only screen and (max-width: 600px) and (min-width: 360px) {
+  .home-hero {
+    background-size: cover;
+  }
+
+  .home-slogan {
+    max-width: 300px;
+    margin: auto;
+    padding: 10px 20px;
+  }
+
+  .home-slogan > h1 {
+    font-size: 1.5rem;
+  }
+
+  .home-slogan-text > h3 {
+    margin: 8px;
+    font-size: 1rem;
+  }
+
+  .home-part1, .home-part3 {
+    flex-wrap: wrap;
+  }
+
+  .home-part1, .home-part3 {
+    padding: 20px;
+  }
+
+  .home-part1-text > h2,
+  .home-part2 > h2,
+  .home-part3-text > h2 {
+    font-size: 1.3rem;
+  }
+
+  .home-part1-text > h3,
+  .home-part3-text > h3 {
+    font-size: 1rem;
+  }
+
+  .home-part2 {
+    padding: 20px;
+  }
+
+  .auth-container {
+    max-width: 320px;
+  }
+
+  .auth-title {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .auth-form > input {
+    margin: 5px 0;
+  }
+
+  .auth-separate-line {
+    margin: 5px;
+  }
+
+  .google-auth {
+    margin: 15px 0 10px 0;
+  }
+
+  .switch-form {
+    margin: 20px 0 10px 0;
+  }
 }

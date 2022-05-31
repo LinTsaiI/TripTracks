@@ -23,6 +23,19 @@ module.exports = (env, argv) => {
           use: [MiniCssExtractPlugin.loader, 'css-loader']
         },
         {
+          test: /\.s[ac]ss$/i,
+          use: [{
+            loader: 'css-loader',
+          },{
+            loader: 'resolve-url-loader',
+          },{
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
+            }
+          }],
+        },
+        {
           test: /\.(png|jpe?g|gif)$/i,
           type: 'asset',
         },

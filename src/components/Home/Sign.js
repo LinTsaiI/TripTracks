@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { auth, db, provider } from '../../firebase';
 import { getDocs, query, collection, where, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -109,11 +109,11 @@ const Sign = ({ isSignModalOpen, setIsSignModalOpen, setIsUserStateProcessing })
   }
 
   const googleAuth = () => {
-    setIsSignModalOpen(false);
     try {
+      setIsSignModalOpen(false);
       signInWithPopup(auth, provider);
     } catch (err) {
-      console.log('google sign in err', error);
+      console.log('google sign in err', err);
     }
   }
 

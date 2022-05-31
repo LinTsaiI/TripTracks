@@ -22,7 +22,7 @@ const Arrow = ({ index }) => {
   const [directionIcon, setDirectionIcon] = useState();
   const [otherDirectionOptions, setOtherDirectionOptions] = useState([]);
   const tripValue = useContext(TripContext);
-  const { openedDropdownMenu, setOpenedDropdownMenu, setIsNoteOpen, setIsDirectionOpen, currentFocusDirection, setCurrentFocusDirection } = tripValue;
+  const { openedDropdownMenu, setOpenedDropdownMenu } = tripValue;
   const directionValue = useContext(DirectionContext);
   const { estimatedDirection } = directionValue;
   const dropdownMenu = useRef();
@@ -62,17 +62,6 @@ const Arrow = ({ index }) => {
     dropdownMenu.current.className = 'display-none';
     setOtherDirectionOptions([]);
   }, [trackIndex]);
-
-  const handelDirection = (e) => {
-    setIsNoteOpen(false);
-    if (currentFocusDirection == null || currentFocusDirection == e.target.parentNode.id) {
-      setCurrentFocusDirection(e.target.parentNode.id);
-      setIsDirectionOpen(currentState => !currentState);
-    } else {
-      setCurrentFocusDirection(e.target.parentNode.id);
-      setIsDirectionOpen(true);
-    }
-  }
 
   const switchDropdownModal = (e) => {
     if (!openedDropdownMenu) {
@@ -159,7 +148,7 @@ const Arrow = ({ index }) => {
       onClick={switchDropdownModal}
     >
       <div className='arrow-content' id={index}>
-        <img className='path-icon' src={pathIcon} onClick={e => handelDirection(e)}/>
+        <img className='path-icon' src={pathIcon}/>
         <img src={directionIcon} className='default-direction-icon'/>
         <img src={directionLoadingIcon} className={directionLoadingIconClassName}/>
         <div className='direction'>{directionInfo}</div>

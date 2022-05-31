@@ -88,7 +88,17 @@ const Dashboard = () => {
           </div>
           <button className='sign-out-btn' onClick={handleSignOut}>Sign Out</button>
         </div>
+        <div className='new-trip-btn' onClick={() => setIsModalShown(true)}>+</div>
         <div className='collections'>
+          <div
+            key={tripList.length}
+            className='trip-card new-trip'
+            onClick={() => setIsModalShown(true)}
+          >
+            <div className='plus-container'>
+              <div className='plus'>+</div>
+            </div>
+          </div>
           {
             tripList.map((trip, index) => {
               return <TripCard
@@ -100,15 +110,6 @@ const Dashboard = () => {
               />
             })
           }
-          <div
-            key={tripList.length}
-            className='trip-card'
-            onClick={() => setIsModalShown(true)}
-          >
-            <div className='new-trip'>
-              <div className='plus-icon'>+</div>
-            </div>
-          </div>
         </div>
         {
           isModalShown ? <NewTrip openModal={setIsModalShown} /> : <div/>
