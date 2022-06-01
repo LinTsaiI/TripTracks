@@ -6,28 +6,28 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgb(0 0 0 / 50%);
   z-index: 1;
 }
 
 .modal-main {
   position: fixed;
-  width: 500px;
+  width: 400px;
   height: auto;
-  top: 20vh;
+  top: 80px;
   border-radius: 10px;
-  background: #F1EBE4;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 12px rgb(0 0 0 / 20%);
   padding: 25px;
   font-size: 20px;
-  color: #666666;
-  font-weight: bold;
-  text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
+  color: #646464;
 }
 
 .create-form-name {
   text-align: center;
-  font-size: 36px;
+  font-size: 24px;
   margin-bottom: 20px;
+  font-weight: bold;
 }
 
 .close-btn {
@@ -37,26 +37,28 @@
   cursor: pointer;
 }
 
-.style-in-line {
-  display: inline-flex;
-  align-items: center;
+.create-form-input {
+  margin: 10px 0;
 }
 
 .label-value {
-  width: 30%;
-  margin: 15px 0;
+  font-size: 16px;
 }
 
-.create-form-input {
-  width: 70%;
+.create-form-input > input {
+  width: 100%;
   height: 45px;
-  border-radius: 20px;
-  margin: 0 auto;
+  border-radius: 10px;
   font-size: 18px;
-  padding: 0 10px;
-  border: none;
-  box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+  padding: 10px;
+  border: 1px solid #e4e4e4;
   outline: none;
+}
+
+.create-form-input > input::placeholder {
+  color: #b3b3b3;
+  font-size: 14px;
+  font-style: italic;
 }
 
 .create-form {
@@ -85,4 +87,10 @@
 .create-btn:disabled {
   background-color: #bbc2c0;
   cursor: auto;
+}
+
+@media only screen and (max-width: 600px) and (min-width: 360px) {
+  .modal-main {
+    max-width: 320px;
+  }
 }

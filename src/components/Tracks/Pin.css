@@ -26,6 +26,8 @@
   color: #212529;
   background-color: #F8F5F2;
   cursor: pointer;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pin-name:hover {

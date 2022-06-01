@@ -14,6 +14,7 @@
 }
 
 .header-plan {
+  width: calc(100% - 80px);
   margin-right: auto;
 }
 
@@ -23,7 +24,10 @@
   color: #F8F5F2;
   font-weight: bold;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
-}
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  }
 
 .header-avatar-circle {
   width: 80px;
@@ -48,7 +52,7 @@
   width: 80px;
   height: 80px;
   border-radius: 40px;
-  border: 6px solid white;
+  border: 4px solid white;
 }
 
 .header-plan-date {
@@ -80,6 +84,7 @@
 .trip-date {
   height: 100%;
   width: 50px;
+  min-width: 40px;
   background-color: #F8F5F2;
   overflow-y: auto;
 }
@@ -113,3 +118,67 @@
   background-color: #dadada;
 }
 
+@media only screen and (max-width: 1000px) and (min-width: 700.01px) {
+  .sidebar {
+    width: 40%;
+    min-width: 300px;
+  }
+
+  .header {
+    padding: 10px;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .sidebar {
+    position: absolute;
+    width: 100%;
+    height: 40vh;
+    top: 60vh;
+    z-index: 1;
+    bottom: 0;
+    overflow-y: auto;
+  }
+
+  .header {
+    height: 80px;
+  }
+
+  .header-avatar-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+  }
+
+  .header-avatar-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    border: 3px solid white;
+  }
+  
+  .tracks-container {
+    position: relative;
+    display: block;
+    height: 100%;
+  }
+
+  .trip-date {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    width: 100%;
+    overflow-y: hidden;
+    overflow-x: auto;
+    padding: 0 10px;
+  }
+
+  .footer-container {
+    display: none;
+  }
+
+  .pin-collection {
+    width: 100%;
+    padding: 10px 20px;
+  }
+}

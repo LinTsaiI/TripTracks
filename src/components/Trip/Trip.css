@@ -34,3 +34,102 @@
   top: 38px;
   left: -4px;
 }
+
+/* infoWindow */
+.infoWindow-container {
+  width: 300px;
+}
+
+.infoWindow-upper {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.infoWindow-upper-left {
+  width: 60%;
+}
+
+.infoWindow-upper-left > h2 {
+  margin: 15px 0 10px 0;
+}
+
+.infoWindow-upper-left > h4 {
+  margin: 10px 0;
+}
+
+.infoWindow-upper-left-type {
+  display: flex;
+  align-items: center;
+}
+
+.infoWindow-upper-left-type > img {
+  width: 20px;
+}
+
+.infoWindow-upper-left-type > div {
+  font-size: 16px;
+  margin: 0 3px;
+}
+
+.infoWindow-upper-right {
+  width: 40%;
+  margin: 10px 0;
+}
+
+.infoWindow-bottom {
+  width: 100%;
+  display: flex;
+  align-items: end
+}
+
+.infoWindow-bottom-rating {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.infoWindow-bottom-rating > div {
+  width: 15px;
+  height: 15px;
+  background: #ffffff url('../../img/icons_star.png') no-repeat center center;
+  background-size: 15px;
+}
+
+.infoWindow-bottom-rating > p {
+  margin: 0 3px;
+}
+
+.infoWindow-bottom-trashcan {
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  cursor: pointer;
+  background: #ffffff url('../../img/icons_trashcan.png') no-repeat center center;
+  background-size: 28px;
+}
+
+
+@media only screen and (max-width: 1000px) and (min-width: 700.01px) {
+  .tracks-container {
+    position: relative;
+    height: calc(100vh - 100px - 40px);
+  }
+
+  .map-region {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .trip-container {
+    position: block;
+    flex-direction: column-reverse;    
+  }
+
+  .map-region {
+    position: relative;
+    width: 100vw;
+    height: 60vh;
+  }
+}

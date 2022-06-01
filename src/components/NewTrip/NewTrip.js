@@ -70,17 +70,17 @@ const NewTrip = ({ openModal }) => {
         <div className='create-form-name'>Plan A New Trip</div>
         <div onClick={() => openModal(false)} className='close-btn'>&#215;</div>
         <form className='create-form' onSubmit={handelSubmit}>
-          <div className='style-in-line'>
+          <div className='create-form-input'>
             <label htmlFor='trip-name' className='label-value'>Trip Name </label>
-            <input type='text' id='trip-name' placeholder='Give a name to your trip!' className='create-form-input' onChange={e => setTripName(e.target.value)}/>
+            <input type='text' id='trip-name' placeholder='Give a name to your trip!' onChange={e => setTripName(e.target.value)}/>
           </div>
-          <div className='style-in-line'>
+          <div className='create-form-input'>
             <label htmlFor='start-date' className='label-value'>Start Date </label>
-            <input type='date' id='start-date' placeholder='Start from' defaultValue={currentDate} className='create-form-input' onChange={e => setStartDate(e.target.value)}/>
+            <input type='date' id='start-date' placeholder='Start from' defaultValue={currentDate} onChange={e => setStartDate(e.target.value)}/>
           </div>
-          <div className='style-in-line'>
+          <div className='create-form-input'>
             <label htmlFor='end-date' className='label-value'>End Date </label>
-            <input type='date' id='end-date' placeholder='End on' defaultValue={defaultEndDate} className='create-form-input' onChange={e => setEndDate(e.target.value)}/>
+            <input type='date' id='end-date' placeholder='End on' defaultValue={defaultEndDate} onChange={e => setEndDate(e.target.value)}/>
           </div>
           <input type='submit' value='Start to Plan' className='create-btn' disabled={disabled}/>
         </form>

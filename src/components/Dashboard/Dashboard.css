@@ -73,10 +73,16 @@ input[type=file] {
 }
 
 .dashboard-username {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0 20px;
   font-size: 20px;
   color: #F1EBE4;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
   margin-bottom: 40px;
+  text-align: center;
 }
 
 .dashboard-menu {
@@ -98,10 +104,10 @@ input[type=file] {
   margin: 20px;
   background-color: #F1EBE4;
   color: #3f3f3f;
-  width: 120px;
-  height: 50px;
-  padding: 10px;
-  font-size: 22px;
+  width: 100px;
+  height: 40px;
+  padding: 5px;
+  font-size: 20px;
   border: none;
   border-radius: 25px;
   box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
@@ -170,10 +176,11 @@ input[type=file] {
   }
 }
 
-@media only screen and (max-width: 810px) and (min-width: 620.01px) {
+@media only screen and (max-width: 810px) and (min-width: 600.01px) {
   .collections {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    padding: 0;
   }
 
   .collections > div {
@@ -194,8 +201,10 @@ input[type=file] {
 
   .dashboard-username {
     position: absolute;
+    max-width: calc(100% - 120px);
     top: 10px;
     left: 110px;
+    text-align: left;
   }
 
   .dashboard-avatar {
@@ -252,7 +261,23 @@ input[type=file] {
   }
 }
 
-@media only screen and (max-width: 620px) and (min-width: 360px) {
+@media only screen and (max-width: 600px) {
+  .collections {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+
+  .collections > div {
+    justify-self: center;
+    min-width: 320px;
+    min-height: 350px;
+  }
+
+  .trip-card-content {
+    padding: 10px;
+  }
+
   .dashboard-container {
     display: block;
     height: calc(100vh - 100px - 40px);
@@ -267,8 +292,11 @@ input[type=file] {
 
   .dashboard-username {
     position: absolute;
+    max-width: calc(100% - 120px);
+    padding: 0;
     top: 10px;
     left: 100px;
+    text-align: left;
   }
 
   .dashboard-avatar {

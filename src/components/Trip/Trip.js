@@ -304,27 +304,27 @@ const Trip = () => {
         icon = defaultMarker;
     }
     infoWindow.setContent(`
-      <div style='width: 300px'>
-        <div style='width: 100%; display: flex'>
-          <div style='width: 60%'>
+      <div class='infoWindow-container'>
+        <div class='infoWindow-upper'>
+          <div class='infoWindow-upper-left'>
             <h2>${placeName}</h2>
-            <div style='display: flex; align-items: center'>
-              <img src=${icon} style='width: 20px'>
-              <div style='font-size: 16px; margin: 0 3px'>${displayType}</div>
+            <div class='infoWindow-upper-left-type'>
+              <img src=${icon}>
+              <div class='infoWindow-upper-left-type'>${displayType}</div>
             </div>
             <h4>${address}</h4>
           </div>
-          <div style='width: 40%; margin: 10px; background: #ffffff url("${photo}") no-repeat center center; background-size: cover'></div>
+          <img src=${photo} class='infoWindow-upper-right'/>
         </div>
-        <div style='width: 100%; display: flex; align-items: end'>
+        <div class='infoWindow-bottom'>
           <div>
-            <div style='display: flex; align-items: center; margin: 5px 0'>
-              <img src=${star} style='width: 15px; height: 15px'/>
-              <p style='margin: 0 3px'>${rating} ${voteNumber}</p>
+            <div class='infoWindow-bottom-rating'>
+              <div></div>
+              <p>${rating} ${voteNumber}</p>
             </div>
             <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${placeId}' target='_blank'>Find on google map</a>
           </div>
-          <img id='deleteBtn' src=${trashCanIcon} style='width: 28px; height: 28px; margin: 0 10px 0 auto; cursor: pointer;'/>
+          <div id='deleteBtn' class='infoWindow-bottom-trashcan'></div>
         </div>
       </div>
     `);
@@ -332,7 +332,8 @@ const Trip = () => {
       anchor: pinMarker,
       map: map,
       shouldFocus: true,
-      maxWidth: 300
+      maxWidth: 300,
+      minWidth: 250
     });
   };
 

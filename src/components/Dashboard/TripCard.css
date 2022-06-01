@@ -80,6 +80,7 @@
 }
 
 .trip-card-content {
+  width: 100%;
   padding: 0 10px 0 10px;
   height: 25%;
   position: absolute;
@@ -93,6 +94,9 @@
   line-height: 40px;
   font-weight: bold;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .trip-card-date {
