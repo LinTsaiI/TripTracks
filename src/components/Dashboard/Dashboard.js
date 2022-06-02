@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 import { signOut } from "firebase/auth";
-import { auth, storage, db } from '../../firebase';
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, updateDoc } from 'firebase/firestore';
-import { setUser, changeAvatar } from '../../store/slice/userSlice';
+import { auth, storage } from '../../firebase';
+import { ref, getDownloadURL } from "firebase/storage";
+import { setUser } from '../../store/slice/userSlice';
 import { asyncFetchTripList } from '../../store/slice/dashboardSlice';
 import TripCard from './TripCard';
 import NewTrip from '../NewTrip/NewTrip';
 import Footer from '../Footer/Footer';
 import './Dashboard.css';
 import defaultAvatar from '../../img/blank_profile_avatar.png';
-import uploadImgIcon from '../../img/icons_camera.png';
+import hamburgerIcon from '../../img/icons_hamburger.png';
+import mapIcon from '../../img/icons_map.png';
+import profileIcon from '../../img/icons_user.png';
+import homeIcon from '../../img/icons_home.png';
+import signOutIcon from '../../img/icons_signOut.png';
 
 const Dashboard = () => {
   const [isModalShown, setIsModalShown] = useState(false);
@@ -21,8 +25,10 @@ const Dashboard = () => {
   const { tripList, isProcessing } = dashboardStates;
   const [openedTripCardOptionModal, setOpenedTripCardOptionModal] = useState(null);
   const [avatar, setAvatar] = useState(null);
+  const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const avatarFetching = user.avatar ? 'dashboard-avatar' : 'dashboard-avatar dashboard-avatar-loading-background';
   const processingLoading = isProcessing ? 'creating-new-trip' : 'display-none';
+  const hamburgerClassName = isHamburgerOpen ? 'hamburger-menu' : 'display-none';
 
   useEffect(() => {
     dispatch(asyncFetchTripList(user.userId));
@@ -44,20 +50,6 @@ const Dashboard = () => {
     }
   }, [user.avatar]);
 
-  const uploadAvatar = (e) => {
-    const file = e.target.files[0];
-    const avatarRef = ref(storage, `avatar/${user.userId}/${file.name}`);
-    uploadBytes(avatarRef, file)
-      .then(snapshot => {
-        updateDoc(doc(db, 'user', user.userId), {
-          avatar: snapshot.ref.fullPath
-        });
-        dispatch(changeAvatar(snapshot.ref.fullPath));
-      })
-      .catch(err => console.log('Something goes wrong', err));
-    return false;
-  }
-
   const handleSignOut = () => {
     window.localStorage.removeItem('userId');
     window.localStorage.removeItem('username');
@@ -76,17 +68,44 @@ const Dashboard = () => {
         <div className={processingLoading}></div>
         <div className='dashboard-sidebar'>
           <div className={avatarFetching}>
-            <img src={avatar} className='dashboard-avatar-img'/>
-            <label htmlFor='avatar-img' className='upload'>
-              <img src={uploadImgIcon}/>
-            </label>
-            <input type='file' id='avatar-img' accept='image/*' onChange={uploadAvatar}/>
+            <div className='dashboard-avatar-img' style={{backgroundImage: `url(${avatar})`}}/>
           </div>
           <div className='dashboard-username'>{user.username}</div>
           <div className='dashboard-menu'>
-            <div className='dashboard-menu-item'>My trips</div>
+            <div className='dashboard-menu-item'>
+              <NavLink to='/dashboard'>My trips</NavLink>
+            </div>
+            <div className='dashboard-menu-item'>
+              <NavLink to='/profile'>Profile</NavLink>
+            </div>
+            <div className='dashboard-menu-item'>
+              <NavLink to='/'>Home</NavLink>
+            </div>
           </div>
           <button className='sign-out-btn' onClick={handleSignOut}>Sign Out</button>
+          <img src={hamburgerIcon} className='hamburger' onClick={() => setIsHamburgerOpen(current => !current)}/>
+          <div className={hamburgerClassName}>
+            <div className='nav-btn'>
+              <img src={mapIcon}/>
+              <div onClick={() => setIsHamburgerOpen(false)}>My trips</div>
+            </div>
+            <NavLink to='/profile'>
+              <div className='nav-btn'>
+                <img src={profileIcon}/>
+                <div>Profile</div>
+              </div>
+            </NavLink>
+            <NavLink to='/'>
+              <div className='nav-btn'>
+                <img src={homeIcon}/>
+                <div>Home</div>
+              </div>
+            </NavLink>
+            <div className='nav-btn' onClick={handleSignOut}>
+              <img src={signOutIcon}/>
+              <div>Sign Out</div>
+            </div>
+          </div>
         </div>
         <div className='new-trip-btn' onClick={() => setIsModalShown(true)}>+</div>
         <div className='collections'>

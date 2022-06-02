@@ -9,6 +9,7 @@ import WelcomeAnimation from './components/WelcomeAnimation/WelcomeAnimation';
 import Home from './components/Home/Home';
 import Dashboard from './components/Dashboard/Dashboard';
 import Trip from './components/Trip/Trip';
+import Profile from './components/Profile/Profile';
 import './App.css';
 
 const App = () => {
@@ -65,6 +66,7 @@ const App = () => {
           <Route path='/dashboard' element={userId ? <Dashboard /> : <Navigate to='/' />} />
           <Route path='/trip/:tripId' element={userId ? <Trip /> : <Navigate to='/' />}>
           </Route>
+          <Route path='/profile' element={userId ? <Profile /> : <Navigate to='/' />} />
           <Route
               path='*'
               element={

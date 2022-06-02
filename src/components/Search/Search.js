@@ -38,7 +38,7 @@ const Search = ({ setFocusInfoWindow }) => {
   const mapValue = useContext(MapContext);
   const { map, infoWindow } = mapValue;
   const tripValue = useContext(TripContext);
-  const { setIsNoteOpen, setIsDirectionOpen } = tripValue;
+  const { setIsNoteOpen } = tripValue;
   const placeReturnField = ['name', 'types', 'geometry', 'formatted_address', 'photos', 'place_id', 'rating', 'user_ratings_total'];
   const autocompleteOptions = {
     fields: placeReturnField,

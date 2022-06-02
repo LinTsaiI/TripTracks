@@ -58,7 +58,7 @@ export const getTripList = async (userId) => {
 const randomGetPhoto = () => {
   return fetch(`https://api.unsplash.com/photos/random?query='travel-nature'&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
     .then(response => response.json()) 
-    .then(result => result[0].urls.small)
+    .then(result => result[0].urls.thumb)
     .catch(e => {
       console.log('err', e);
     });

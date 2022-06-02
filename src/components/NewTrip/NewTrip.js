@@ -42,19 +42,8 @@ const NewTrip = ({ openModal }) => {
       setDisabled(true);
     }
   }, [tripName]);
-
-  const randomGetPhoto = () => {
-    fetch(`https://api.unsplash.com/photos/random?query='travel'&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
-      .then(response => response.json()) 
-      .then(result => {
-        return result[0].urls.small;
-      })
-      .catch(e => {
-        console.log('err', e);
-      })
-  }
-
-  const handelSubmit = async (e) => {
+  
+  const handelSubmit = (e) => {
     e.preventDefault();
     dispatch(asyncCreateNewTrip({
       userId: userId,

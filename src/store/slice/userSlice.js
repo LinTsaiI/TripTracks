@@ -24,6 +24,9 @@ export const userSlice = createSlice({
     },
     changeAvatar: (state, action) => {
       state.avatar = action.payload;
+    },
+    changeName: (state, action) => {
+      state.username = action.payload;
     }
   },
   extraReducers: builder => {
@@ -34,5 +37,5 @@ export const userSlice = createSlice({
   }
 });
 
-export const { signIn, signUp, signOut, setUser, changeAvatar } = userSlice.actions;
+export const { signIn, signUp, signOut, setUser, changeAvatar, changeName } = userSlice.actions;
 export default userSlice.reducer;
