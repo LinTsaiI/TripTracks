@@ -73,13 +73,13 @@ const Dashboard = () => {
           <div className='dashboard-username'>{user.username}</div>
           <div className='dashboard-menu'>
             <div className='dashboard-menu-item'>
-              <NavLink to='/dashboard'>My trips</NavLink>
+              <NavLink to='/dashboard'>My Trips</NavLink>
             </div>
             <div className='dashboard-menu-item'>
               <NavLink to='/profile'>Profile</NavLink>
             </div>
             <div className='dashboard-menu-item'>
-              <NavLink to='/'>Home</NavLink>
+              <NavLink to='/home'>Home</NavLink>
             </div>
           </div>
           <button className='sign-out-btn' onClick={handleSignOut}>Sign Out</button>
@@ -87,7 +87,7 @@ const Dashboard = () => {
           <div className={hamburgerClassName}>
             <div className='nav-btn'>
               <img src={mapIcon}/>
-              <div onClick={() => setIsHamburgerOpen(false)}>My trips</div>
+              <div onClick={() => setIsHamburgerOpen(false)}>My Trips</div>
             </div>
             <NavLink to='/profile'>
               <div className='nav-btn'>
@@ -95,7 +95,7 @@ const Dashboard = () => {
                 <div>Profile</div>
               </div>
             </NavLink>
-            <NavLink to='/'>
+            <NavLink to='/home'>
               <div className='nav-btn'>
                 <img src={homeIcon}/>
                 <div>Home</div>

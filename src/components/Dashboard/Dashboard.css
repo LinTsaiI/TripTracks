@@ -10,7 +10,7 @@
   height: 100%;
   background: rgb(255 255 255 / 70%) url('../../img/icons_dashboard_loading2.gif') no-repeat center center;
   background-size: 80px;
-  z-index: 1;
+  z-index: 2;
 }
 
 .dashboard-sidebar {

@@ -45,6 +45,8 @@ export const getTripList = async (userId) => {
   querySnapshot.forEach(doc => {
     let trip = {
       tripId: doc.id,
+      destination: doc.data().destination,
+      destinationLatLng: doc.data().destinationLatLng,
       tripName: doc.data().tripName,
       startDate: doc.data().startDate,
       endDate: doc.data().endDate,
@@ -55,8 +57,8 @@ export const getTripList = async (userId) => {
   return tripList;
 };
 
-const randomGetPhoto = () => {
-  return fetch(`https://api.unsplash.com/photos/random?query='travel-nature'&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
+const randomGetPhoto = (destination) => {
+  return fetch(`https://api.unsplash.com/photos/random?query=${destination}&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
     .then(response => response.json()) 
     .then(result => result[0].urls.thumb)
     .catch(e => {
@@ -66,11 +68,14 @@ const randomGetPhoto = () => {
 
 // 點擊 start to plan 新增空白行程
 export const createNewTrip = async (newTrip) => {
-  const { userId, tripName, startDate, endDate } = newTrip;
-  const coverImg = await randomGetPhoto();
+  const { userId, destination, destinationLatLng, tripName, startDate, endDate } = newTrip;
+  const coverImg = await randomGetPhoto(destination);
   try {
     const docRef = await addDoc(collection(db, 'trips'), {
       userId: userId,
+      timestamp: serverTimestamp(),
+      destination: destination,
+      destinationLatLng: destinationLatLng,
       tripName: tripName,
       startDate: startDate,
       endDate: endDate,
@@ -85,8 +90,8 @@ export const createNewTrip = async (newTrip) => {
       const duration = (end - start)/(1000 * 3600 * 24) + 1;
       for (let i = 0; i < duration; i++) {
         await addDoc(collection(db, 'trips', docRef.id, 'tracks'), {
-          mapCenter: {lat: 0, lng: 0},
-          zoom: 0,
+          mapCenter: destinationLatLng,
+          zoom: 13,
           directions: []
         });
       }

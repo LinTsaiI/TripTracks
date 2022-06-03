@@ -58,11 +58,16 @@ const App = () => {
     }
   }, [userId]);
 
+  // let output=null;
+  // if(userId){
+  //   output=<></>
+  // }
   return isLoading ? <WelcomeAnimation /> : (
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<Home />} />
+          <Route path='/' element={userId ? <Dashboard /> : <Home />} />
+          <Route path='/home' element={<Home />} />
           <Route path='/dashboard' element={userId ? <Dashboard /> : <Navigate to='/' />} />
           <Route path='/trip/:tripId' element={userId ? <Trip /> : <Navigate to='/' />}>
           </Route>
@@ -82,3 +87,31 @@ const App = () => {
 };
 
 export default App;
+
+  // useEffect(() => {
+  //   onAuthStateChanged(auth, user => {
+  //     if (user) {
+  //       try {
+  //         getDoc(doc(db, 'user', user.uid))
+  //           .then(userSnap => {
+  //             if (userSnap.exists()) {
+  //               dispatch(setUser({
+  //                 userId: user.uid,
+  //                 username: userSnap.data().name,
+  //                 email: user.email
+  //               }));
+  //             } else {
+  //               dispatch(setUser({
+  //                 userId: user.uid,
+  //                 username: user.displayName,
+  //                 email: user.email,
+  //               }));
+  //               creatUserIfNew(user.uid, user.displayName, user.email);
+  //             }
+  //           })
+  //       } catch (err) {
+  //         console.log('Error getting user', err);
+  //       }
+  //     }
+  //   });
+  // }, []);

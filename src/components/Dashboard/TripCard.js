@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { asyncDeleteTrip } from '../../store/slice/dashboardSlice';
 import './TripCard.css';
 import calendar from '../../img/icons_calendar.png';
-import tripCardCover from '../../img/london.jpeg';
 import dotsIcon from '../../img/icons_dots.png';
 import trashCanIcon from '../../img/icons_trashcan.png';
 
@@ -68,8 +67,8 @@ const TripCard = ({ trip, index, openedTripCardOptionModal, setOpenedTripCardOpt
             <div>Delete</div>
           </div>
         </div>
-        <img
-          src={trip.cover}
+        <div
+          style={{backgroundImage: `url(${trip.cover}`}}
           className='trip-card-img'
           onClick={() => navigate(`/trip/${trip.tripId}`)}
         />

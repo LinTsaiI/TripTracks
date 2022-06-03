@@ -52,7 +52,10 @@
   width: 80px;
   height: 80px;
   border-radius: 40px;
-  border: 4px solid white;
+  border: 3px solid white;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
 }
 
 .header-plan-date {

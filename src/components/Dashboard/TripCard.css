@@ -27,6 +27,9 @@
   height: 100%;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .trip-card-option, .trip-card-option-opened {

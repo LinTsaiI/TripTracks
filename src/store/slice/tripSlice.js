@@ -77,15 +77,9 @@ export const tripSlice = createSlice({
       })
       .addCase(fetchDayTrack.fulfilled, (state, action) => {
         console.log('dayTrack data fetch success');
-        const { tripId, trackId, mapCenter, zoom, pinIds, pinList, directions } = action.payload;
-        console.log(action.payload);
-        if (mapCenter && zoom) {
-          state.mapCenter = mapCenter;
-          state.zoom = zoom;
-        } else {
-          state.mapCenter = { lat: 23.247797913420555, lng: 119.4327646617118 };
-          state.zoom = 3;
-        }
+        const { tripId, trackId, mapCenter, zoom, pinIds, pinList, directions } = action.payload;        
+        state.mapCenter = mapCenter;
+        state.zoom = zoom;
         state.tripId =  tripId;
         state.trackId = trackId;
         state.pinIds = pinIds;

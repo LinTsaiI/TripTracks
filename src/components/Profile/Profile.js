@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import { Loader } from '@googlemaps/js-api-loader';
 import { auth, storage, db } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc } from 'firebase/firestore';
@@ -17,7 +18,10 @@ import './Profile.css';
 
 const Profile = () => {
   const user = useSelector(state => state.user);
+  const tripList = useSelector(state => state.dashboard.tripList);
   const dispatch = useDispatch();
+  const mapRegion = useRef();
+  const [tripMarkerList, setTripMarkerList] = useState([]);
   const [avatar, setAvatar] = useState(null);
   const [name, setName] = useState('');
   const [cover, setCover] = useState(null);
@@ -27,6 +31,29 @@ const Profile = () => {
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const loading = isDataUpdating ? 'user-data-loading' : 'display-none';
   const hamburgerClassName = isHamburgerOpen ? 'hamburger-menu' : 'display-none';
+
+  const mapLoader = new Loader({
+    apiKey: process.env.REACT_GOOGLE_MAP_API_KEY,
+    libraries: ['places']
+  });
+
+  useEffect(() => {
+    mapLoader.load().then((google) => {
+      const map = new google.maps.Map(mapRegion.current, {
+        mapId: '6fe2140f54e6c7b3',
+        mapTypeControl: false,
+        center: { lat: 20, lng: 0 },
+        zoom: 2
+      });
+      tripList.forEach(trip => {
+        const markerOptions = {
+          map: map,
+          position: trip.destinationLatLng,
+        }
+        new google.maps.Marker(markerOptions);
+      });
+    });
+  }, []);
 
   useEffect(() => {
     fetch(`https://api.unsplash.com/photos/random?query='city'&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
@@ -114,9 +141,9 @@ const Profile = () => {
   return (
     <div>
       <nav className='profile-nav'>
-        <div><NavLink to='/dashboard'>My trips</NavLink></div>
+        <div><NavLink to='/dashboard'>My Trips</NavLink></div>
         <div><NavLink to='/profile'>Profile</NavLink></div>
-        <div><NavLink to='/'>Home</NavLink></div>
+        <div><NavLink to='/home'>Home</NavLink></div>
         <button className='sign-out-btn' onClick={handleSignOut}>Sign Out</button>
       </nav>
       <img src={hamburgerIcon} className='profile-hamburger' onClick={() => setIsHamburgerOpen(current => !current)}/>
@@ -124,14 +151,14 @@ const Profile = () => {
         <NavLink to='/dashboard'>
           <div className='nav-btn'>
             <img src={mapIcon}/>
-            <div>My trips</div>
+            <div>My Trips</div>
           </div>
         </NavLink>
         <div className='nav-btn'>
           <img src={profileIcon}/>
           <div onClick={() => setIsHamburgerOpen(false)}>Profile</div>
         </div>
-        <NavLink to='/'>
+        <NavLink to='/home'>
           <div className='nav-btn'>
             <img src={homeIcon}/>
             <div>Home</div>
@@ -151,6 +178,9 @@ const Profile = () => {
           <div className='profile-username'>{user.username}</div>
           <button onClick={() => setIsProfileModalOpen(true)}><img src={editIcon}/>Edit</button>
         </div>
+      <div className='profile-map'>
+        <div ref={mapRegion}/>
+      </div>
       </div>
       {
         isProfileModalOpen ? (

@@ -70,8 +70,8 @@ const Trip = () => {
       .then(trackData => {
         dispatch(initTrackData(trackData));
         mapLoader.load().then(() => {
-          const center = trackData.mapCenter ? trackData.mapCenter : { lat: 23.247797913420555, lng: 119.4327646617118 };
-          const zoom = trackData.zoom ? trackData.zoom : 3
+          const center = trackData.mapCenter;
+          const zoom = trackData.zoom
           const map = new google.maps.Map(mapRegin.current, {
             mapId: '6fe2140f54e6c7b3',
             mapTypeControl: false,

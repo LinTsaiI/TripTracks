@@ -31,11 +31,6 @@ const Tracks = ({ tripInfo }) => {
     const day = loopDay.toDateString().split(' ')[2];
     date.push(
       <NavLink
-        // style={({ isActive }) => {
-        //   return {
-        //     color: isActive ? "red" : "",
-        //   };
-        // }}
         to={`/trip/${tripId}?day=${index+1}`}
         key={index}
       >
@@ -81,7 +76,7 @@ const Tracks = ({ tripInfo }) => {
         <NavLink to='/dashboard'>
           <div className='header-avatar'>
             <div className={avatarFetchingClassName}>
-              <img src={avatar} className='header-avatar-img'/>
+              <div style={{backgroundImage: `url(${avatar})`}} className='header-avatar-img'/>
             </div>
           </div>
         </NavLink>
