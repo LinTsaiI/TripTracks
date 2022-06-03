@@ -91,7 +91,7 @@ export const createNewTrip = async (newTrip) => {
       for (let i = 0; i < duration; i++) {
         await addDoc(collection(db, 'trips', docRef.id, 'tracks'), {
           mapCenter: destinationLatLng,
-          zoom: 13,
+          zoom: 9,
           directions: []
         });
       }

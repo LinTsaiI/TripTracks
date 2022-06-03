@@ -20,6 +20,7 @@ import shopIcon from '../../img/icons_shop.png';
 import hotelIcon from '../../img/icons_hotel.png';
 import defaultMarker from '../../img/icons_hotelMarker.png';
 import star from '../../img/icons_star.png';
+import imgPlaceholder from '../../img/img_placeholder.png';
 
 export const TripContext = createContext();
 export const MapContext = createContext();
@@ -267,7 +268,7 @@ const Trip = () => {
 
     const placeName = dayTrack.pinList[index].name;
     const address = dayTrack.pinList[index].address;
-    const photo = dayTrack.pinList[index].photo;
+    const photo = dayTrack.pinList[index].photo ? dayTrack.pinList[index].photo : imgPlaceholder;
     const placeId = dayTrack.pinList[index].id;
     const type = dayTrack.pinList[index].type;
     const rating = dayTrack.pinList[index].rating ? dayTrack.pinList[index].rating : '';

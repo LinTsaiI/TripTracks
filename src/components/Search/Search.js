@@ -20,6 +20,7 @@ import barIcon from '../../img/icons_bar.png';
 import shopIcon from '../../img/icons_shop.png';
 import hotelIcon from '../../img/icons_hotel.png';
 import star from '../../img/icons_star.png';
+import imgPlaceholder from '../../img/img_placeholder.png';
 
 const Search = ({ setFocusInfoWindow }) => {
   const [inputTarget, setInputTarget] = useState(null);
@@ -30,6 +31,7 @@ const Search = ({ setFocusInfoWindow }) => {
   const [drawingAreaMarkers, setDrawingAreaMarkers] = useState([]);
   const [isDrawBtnDisabled, setIsDrawBtnDisabled] = useState(true);
   const [drawingOption, setDrawingOption] = useState(null);
+  const [clickedMapPlace, setClickedMapPlace] = useState(null);
   const checkedOption = useRef();
   const drawingClassName = isDrawing ? 'display-none' : 'draw-btn';
   const stopDrawingClassName = isDrawing ? 'draw-btn' : 'display-none';
@@ -51,6 +53,7 @@ const Search = ({ setFocusInfoWindow }) => {
       map.addListener('click', (event) => {
         if (event.placeId) {
           event.stop();
+          setClickedMapPlace(event.placeId);
           const service = new google.maps.places.PlacesService(map);
           const marker = new google.maps.Marker({
             map: map,
@@ -75,6 +78,11 @@ const Search = ({ setFocusInfoWindow }) => {
     }
   }, [map]);
 
+  useEffect(() => {
+    if (marker) {
+      marker.setMap(null);
+    }
+  }, [clickedMapPlace]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -113,15 +121,11 @@ const Search = ({ setFocusInfoWindow }) => {
           marker.setPosition(position);
         }, 500)
       }
-      return () => {
-        marker.setMap(null);
-      }
     }
   }, [marker]);
 
   useEffect(() => {
     if (placeInfo) {
-      // infoWindow.close();
       showInfoWindow();
       let infoWindowListener = infoWindow.addListener('domready', () => {
         const addBtn = document.getElementById('addBtn');
@@ -131,7 +135,7 @@ const Search = ({ setFocusInfoWindow }) => {
           const address = placeInfo.formatted_address ? placeInfo.formatted_address : placeInfo.vicinity;
           const lat = placeInfo.geometry.location.lat();
           const lng = placeInfo.geometry.location.lng();
-          const photo = placeInfo.photos[0].getUrl();
+          const photo = placeInfo.photos ? placeInfo.photos[0].getUrl() : '';
           const place_id = placeInfo.place_id;
           const placeType = drawingOption ? drawingOption : placeInfo.types[0];
           const rating = placeInfo.rating;
@@ -167,7 +171,7 @@ const Search = ({ setFocusInfoWindow }) => {
   const showInfoWindow = (place = placeInfo, focusedMarker = marker) => {
     const placeName = place.name;
     const address = place.formatted_address ? place.formatted_address : place.vicinity;
-    const photo = place.photos[0].getUrl();
+    const photo = place.photos ? place.photos[0].getUrl() : imgPlaceholder;
     const place_id = place.place_id;
     const rating = place.rating ? place.rating : '';
     const voteNumber = place.user_ratings_total ? `(${place.user_ratings_total} Reviews)` : '';
@@ -343,7 +347,6 @@ const Search = ({ setFocusInfoWindow }) => {
       let request = {
         bounds: bounds,
         type: [drawingOption],
-        fields: placeReturnField,
       };
       service.nearbySearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
