@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { MapContext, TripContext } from '../Trip/Trip';
 import { addNewPin } from '../../store/slice/tripSlice';
 import './Search.css';
@@ -23,6 +24,9 @@ import star from '../../img/icons_star.png';
 import imgPlaceholder from '../../img/img_placeholder.png';
 
 const Search = ({ setFocusInfoWindow }) => {
+  const [searchParams] = useSearchParams();
+  const day = searchParams.get('day');
+  const trackIndex = day ? day-1 : 0;
   const [inputTarget, setInputTarget] = useState(null);
   const [marker, setMarker] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
@@ -32,6 +36,7 @@ const Search = ({ setFocusInfoWindow }) => {
   const [isDrawBtnDisabled, setIsDrawBtnDisabled] = useState(true);
   const [drawingOption, setDrawingOption] = useState(null);
   const [clickedMapPlace, setClickedMapPlace] = useState(null);
+  const [drawingCover, setDrawingCover] = useState('display-none');
   const checkedOption = useRef();
   const drawingClassName = isDrawing ? 'display-none' : 'draw-btn';
   const stopDrawingClassName = isDrawing ? 'draw-btn' : 'display-none';
@@ -272,17 +277,14 @@ const Search = ({ setFocusInfoWindow }) => {
     checkedOption.current = e.target;
     setIsDrawBtnDisabled(false);
     setDrawingOption(e.target.value);
-  };
-
-  const enableDrawing = (e) => {
-    e.preventDefault();
     if(marker) {
       marker.setMap(null);
     }
     setIsDrawing(true);
+    setDrawingCover('drawing-cover');
     infoWindow.close();
     map.addListener('mousedown', () => drawFreeRegion());
-  }
+  };
 
   const drawFreeRegion = () => {
     const poly = new google.maps.Polyline({
@@ -296,6 +298,7 @@ const Search = ({ setFocusInfoWindow }) => {
       poly.getPath().push(e.latLng);
     });
     map.addListener('mouseup', () => {
+      setDrawingCover('display-none');
       const path = poly.getPath();
       poly.setMap(null);
       const region = new google.maps.Polygon({
@@ -381,7 +384,8 @@ const Search = ({ setFocusInfoWindow }) => {
               map: map,
               position: result.geometry.location,
               icon: drawingSearchMarker,
-              optimized: true
+              optimized: true,
+              zIndex: 99
             }
             const isInRegion = google.maps.geometry.poly.containsLocation(result.geometry.location, area)
             if (isInRegion) {
@@ -422,15 +426,21 @@ const Search = ({ setFocusInfoWindow }) => {
   }
 
   useEffect(() => {
-    if (dayTrack.pinList && checkedOption.current) {
-      return () => {
-        resetDrawingArea();
-      }
+    if (marker) {
+      marker.setMap(null);
+      setMarker(null);
     }
-  }, [dayTrack.pinList]);
+    if (infoWindow) {
+      infoWindow.close();
+    }
+    if (checkedOption.current) {
+      resetDrawingArea();
+    }
+  }, [trackIndex]);
 
   return(
     <div>
+      <div className={drawingCover}></div>
       <div className='search-input-block'>
         <input type='text' className='search-input' onClick={(e) => setInputTarget(e.target)}/>
         <input type='button' className='search-button' onClick={() => searchPlace()}/>
@@ -472,7 +482,7 @@ const Search = ({ setFocusInfoWindow }) => {
             <img src={hotelIcon} className='drawing-search-option-icon'/>
           </label>
         </div>
-        <button className={drawingClassName} onClick={enableDrawing} title='Choose a type, draw an area to search places!' disabled={isDrawBtnDisabled}>
+        <button className={drawingClassName} title='Choose a type, draw an area to search places!' disabled={isDrawBtnDisabled}>
           <img src={drawingIcon} className='draw-btn-icon'/>
         </button>
         <button className={stopDrawingClassName} onClick={stopDrawing} title='Remove area/Stop drawing'>

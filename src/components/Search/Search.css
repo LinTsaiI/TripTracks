@@ -60,6 +60,15 @@
   width: 36px;
 }
 
+.drawing-cover {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(0 0 0 / 20%);
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* .alerts-border {
   top: 170px;
   padding: 5px;
