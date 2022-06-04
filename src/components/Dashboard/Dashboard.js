@@ -82,7 +82,7 @@ const Dashboard = () => {
               <NavLink to='/home'>Home</NavLink>
             </div>
           </div>
-          <button className='sign-out-btn' onClick={handleSignOut}>Sign Out</button>
+          <button className='dashboard-sign-out-btn' onClick={handleSignOut}>Sign Out</button>
           <img src={hamburgerIcon} className='hamburger' onClick={() => setIsHamburgerOpen(current => !current)}/>
           <div className={hamburgerClassName}>
             <div className='nav-btn'>

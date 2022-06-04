@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
 import { auth, storage, db } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc } from 'firebase/firestore';
 import { setUser, changeAvatar, changeName } from '../../store/slice/userSlice';
+import Footer from '../Footer/Footer';
 import defaultAvatar from '../../img/blank_profile_avatar.png';
 import uploadImgIcon from '../../img/icons_camera.png';
 import editIcon from '../../img/icons_edit.png';
@@ -14,17 +15,17 @@ import mapIcon from '../../img/icons_map.png';
 import profileIcon from '../../img/icons_user.png';
 import homeIcon from '../../img/icons_home.png';
 import signOutIcon from '../../img/icons_signOut.png';
+import flag from '../../img/icons_flag.png';
 import './Profile.css';
 
 const Profile = () => {
   const user = useSelector(state => state.user);
   const tripList = useSelector(state => state.dashboard.tripList);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const mapRegion = useRef();
-  const [tripMarkerList, setTripMarkerList] = useState([]);
   const [avatar, setAvatar] = useState(null);
   const [name, setName] = useState('');
-  const [cover, setCover] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isDataUpdating, setIsDataUpdating] = useState(false);
   const [disabled, setDisabled] = useState(true);
@@ -42,28 +43,31 @@ const Profile = () => {
       const map = new google.maps.Map(mapRegion.current, {
         mapId: '6fe2140f54e6c7b3',
         mapTypeControl: false,
-        center: { lat: 20, lng: 0 },
+        center: { lat: 30, lng: 5 },
         zoom: 2
       });
-      tripList.forEach(trip => {
+      const tripInfoWindow = new google.maps.InfoWindow();
+      tripList.forEach((trip, index) => {
         const markerOptions = {
           map: map,
           position: trip.destinationLatLng,
+          icon: flag
         }
-        new google.maps.Marker(markerOptions);
+        const marker = new google.maps.Marker(markerOptions);
+        marker.addListener('mouseover', () => {
+          tripInfoWindow.setContent(`<h3>${tripList[index].tripName}<h3>`);
+          tripInfoWindow.open({
+            anchor: marker,
+            map: map,
+            shouldFocus: true,
+          });
+        });
+        marker.addListener('mouseout', () => tripInfoWindow.close());
+        marker.addListener('click', () => {
+          navigate(`/trip/${tripList[index].tripId}`);
+        });
       });
     });
-  }, []);
-
-  useEffect(() => {
-    fetch(`https://api.unsplash.com/photos/random?query='city'&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
-      .then(response => response.json()) 
-      .then(result => {
-        setCover(result[0].urls.regular);
-      })
-      .catch(e => {
-        console.log('err', e);
-      });
   }, []);
 
   useEffect(() => {
@@ -144,7 +148,7 @@ const Profile = () => {
         <div><NavLink to='/dashboard'>My Trips</NavLink></div>
         <div><NavLink to='/profile'>Profile</NavLink></div>
         <div><NavLink to='/home'>Home</NavLink></div>
-        <button className='sign-out-btn' onClick={handleSignOut}>Sign Out</button>
+        <button className='profile-sign-out-btn' onClick={handleSignOut}>Sign Out</button>
       </nav>
       <img src={hamburgerIcon} className='profile-hamburger' onClick={() => setIsHamburgerOpen(current => !current)}/>
       <div className={hamburgerClassName}>
@@ -169,8 +173,7 @@ const Profile = () => {
           <div>Sign Out</div>
         </div>
       </div>
-      <div>
-        <div className='profile-background' style={{backgroundImage: `url(${cover})`}}/>
+      <div className='profile-container'>
         <div className='profile-user'>
           <div className='profile-avatar'>
             <div style={{backgroundImage: `url(${avatar})`}}/>
@@ -182,6 +185,7 @@ const Profile = () => {
         <div ref={mapRegion}/>
       </div>
       </div>
+      <Footer />
       {
         isProfileModalOpen ? (
           <div className='profile-modal-background'>

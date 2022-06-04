@@ -57,8 +57,8 @@ export const getTripList = async (userId) => {
   return tripList;
 };
 
-const randomGetPhoto = (destination) => {
-  return fetch(`https://api.unsplash.com/photos/random?query=${destination}&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
+const randomGetPhoto = () => {
+  return fetch(`https://api.unsplash.com/photos/random?query=nature&count=1&client_id=${process.env.UNSPLASH_ACCESS_KEY}`, {method: 'GET'})
     .then(response => response.json()) 
     .then(result => result[0].urls.thumb)
     .catch(e => {
@@ -69,7 +69,7 @@ const randomGetPhoto = (destination) => {
 // 點擊 start to plan 新增空白行程
 export const createNewTrip = async (newTrip) => {
   const { userId, destination, destinationLatLng, tripName, startDate, endDate } = newTrip;
-  const coverImg = await randomGetPhoto(destination);
+  const coverImg = await randomGetPhoto();
   try {
     const docRef = await addDoc(collection(db, 'trips'), {
       userId: userId,
