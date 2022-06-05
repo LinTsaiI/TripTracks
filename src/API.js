@@ -1,7 +1,6 @@
 import { auth, db, provider, storage } from './firebase';
 import { signInWithPopup  } from 'firebase/auth';
 import { runTransaction, setDoc, addDoc, serverTimestamp, collection, doc, updateDoc, getDoc, arrayUnion, arrayRemove, getDocs, query, where, deleteDoc, orderBy } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 // Log in / Sign up with Google
 export const googleAuth = () => {
@@ -13,23 +12,16 @@ export const googleAuth = () => {
 };
 
 // Add user to user collection database
-export const creatUserIfNew = async (userId, username, email) => {
+export const creatNewUser = async (userId, username, email) => {
   try {
-    const userSnap = await getDoc(doc(db, 'user', userId));
-    if (!userSnap.exists()) {
-      try {
-        await setDoc(doc(db, 'user', userId), {
-          name: username,
-          email: email,
-          tripId: [],
-          FirstEntryTime: serverTimestamp(),
-          avatar: 'default'
-        });
-        console.log('create new user successfully');
-      } catch (err) {
-        console.error('Error adding document: ', err);
-      }
-    }
+    await setDoc(doc(db, 'user', userId), {
+      name: username,
+      email: email,
+      tripId: [],
+      FirstEntryTime: serverTimestamp(),
+      avatar: 'default'
+    });
+    console.log('create new user successfully');
   } catch (err) {
     console.error('Error adding document: ', err);
   }

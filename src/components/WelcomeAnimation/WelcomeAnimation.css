@@ -16,6 +16,7 @@
   font-size: 36px;
   font-weight: 500;
   color: white;
+  font-family: 'Source Sans Pro', Calibri, Tahoma, sans-serif;
 }
 
 .loading div {
@@ -59,7 +60,7 @@
     transform: translateY(0px);
   }
   30% {
-    transform: translateY(-30px);
+    transform: translateY(-20px);
   }
   100% {
     transform: translateY(0px);

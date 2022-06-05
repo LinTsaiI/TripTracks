@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
+import { getDoc, doc } from 'firebase/firestore';
 import { setUser, getAvatarRef } from './store/slice/userSlice';
-import { creatUserIfNew } from './API';
+import { creatNewUser } from './API';
 import WelcomeAnimation from './components/WelcomeAnimation/WelcomeAnimation';
 import Home from './components/Home/Home';
 import Dashboard from './components/Dashboard/Dashboard';
@@ -42,12 +43,23 @@ const App = () => {
   useEffect(() => {
     onAuthStateChanged(auth, user => {
       if (user) {
-        dispatch(setUser({
-          userId: user.uid,
-          username: user.displayName,
-          email: user.email,
-        }));
-        creatUserIfNew(user.uid, user.displayName, user.email);
+        getDoc(doc(db, 'user', user.uid))
+          .then(userSnap => {
+            if (userSnap.exists()) {
+              dispatch(setUser({
+                userId: user.uid,
+                username: userSnap.data().name,
+                email: user.email,
+              }));
+            } else {
+              creatNewUser(user.uid, user.displayName, user.email);
+              dispatch(setUser({
+                userId: user.uid,
+                username: user.displayName,
+                email: user.email,
+              }));
+            }
+          })
       }
     });
   }, []);
