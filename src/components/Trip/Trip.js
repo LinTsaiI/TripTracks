@@ -48,6 +48,7 @@ const Trip = () => {
   const [openedDropdownMenu, setOpenedDropdownMenu] = useState(null);
   const [currentFocusDirection, setCurrentFocusDirection] = useState(null);
   const [estimatedDirection, setEstimatedDirection] = useState([]);
+  const [pinInfoWindowPhoto, setPinInfoWindowPhoto] = useState(imgPlaceholder);
   const dataFetchingClassName = dayTrack.isFetching ? 'fetching-data' : 'display-none';
   const pathUpdatingClassName = dayTrack.isPathUpdating ? 'path-updating' : 'display-none';
 
@@ -266,76 +267,88 @@ const Trip = () => {
     });
     setFocusInfoWindow(infoWindowListener);
 
-    const placeName = dayTrack.pinList[index].name;
-    const address = dayTrack.pinList[index].address;
-    const photo = dayTrack.pinList[index].photo ? dayTrack.pinList[index].photo : imgPlaceholder;
-    const placeId = dayTrack.pinList[index].id;
-    const type = dayTrack.pinList[index].type;
-    const rating = dayTrack.pinList[index].rating ? dayTrack.pinList[index].rating : '';
-    const voteNumber = dayTrack.pinList[index].voteNumber ? `(${dayTrack.pinList[index].voteNumber} Reviews)` : '';
-    let displayType;
-    let icon;
-    switch (type) {
-      case 'tourist_attraction':
-        displayType = 'Attraction';
-        icon = attractionIcon;
-        break;
-      case 'restaurant':
-        displayType = 'Restaurant';
-        icon = restaurantIcon;
-        break;
-      case 'cafe':
-        displayType = 'Cafe';
-        icon = cafeIcon;
-        break;
-      case 'bar':
-        displayType = 'Bar';
-        icon = barIcon;
-        break;
-      case 'store':
-        displayType = 'Shop';
-        icon = shopIcon;
-        break;
-      case 'lodging':
-        displayType = 'Hotel';
-        icon = hotelIcon;
-        break;
-      default:
-        displayType = 'Others';
-        icon = defaultMarker;
-    }
-    infoWindow.setContent(`
-      <div class='infoWindow-container'>
-        <div class='infoWindow-upper'>
-          <div class='infoWindow-upper-left'>
-            <h2>${placeName}</h2>
-            <div class='infoWindow-upper-left-type'>
-              <img src=${icon}>
-              <div class='infoWindow-upper-left-type'>${displayType}</div>
+    const service = new google.maps.places.PlacesService(map);
+    let request = {
+      placeId: dayTrack.pinList[index].id,
+      fields: ['photos']
+    };
+    service.getDetails(request, (result, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && result) {
+        const photoUrl = result.photos[0].getUrl();
+        const photo = photoUrl ? photoUrl : imgPlaceholder;
+        const placeName = dayTrack.pinList[index].name;
+        const address = dayTrack.pinList[index].address;
+        const placeId = dayTrack.pinList[index].id;
+        const type = dayTrack.pinList[index].type;
+        const rating = dayTrack.pinList[index].rating ? dayTrack.pinList[index].rating : '';
+        const voteNumber = dayTrack.pinList[index].voteNumber ? `(${dayTrack.pinList[index].voteNumber} Reviews)` : '';
+        let displayType;
+        let icon;
+        switch (type) {
+          case 'tourist_attraction':
+            displayType = 'Attraction';
+            icon = attractionIcon;
+            break;
+          case 'restaurant':
+            displayType = 'Restaurant';
+            icon = restaurantIcon;
+            break;
+          case 'cafe':
+            displayType = 'Cafe';
+            icon = cafeIcon;
+            break;
+          case 'bar':
+            displayType = 'Bar';
+            icon = barIcon;
+            break;
+          case 'store':
+            displayType = 'Shop';
+            icon = shopIcon;
+            break;
+          case 'lodging':
+            displayType = 'Hotel';
+            icon = hotelIcon;
+            break;
+          default:
+            displayType = 'Others';
+            icon = defaultMarker;
+        }
+        infoWindow.setContent(`
+          <div class='infoWindow-container'>
+            <div class='infoWindow-upper'>
+              <div class='infoWindow-upper-left'>
+                <h2>${placeName}</h2>
+                <div class='infoWindow-upper-left-type'>
+                  <img src=${icon}>
+                  <div class='infoWindow-upper-left-type'>${displayType}</div>
+                </div>
+                <h4>${address}</h4>
+              </div>
+              <img src=${photo} class='infoWindow-upper-right'/>
             </div>
-            <h4>${address}</h4>
-          </div>
-          <img src=${photo} class='infoWindow-upper-right'/>
-        </div>
-        <div class='infoWindow-bottom'>
-          <div>
-            <div class='infoWindow-bottom-rating'>
-              <div></div>
-              <p>${rating} ${voteNumber}</p>
+            <div class='infoWindow-bottom'>
+              <div>
+                <div class='infoWindow-bottom-rating'>
+                  <div></div>
+                  <p>${rating} ${voteNumber}</p>
+                </div>
+                <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${placeId}' target='_blank'>Find on google map</a>
+              </div>
+              <div id='deleteBtn' class='infoWindow-bottom-trashcan'></div>
             </div>
-            <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${placeId}' target='_blank'>Find on google map</a>
           </div>
-          <div id='deleteBtn' class='infoWindow-bottom-trashcan'></div>
-        </div>
-      </div>
-    `);
-    infoWindow.open({
-      anchor: pinMarker,
-      map: map,
-      shouldFocus: true,
-      maxWidth: 300,
-      minWidth: 250
-    });
+        `);
+        infoWindow.open({
+          anchor: pinMarker,
+          map: map,
+          shouldFocus: true,
+          maxWidth: 300,
+          minWidth: 250
+        });
+      } else {
+        console.log('can not get place info');
+      }
+    });    
   };
 
   if (tripInfo) {

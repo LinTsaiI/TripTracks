@@ -410,6 +410,7 @@ const Search = ({ setFocusInfoWindow }) => {
     setIsDrawing(false);
     setIsDrawBtnDisabled(true);
     setDrawingOption(null);
+    setDrawingCover('display-none');
     infoWindow.close();
     map.setOptions({ draggable: true, clickableIcons: true });
     if (area) {

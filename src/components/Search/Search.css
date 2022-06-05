@@ -69,19 +69,6 @@
   pointer-events: none;
 }
 
-/* .alerts-border {
-  top: 170px;
-  padding: 5px;
-  border: 8px;
-  border-radius: 30px;
-  animation: blink 2s;
-  animation-iteration-count: 3;
-}
-
-@keyframes blink {
-  50% { border-color:#fff ; }
-} */
-
 .drawing-search-option {
   position: absolute;
   top: 60px;
@@ -121,5 +108,10 @@
   .drawing-search-option {
     top: 45px;
     margin: 5px;
+  }
+
+  .drawing-cover {
+    height: 60vh;
+    top: 0;
   }
 }

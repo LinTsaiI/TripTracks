@@ -1,3 +1,15 @@
+/* .profile-map-infoWindow > button.gm-ui-hover-effect {
+  visibility: hidden;
+} */
+.user-data-processing {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: rgb(255 255 255 / 70%) url('../../img/icons_dashboard_loading2.gif') no-repeat center center;
+  background-size: 80px;
+  z-index: 2;
+}
+
 .profile-nav {
   height: 60px;
   background-color: #134161;

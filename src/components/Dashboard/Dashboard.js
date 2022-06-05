@@ -71,16 +71,17 @@ const Dashboard = () => {
             <div className='dashboard-avatar-img' style={{backgroundImage: `url(${avatar})`}}/>
           </div>
           <div className='dashboard-username'>{user.username}</div>
+          <hr/>
           <div className='dashboard-menu'>
-            <div className='dashboard-menu-item'>
-              <NavLink to='/dashboard'>My Trips</NavLink>
-            </div>
-            <div className='dashboard-menu-item'>
-              <NavLink to='/profile'>Profile</NavLink>
-            </div>
-            <div className='dashboard-menu-item'>
-              <NavLink to='/home'>Home</NavLink>
-            </div>
+            <NavLink to='/dashboard'>
+              <div className='dashboard-menu-item'>My Trips</div>
+            </NavLink>
+            <NavLink to='/profile'>
+              <div className='dashboard-menu-item'>Profile</div>
+            </NavLink>
+            <NavLink to='/home'>
+              <div className='dashboard-menu-item'>Home</div>
+            </NavLink>
           </div>
           <button className='dashboard-sign-out-btn' onClick={handleSignOut}>Sign Out</button>
           <img src={hamburgerIcon} className='hamburger' onClick={() => setIsHamburgerOpen(current => !current)}/>

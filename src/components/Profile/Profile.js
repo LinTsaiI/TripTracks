@@ -30,7 +30,7 @@ const Profile = () => {
   const [isDataUpdating, setIsDataUpdating] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
-  const loading = isDataUpdating ? 'user-data-loading' : 'display-none';
+  const loading = isDataUpdating ? 'user-data-processing' : 'display-none';
   const hamburgerClassName = isHamburgerOpen ? 'hamburger-menu' : 'display-none';
 
   const mapLoader = new Loader({
@@ -55,7 +55,7 @@ const Profile = () => {
         }
         const marker = new google.maps.Marker(markerOptions);
         marker.addListener('mouseover', () => {
-          tripInfoWindow.setContent(`<h3>${tripList[index].tripName}<h3>`);
+          tripInfoWindow.setContent(`<div className='profile-map-infoWindow'>${tripList[index].tripName}<div>`);
           tripInfoWindow.open({
             anchor: marker,
             map: map,
@@ -111,8 +111,8 @@ const Profile = () => {
           avatar: snapshot.ref.fullPath
         });
         dispatch(changeAvatar(snapshot.ref.fullPath));
-        setIsDataUpdating(false);
         setDisabled(false);
+        setIsDataUpdating(false);
       })
       .catch(err => console.log('Something goes wrong', err));
     return false;
@@ -132,18 +132,24 @@ const Profile = () => {
 
   const handelSubmit = async (e) => {
     e.preventDefault();
+    setIsDataUpdating(true);
     if (name) {
       await updateDoc(doc(db, 'user', user.userId), {
         name: name
       });
       dispatch(changeName(name));
+      setIsDataUpdating(false);
+      setIsProfileModalOpen(false);
     } else {
+      setIsDataUpdating(false);
+      setIsProfileModalOpen(false);
       return false;
     }
   };
 
   return (
     <div>
+      <div className={loading}></div>
       <nav className='profile-nav'>
         <div><NavLink to='/dashboard'>My Trips</NavLink></div>
         <div><NavLink to='/profile'>Profile</NavLink></div>
