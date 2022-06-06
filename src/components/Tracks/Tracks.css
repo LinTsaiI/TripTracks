@@ -19,8 +19,8 @@
 }
 
 .header-plan-place {
-  font-size: 24px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-bottom: 20px;
   color: #F8F5F2;
   font-weight: bold;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
@@ -70,7 +70,7 @@
 }
 
 .header-plan-duration {
-  font-size: 16px;
+  font-size: 14px;
   color: #F8F5F2;
   font-weight: bold;
   text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);

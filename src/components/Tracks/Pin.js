@@ -36,9 +36,8 @@ const Pin = () => {
       fields: ['photos']
     };
     service.getDetails(request, (result, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && result) {
-        const photoUrl = result.photos[0].getUrl();
-        const photo = photoUrl ? photoUrl : imgPlaceholder;
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        const photo = result.photos ? result.photos[0].getUrl() : imgPlaceholder;
         const placeName = dayTrack.pinList[index].name;
         const address = dayTrack.pinList[index].address;
         const placeId = dayTrack.pinList[index].id;

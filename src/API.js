@@ -168,8 +168,8 @@ export const addToPinList = async (pinInfo) => {
       photo: photo,
       id: placeId,
       type: placeType,
-      rating: rating,
-      voteNumber: voteNumber,
+      rating: rating ? rating : 0,
+      voteNumber: voteNumber ? voteNumber : 0,
       notes: ''
     }
     const pinDocRef = await addDoc(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), pinContent);

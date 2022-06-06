@@ -12,16 +12,16 @@ const Sign = ({ isSignModalOpen, setIsSignModalOpen, setIsUserStateProcessing })
   const navigate = useNavigate();
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [username, setUserName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('demo@gmail.com');
+  const [password, setPassword] = useState('demodemo');
   const [alert, setAlert] = useState('');
   const signInFormClassName = isSignInForm ? 'sign-in-container' : 'display-none';
   const signUpFormClassName = isSignInForm ? 'display-none' : 'sign-up-container';
 
   useEffect(() => {
     setUserName('');
-    setEmail('');
-    setPassword('');
+    // setEmail('');
+    // setPassword('');
     setAlert('');
     setIsSignInForm(true);
   }, [isSignModalOpen]);
