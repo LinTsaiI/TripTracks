@@ -15,7 +15,7 @@ import defaultMarker from '../../img/icons_hotelMarker.png';
 import star from '../../img/icons_star.png';
 import imgPlaceholder from '../../img/img_placeholder.png';
 
-const Pin = () => {
+const Pin = ({ setIsNoteOpen, currentFocusNote, setCurrentFocusNote, setFocusInfoWindow } ) => {
   const dragPin = useRef();
   const dragOverPin = useRef();
   const dispatch = useDispatch();
@@ -23,8 +23,8 @@ const Pin = () => {
   const mapValue = useContext(MapContext);
   const { map, infoWindow } = mapValue;
   const tripValue = useContext(TripContext);
-  const { setIsNoteOpen, currentFocusNote, setCurrentFocusNote, pinMarkerList, setFocusInfoWindow } = tripValue;
-  const pinUpdatingClassName = dayTrack.isPinUpdating ? 'updating-pinList' : 'display-none';
+  const { pinMarkerList } = tripValue;
+  const pinUpdating = dayTrack.isPinUpdating ? 'updating-pinList' : 'display-none';
 
   const switchToPin = (e) => {
     setFocusInfoWindow(null);
@@ -191,7 +191,7 @@ const Pin = () => {
           )
         })
       }
-      <div className={pinUpdatingClassName}></div>
+      <div className={pinUpdating}></div>
     </div>
   )
 }

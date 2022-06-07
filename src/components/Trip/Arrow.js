@@ -2,7 +2,7 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { changeDirectionOptions } from '../../store/slice/tripSlice';
-import { TripContext, DirectionContext } from './Trip';
+import { TripContext, MapContext } from './Trip';
 import './Arrow.css';
 import pathIcon from '../../img/icons_itinerary.png';
 import carIcon from '../../img/icons_car.png';
@@ -20,20 +20,53 @@ const Arrow = ({ index }) => {
   const { tripId, trackId, pinList, directions } = dayTrack;
   const [directionInfo, setDirectionInfo] = useState(null);
   const [directionIcon, setDirectionIcon] = useState();
+  const [openedDropdownMenu, setOpenedDropdownMenu] = useState(null);
+  const [estimatedDirection, setEstimatedDirection] = useState([]);
   const [otherDirectionOptions, setOtherDirectionOptions] = useState([]);
+  const mapValue = useContext(MapContext);
+  const { map } = mapValue;
   const tripValue = useContext(TripContext);
-  const { openedDropdownMenu, setOpenedDropdownMenu } = tripValue;
-  const directionValue = useContext(DirectionContext);
-  const { estimatedDirection } = directionValue;
+  const { pinLatLng } = tripValue;
   const dropdownMenu = useRef();
   const travelMode = [
     { mode: 'DRIVING', icon: carIcon },
     { mode: 'TRANSIT', icon: trainIcon },
     { mode: 'WALKING', icon: walkIcon }
   ];
-  const directionLoadingIconClassName = (!estimatedDirection[index]) ? 'direction-fetching-icon' : 'display-none';
-  // 若為最後一個箭頭，不顯示
-  const arrowClassName = (index == pinList.length - 1 ) ? 'display-none' : 'arrow';
+  const directionLoadingIconDisplay = (!estimatedDirection[index]) ? 'direction-fetching-icon' : 'display-none';
+  // do not display the last arrow of pin
+  const arrowDisplay = (index == pinList.length - 1 ) ? 'display-none' : 'arrow';
+
+  useEffect(() => {
+    if (map) {
+      setEstimatedDirection([]);
+      const directionsService = new google.maps.DirectionsService();
+      for (let i = 0; i < pinLatLng.length-1; i++) {
+        const directionRequest = {
+          origin: pinLatLng[i],
+          destination: pinLatLng[i+1],
+          travelMode: dayTrack.directions[i],
+          drivingOptions: {
+            departureTime: new Date(Date.now()),
+            trafficModel: 'pessimistic'
+          },
+          transitOptions: {
+            modes: ['BUS', 'RAIL', 'SUBWAY', 'TRAIN', 'TRAM'],
+            routingPreference: 'FEWER_TRANSFERS'
+          },
+        };
+        directionsService.route(directionRequest, (result, status) => {
+          if (status == 'OK') {
+            const distance = result.routes[0].legs[0].distance.text;
+            const duration = result.routes[0].legs[0].duration.text;
+            setEstimatedDirection(origin => [...origin, `${distance}・${duration}`]);
+          } else {
+            setEstimatedDirection(current => [...current, 'No results']);
+          }
+        });
+      }
+    }
+  }, [pinLatLng]);
 
   const showDirectionIcon = (directionMode) => {
     switch (directionMode) {
@@ -143,13 +176,13 @@ const Arrow = ({ index }) => {
 
   return (
     <div
-      className={arrowClassName}
+      className={arrowDisplay}
       onClick={switchDropdownModal}
     >
       <div className='arrow-content' id={index}>
         <img className='path-icon' src={pathIcon}/>
         <img src={directionIcon} className='default-direction-icon'/>
-        <img src={directionLoadingIcon} className={directionLoadingIconClassName}/>
+        <img src={directionLoadingIcon} className={directionLoadingIconDisplay}/>
         <div className='direction'>{directionInfo}</div>
         <img src={triangleIcon} className='dropdown-icon'/>
         <div className='display-none' ref={dropdownMenu}>

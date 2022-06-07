@@ -26,7 +26,6 @@ import imgPlaceholder from '../../img/img_placeholder.png';
 
 export const TripContext = createContext();
 export const MapContext = createContext();
-export const DirectionContext = createContext();
 
 export const getTripData = async (tripId) => {
   try {
@@ -71,10 +70,8 @@ const Trip = () => {
   const [focusInfoWindow, setFocusInfoWindow] = useState(null);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [currentFocusNote, setCurrentFocusNote] = useState(null);
-  const [openedDropdownMenu, setOpenedDropdownMenu] = useState(null);
-  const [estimatedDirection, setEstimatedDirection] = useState([]);
-  const dataFetchingClassName = dayTrack.isFetching ? 'fetching-data' : 'display-none';
-  const pathUpdatingClassName = dayTrack.isPathUpdating ? 'path-updating' : 'display-none';
+  const dataFetching = dayTrack.isFetching ? 'fetching-data' : 'display-none';
+  const pathUpdating = dayTrack.isPathUpdating ? 'path-updating' : 'display-none';
 
   const mapLoader = new Loader({
     apiKey: process.env.REACT_GOOGLE_MAP_API_KEY,
@@ -141,7 +138,6 @@ const Trip = () => {
   }, [map]);
 
   useEffect(() => {
-    setEstimatedDirection([]);
     if (pinLatLng && map) {
       const pinPath = new google.maps.Polyline({
         path: pinLatLng,
@@ -152,7 +148,6 @@ const Trip = () => {
       });
       setPath(pinPath);
       pinPath.setMap(map);
-      getDirections();
     }
   }, [pinLatLng]);
 
@@ -240,34 +235,6 @@ const Trip = () => {
       }
     }
   }, [focusInfoWindow]);
-
-  const getDirections = () => {
-    const directionsService = new google.maps.DirectionsService();
-    for (let i = 0; i < pinLatLng.length-1; i++) {
-      const directionRequest = {
-        origin: pinLatLng[i],
-        destination: pinLatLng[i+1],
-        travelMode: dayTrack.directions[i],
-        drivingOptions: {
-          departureTime: new Date(Date.now()),
-          trafficModel: 'pessimistic'
-        },
-        transitOptions: {
-          modes: ['BUS', 'RAIL', 'SUBWAY', 'TRAIN', 'TRAM'],
-          routingPreference: 'FEWER_TRANSFERS'
-        },
-      };
-      directionsService.route(directionRequest, (result, status) => {
-        if (status == 'OK') {
-          const distance = result.routes[0].legs[0].distance.text;
-          const duration = result.routes[0].legs[0].duration.text;
-          setEstimatedDirection(origin => [...origin, `${distance}・${duration}`]);
-        } else {
-          setEstimatedDirection(current => [...current, 'No results']);
-        }
-      });
-    }
-  };
 
   const showPinInfoWindow = (pinMarker, index) => {
     map.panTo(dayTrack.pinList[index].position);
@@ -377,33 +344,35 @@ const Trip = () => {
   if (tripInfo) {
     return (
       <div className='trip-container'>
-        <div className={dataFetchingClassName}></div>
+        <div className={dataFetching}></div>
         <MapContext.Provider value={{
           map: map,
           infoWindow: infoWindow
         }}>
           <TripContext.Provider value={{
+            pinLatLng: pinLatLng,
             pinMarkerList: pinMarkerList,
-            isNoteOpen: isNoteOpen,
-            setIsNoteOpen: setIsNoteOpen,
-            currentFocusNote: currentFocusNote,
-            setCurrentFocusNote: setCurrentFocusNote,
-            openedDropdownMenu: openedDropdownMenu,
-            setOpenedDropdownMenu: setOpenedDropdownMenu,
-            setPinMarkerList: setPinMarkerList,
-            setFocusInfoWindow: setFocusInfoWindow
           }}>
-            <DirectionContext.Provider value={{
-              estimatedDirection: estimatedDirection,
-              setEstimatedDirection: setEstimatedDirection,
-            }}>
-              <Tracks tripInfo={tripInfo} setFocusInfoWindow={setFocusInfoWindow} />
-              <Search setFocusInfoWindow={setFocusInfoWindow} />
-              <Notes />
-            </DirectionContext.Provider>
+            <Tracks
+              tripInfo={tripInfo}
+              setIsNoteOpen={setIsNoteOpen}
+              currentFocusNote={currentFocusNote}
+              setCurrentFocusNote={setCurrentFocusNote}
+              setFocusInfoWindow={setFocusInfoWindow}
+            />
+            <Search
+              setFocusInfoWindow={setFocusInfoWindow}
+              setIsNoteOpen={setIsNoteOpen}
+            />
+            <Notes
+              isNoteOpen={isNoteOpen}
+              setIsNoteOpen={setIsNoteOpen}
+              currentFocusNote={currentFocusNote}
+              setCurrentFocusNote={setCurrentFocusNote}
+            />
           </TripContext.Provider>
           <div className='map-region'>
-            <div className={pathUpdatingClassName}/>
+            <div className={pathUpdating}/>
             <div className='map' ref={mapRegin}/>
           </div>          
         </MapContext.Provider>

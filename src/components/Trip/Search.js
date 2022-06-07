@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { MapContext, TripContext } from './Trip';
+import { MapContext } from './Trip';
 import { addNewPin } from '../../store/slice/tripSlice';
 import './Search.css';
 import singleSearchMarker from '../../img/icons_searchMarker.png';
@@ -23,7 +23,7 @@ import hotelIcon from '../../img/icons_hotel.png';
 import star from '../../img/icons_star.png';
 import imgPlaceholder from '../../img/img_placeholder.png';
 
-const Search = ({ setFocusInfoWindow }) => {
+const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
   const [searchParams] = useSearchParams();
   const day = searchParams.get('day');
   const trackIndex = day ? day-1 : 0;
@@ -44,8 +44,6 @@ const Search = ({ setFocusInfoWindow }) => {
   const dispatch = useDispatch();
   const mapValue = useContext(MapContext);
   const { map, infoWindow } = mapValue;
-  const tripValue = useContext(TripContext);
-  const { setIsNoteOpen } = tripValue;
   const placeReturnField = ['name', 'types', 'geometry', 'formatted_address', 'photos', 'place_id', 'rating', 'user_ratings_total'];
   const autocompleteOptions = {
     fields: placeReturnField,

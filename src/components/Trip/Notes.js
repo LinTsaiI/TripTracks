@@ -1,9 +1,8 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { db } from '../../firebase';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { useSearchParams } from 'react-router-dom';
-import { TripContext } from './Trip';
 import './Notes.css';
 import savingLoadingImg from '../../img/icons_loading_circle.gif';
 
@@ -28,7 +27,7 @@ const saveNotes = async (notesInfo) => {
   }
 };
 
-const Notes = () => {
+const Notes = ({ isNoteOpen, setIsNoteOpen, currentFocusNote, setCurrentFocusNote }) => {
   const [searchParams] = useSearchParams();
   const day = searchParams.get('day');
   const trackIndex = day ? day-1 : 0;
@@ -38,10 +37,8 @@ const Notes = () => {
   const [savingLoadingClassName, setSavingLoadingClassName] = useState('display-none');
   const [isSaved, setIsSaved] = useState(false);
   const dayTrack = useSelector(state => state.trip);
-  const value = useContext(TripContext);
-  const { isNoteOpen, setIsNoteOpen, currentFocusNote, setCurrentFocusNote } = value;
   const focusIndex = currentFocusNote ? currentFocusNote : 0;
-  const notesClassName  = isNoteOpen ? 'notes-container' : 'display-none';
+  const notesDisplay  = isNoteOpen ? 'notes-container' : 'display-none';
 
   useEffect(() => {
     setIsNoteOpen(false);
@@ -97,7 +94,7 @@ const Notes = () => {
     return <div>Loading...</div>
   } else if (dayTrack.pinList.length > 0) {
     return (
-      <div className={notesClassName}>
+      <div className={notesDisplay}>
         <div onClick={() => setIsNoteOpen(false)} className='close-btn'>&#215;</div>
         <div className='notes-top-part'>
           <div className='notes-title-block'>

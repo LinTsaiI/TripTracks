@@ -15,12 +15,12 @@ const displayDate = (start, end) => {
   return date;
 };
 
-const Tracks = ({ tripInfo }) => {
+const Tracks = ({ tripInfo, setIsNoteOpen, currentFocusNote, setCurrentFocusNote, setFocusInfoWindow }) => {
   const user = useSelector(state => state.user);
   const tripId = useSelector(state => state.trip.tripId);
   const tripDuration = displayDate(tripInfo.startDate, tripInfo.endDate);
   const [avatar, setAvatar] = useState(null);
-  const avatarFetchingClassName = user.avatar ? 'header-avatar-circle' : 'header-avatar-circle header-avatar-loading-background';
+  const avatarFetching = user.avatar ? 'header-avatar-circle' : 'header-avatar-circle header-avatar-loading-background';
   const startDate = new Date(tripInfo.startDate);
   const endDate = new Date(tripInfo.endDate);
   const date = [];
@@ -75,7 +75,7 @@ const Tracks = ({ tripInfo }) => {
         </div>
         <NavLink to='/dashboard'>
           <div className='header-avatar'>
-            <div className={avatarFetchingClassName}>
+            <div className={avatarFetching}>
               <div style={{backgroundImage: `url(${avatar})`}} className='header-avatar-img'/>
             </div>
           </div>
@@ -85,7 +85,12 @@ const Tracks = ({ tripInfo }) => {
         <div className='trip-date'>
           {date}
         </div>
-        <Pin />
+        <Pin
+          setIsNoteOpen={setIsNoteOpen}
+          currentFocusNote={currentFocusNote}
+          setCurrentFocusNote={setCurrentFocusNote}
+          setFocusInfoWindow={setFocusInfoWindow}
+        />
       </div>
     </div>
   );
