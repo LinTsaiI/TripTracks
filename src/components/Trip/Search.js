@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { MapContext, TripContext } from '../Trip/Trip';
+import { MapContext, TripContext } from './Trip';
 import { addNewPin } from '../../store/slice/tripSlice';
 import './Search.css';
 import singleSearchMarker from '../../img/icons_searchMarker.png';
@@ -284,6 +284,10 @@ const Search = ({ setFocusInfoWindow }) => {
     setDrawingCover('drawing-cover');
     infoWindow.close();
     map.addListener('mousedown', () => drawFreeRegion());
+    map.addListener('touchstart', () => {
+      e.preventDefault();
+      drawFreeRegion();
+    });
   };
 
   const drawFreeRegion = () => {
@@ -297,7 +301,12 @@ const Search = ({ setFocusInfoWindow }) => {
       // document.body.style.cursor = "url('../../img/icons_drawing.png'), crosshair";
       poly.getPath().push(e.latLng);
     });
-    map.addListener('mouseup', () => {
+    map.addListener('touchmove', (e) => {
+      // document.body.style.cursor = "url('../../img/icons_drawing.png'), crosshair";
+      e.preventDefault();
+      poly.getPath().push(e.latLng);
+    });
+    const finishDrawing = () => {
       setDrawingCover('display-none');
       const path = poly.getPath();
       poly.setMap(null);
@@ -312,6 +321,11 @@ const Search = ({ setFocusInfoWindow }) => {
         strokeWeight: 3
       });
       setArea(region);
+    }
+    map.addListener('mouseup', () => finishDrawing());
+    map.addListener('touchend', (e) => {
+      e.preventDefault();
+      finishDrawing();
     });
   }
 

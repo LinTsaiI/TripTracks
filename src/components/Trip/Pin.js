@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useContext } from 'react';
+import React, { useRef, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deletePin, reOrderPinList } from '../../store/slice/tripSlice';
-import { MapContext, TripContext } from '../Trip/Trip';
+import { MapContext, TripContext } from './Trip';
 import Arrow from './Arrow';
 import './Pin.css';
 import trashCanIcon from '../../img/icons_trashcan.png';

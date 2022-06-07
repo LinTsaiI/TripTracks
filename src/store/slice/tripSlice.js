@@ -1,5 +1,95 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getTrackData, addToPinList, deleteSelectedPin, saveMap, updatePinListOrder, updateDirectionOptions } from '../../API';
+import { db } from '../../firebase';
+import { addDoc, collection, doc, updateDoc, getDocs, query, deleteDoc, orderBy } from 'firebase/firestore';
+import { getTrackData } from '../../utilities';
+
+const addToPinList = async (pinInfo) => {
+  const { tripId, trackId, currentPinListLength, placeName, address, lat, lng, photo, placeId, placeType, rating, voteNumber, newDirections } = pinInfo;
+  try {
+    const index = currentPinListLength ? currentPinListLength : 0;
+    const pinContent = {
+      index: index,
+      name: placeName,
+      address: address,
+      position: { lat: lat, lng: lng },
+      photo: photo,
+      id: placeId,
+      type: placeType,
+      rating: rating ? rating : 0,
+      voteNumber: voteNumber ? voteNumber : 0,
+      notes: ''
+    }
+    const pinDocRef = await addDoc(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), pinContent);
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
+      directions: newDirections
+    });
+    if (pinDocRef.id) {
+      return { pinId: pinDocRef.id, pinContent: pinContent, newDirections: newDirections };
+    }
+  } catch (err) {
+    console.log('Error updating pinList', err);
+  }
+};
+
+const deleteSelectedPin = async (pinInfo) => {
+  const { tripId, trackId, pinId, restPinIds, newDirections } = pinInfo;
+  try {
+    await deleteDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId));
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
+      directions: newDirections
+    });
+    restPinIds.forEach((pinId, index) => {
+      updateDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId), {
+        index: index
+      });
+    });
+    const condition = query(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), orderBy('index'));
+    const pinSnap = await getDocs(condition);
+    let newPinIds = [];
+    let newPinList = [];
+    pinSnap.forEach(pin => {
+      newPinIds.push(pin.id);
+      newPinList.push(pin.data());
+    });
+    return { newPinIds: newPinIds, newPinList: newPinList, newDirections: newDirections };
+  } catch (err) {
+    console.log('Error updating pinList', err);
+  }
+};
+
+const updatePinListOrder = async (dndInfo) => {
+  const { tripId, trackId, newPinIds } = dndInfo;
+  try {
+    newPinIds.forEach((pinId, index) => {
+      updateDoc(doc(db, 'trips', tripId, 'tracks', trackId, 'pins', pinId), {
+        index: index
+      });
+    })
+    const condition = query(collection(db, 'trips', tripId, 'tracks', trackId, 'pins'), orderBy('index'));
+    const pinSnap = await getDocs(condition);
+    let pinIds = [];
+    let newPinList = [];
+    pinSnap.forEach(pin => {
+      pinIds.push(pin.id);
+      newPinList.push(pin.data());
+    });
+    return { newPinIds: pinIds, newPinList: newPinList };    
+  } catch (err) {
+    console.log('Error updating pinList order', err);
+  }
+};
+
+const updateDirectionOptions = async (newDirectionInfo) => {
+  const { tripId, trackId, newDirections } = newDirectionInfo;
+  try {
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
+      directions: newDirections
+    });
+    return newDirections;
+  } catch (err) {
+    console.log('Error updating directions', err);
+  }
+};
 
 export const fetchDayTrack = createAsyncThunk('trip/fetchDayTrack', async (targetTrack) => {
   const { tripId, trackIndex } = targetTrack;
@@ -15,11 +105,6 @@ export const addNewPin = createAsyncThunk('trip/addNewPin', async (pinInfo) => {
 export const deletePin = createAsyncThunk('trip/deletePin', async (pinInfo) => {
   const newPins = await deleteSelectedPin(pinInfo);
   return newPins;
-});
-
-export const updateMapCenter = createAsyncThunk('trip/updateMapCenter', async (mapInfo) => {
-  const mapCenter = await saveMap(mapInfo);
-  return mapCenter;
 });
 
 export const reOrderPinList = createAsyncThunk('trip/reOrderPinList', async (newPinListInfo) => {

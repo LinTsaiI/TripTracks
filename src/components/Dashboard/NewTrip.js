@@ -62,19 +62,11 @@ const NewTrip = ({ openModal }) => {
       const autocomplete = new google.maps.places.Autocomplete(inputTarget, autocompleteOptions);
       autocomplete.addListener('place_changed', () => {
         setDestination(inputTarget.value);
+        const position = autocomplete.getPlace().geometry.location;
+        setDestinationLatLng(position);
       });
     }
   }, [inputTarget]);
-
-  useEffect(() => {
-    if (map && destination) {
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ address: destination })
-        .then(result => {
-          setDestinationLatLng(result.results[0].geometry.location);
-        })
-    }
-  }, [destination]);
 
   useEffect(() => {
     if (destination && tripName) {
@@ -82,7 +74,7 @@ const NewTrip = ({ openModal }) => {
     } else {
       setDisabled(true);
     }
-  }, [tripName]);
+  }, [destination, tripName]);
   
   const handelSubmit = (e) => {
     e.preventDefault();

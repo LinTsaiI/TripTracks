@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { auth, db, provider } from '../../firebase';
 import { getDocs, query, collection, where, addDoc, serverTimestamp } from 'firebase/firestore';
-import { signInWithPopup  } from 'firebase/auth';
+import { signInWithPopup } from 'firebase/auth';
 import { setUser } from '../../store/slice/userSlice';
 import googleIcon from '../../img/icons_google.png';
 
@@ -12,8 +12,8 @@ const Sign = ({ isSignModalOpen, setIsSignModalOpen, setIsUserStateProcessing })
   const navigate = useNavigate();
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [username, setUserName] = useState('');
-  const [email, setEmail] = useState('demo@gmail.com');
-  const [password, setPassword] = useState('demodemo');
+  const [email, setEmail] = useState('test@gmail.com');
+  const [password, setPassword] = useState('testtest');
   const [alert, setAlert] = useState('');
   const signInFormClassName = isSignInForm ? 'sign-in-container' : 'display-none';
   const signUpFormClassName = isSignInForm ? 'display-none' : 'sign-up-container';
@@ -102,8 +102,8 @@ const Sign = ({ isSignModalOpen, setIsSignModalOpen, setIsUserStateProcessing })
 
   const switchForm = () => {
     setUserName('');
-    setEmail('');
-    setPassword('');
+    // setEmail('');
+    // setPassword('');
     setAlert('');
     setIsSignInForm(current => !current);
   }

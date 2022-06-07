@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef, createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { db } from '../../firebase';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { Loader } from '@googlemaps/js-api-loader';
 import { resetNewTrip } from '../../store/slice/dashboardSlice';
 import { fetchDayTrack, initTrackData, clearPinList, deletePin } from '../../store/slice/tripSlice';
-import { getTripData, getTrackData, saveMap } from '../../API';
-import Tracks from '../Tracks/Tracks';
-import Search from '../search/search';
-import Notes from '../Notes/Notes';
+import { getTrackData } from '../../utilities';
+import Tracks from './Tracks';
+import Search from './Search';
+import Notes from './Notes';
 import Footer from '../Footer/Footer';
 import './Trip.css';
 import pinMarker from '../../img/icons_marker.png';
@@ -26,6 +28,30 @@ export const TripContext = createContext();
 export const MapContext = createContext();
 export const DirectionContext = createContext();
 
+export const getTripData = async (tripId) => {
+  try {
+    const tripSnap = await getDoc(doc(db, 'trips', tripId));
+    if (tripSnap.exists()) {
+      return tripSnap.data();
+    }
+  } catch (err) {
+    console.log('Error getting document: ', err);
+  }
+};
+
+export const saveMap = async (mapInfo) => {
+  const { tripId, trackId, lat, lng, zoom } = mapInfo;
+  console.log('save map, target: ', trackId);
+  try {
+    await updateDoc(doc(db, 'trips', tripId, 'tracks', trackId), {
+      mapCenter: { lat: lat, lng: lng },
+      zoom: zoom
+    });
+  } catch (err) {
+    console.log('Error saving mapCenter', err);
+  }
+};
+
 const Trip = () => {
   const params = useParams();
   const tripId = params.tripId;
@@ -33,7 +59,7 @@ const Trip = () => {
   const day = searchParams.get('day');
   const trackIndex = day ? day-1 : 0;
   const dispatch = useDispatch();
-  const newTrip = useSelector(state => state.dashboard);
+  const isNewTrip = useSelector(state => state.dashboard.isNewTrip);
   const dayTrack = useSelector(state => state.trip);
   const mapRegin = useRef();
   const [tripInfo, setTripInfo] = useState(null);
@@ -46,9 +72,7 @@ const Trip = () => {
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [currentFocusNote, setCurrentFocusNote] = useState(null);
   const [openedDropdownMenu, setOpenedDropdownMenu] = useState(null);
-  const [currentFocusDirection, setCurrentFocusDirection] = useState(null);
   const [estimatedDirection, setEstimatedDirection] = useState([]);
-  const [pinInfoWindowPhoto, setPinInfoWindowPhoto] = useState(imgPlaceholder);
   const dataFetchingClassName = dayTrack.isFetching ? 'fetching-data' : 'display-none';
   const pathUpdatingClassName = dayTrack.isPathUpdating ? 'path-updating' : 'display-none';
 
@@ -58,7 +82,7 @@ const Trip = () => {
   });
 
   useEffect(() => {
-    if (newTrip.isNewTrip) {
+    if (isNewTrip) {
       dispatch(resetNewTrip());
     }
   }, []);
@@ -366,8 +390,6 @@ const Trip = () => {
             setCurrentFocusNote: setCurrentFocusNote,
             openedDropdownMenu: openedDropdownMenu,
             setOpenedDropdownMenu: setOpenedDropdownMenu,
-            currentFocusDirection: currentFocusDirection,
-            setCurrentFocusDirection: setCurrentFocusDirection,
             setPinMarkerList: setPinMarkerList,
             setFocusInfoWindow: setFocusInfoWindow
           }}>

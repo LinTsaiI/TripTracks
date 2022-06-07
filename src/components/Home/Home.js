@@ -3,11 +3,11 @@ import { useSelector } from 'react-redux';
 import { useNavigate} from 'react-router-dom';
 import Sign from './Sign';
 import tripTracksIcon from '../../img/icon_triptracks.png';
-import part1_demo_img from '../../img/demo_img.jpeg';
 import function_demo_img1 from '../../img/function_demo_01.png';
 import function_demo_img2 from '../../img/function_demo_02.png';
 import function_demo_img3 from '../../img/function_demo_03.png';
-import responsiveDemo from '../../img/responsive_demo.png';
+import mapDemo from '../../img/map_demo.gif';
+import RWD from '../../img/RWD.png';
 import './Home.css';
 
 const Home = () => {
@@ -50,7 +50,7 @@ const Home = () => {
             <h3>Separate daily itineraries by maps. Easy to switch between different days.</h3>
             <h3>Follow the track you planned, and enjoy a wonderful trip.</h3>
           </div>
-          <img src={part1_demo_img}/>
+          <img src={mapDemo}/>
         </div>
         <div className='home-part2'>
           <h2>Easy to use</h2>
@@ -61,7 +61,7 @@ const Home = () => {
           </div>
         </div>
         <div className='home-part3'>
-          <img src={responsiveDemo}/>
+          <img src={RWD}/>
           <div className='home-part3-text'>
             <h2>Easy to browse</h2>
             <h3>We support desktop and a mobile device.</h3>

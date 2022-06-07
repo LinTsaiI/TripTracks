@@ -67,6 +67,7 @@
   background-color: rgb(0 0 0 / 20%);
   z-index: 1;
   pointer-events: none;
+  touch-action: none;
 }
 
 .drawing-search-option {

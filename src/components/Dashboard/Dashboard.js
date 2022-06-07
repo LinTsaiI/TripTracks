@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import { signOut } from "firebase/auth";
+import { signOut } from 'firebase/auth';
 import { auth, storage } from '../../firebase';
-import { ref, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL } from 'firebase/storage';
 import { setUser } from '../../store/slice/userSlice';
 import { asyncFetchTripList } from '../../store/slice/dashboardSlice';
 import TripCard from './TripCard';
-import NewTrip from '../NewTrip/NewTrip';
+import NewTrip from './NewTrip';
 import Footer from '../Footer/Footer';
 import './Dashboard.css';
 import defaultAvatar from '../../img/blank_profile_avatar.png';
@@ -21,34 +21,35 @@ const Dashboard = () => {
   const [isModalShown, setIsModalShown] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector(state => state.user);
+  const { userId, username, avatar } = user;
   const dashboardStates = useSelector(state => state.dashboard);
   const { tripList, isProcessing } = dashboardStates;
   const [openedTripCardOptionModal, setOpenedTripCardOptionModal] = useState(null);
-  const [avatar, setAvatar] = useState(null);
+  const [avatarImg, setAvatarImg] = useState(null);
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
-  const avatarFetching = user.avatar ? 'dashboard-avatar' : 'dashboard-avatar dashboard-avatar-loading-background';
+  const avatarFetching = avatar ? 'dashboard-avatar' : 'dashboard-avatar dashboard-avatar-loading-background';
   const processingLoading = isProcessing ? 'creating-new-trip' : 'display-none';
   const hamburgerClassName = isHamburgerOpen ? 'hamburger-menu' : 'display-none';
 
   useEffect(() => {
-    dispatch(asyncFetchTripList(user.userId));
+    dispatch(asyncFetchTripList(userId));
   }, []);
 
   useEffect(() => {
-    if (user.avatar) {
-      if (user.avatar == 'default') {
-        setAvatar(defaultAvatar);
+    if (avatar) {
+      if (avatar == 'default') {
+        setAvatarImg(defaultAvatar);
       } else {
-        getDownloadURL(ref(storage, user.avatar))
+        getDownloadURL(ref(storage, avatar))
           .then(url => {
-            setAvatar(url);
+            setAvatarImg(url);
           })
           .catch(err => {
             console.log('Something goes wrong', err);
           });
       }
-    }
-  }, [user.avatar]);
+    };
+  }, [avatar]);
 
   const handleSignOut = () => {
     window.localStorage.removeItem('userId');
@@ -60,7 +61,7 @@ const Dashboard = () => {
       username: null,
       email: null
     }));
-  }
+  };
 
   return (
     <div>
@@ -68,9 +69,9 @@ const Dashboard = () => {
         <div className={processingLoading}></div>
         <div className='dashboard-sidebar'>
           <div className={avatarFetching}>
-            <div className='dashboard-avatar-img' style={{backgroundImage: `url(${avatar})`}}/>
+            <div className='dashboard-avatar-img' style={{backgroundImage: `url(${avatarImg})`}}/>
           </div>
-          <div className='dashboard-username'>{user.username}</div>
+          <div className='dashboard-username'>{username}</div>
           <hr/>
           <div className='dashboard-menu'>
             <NavLink to='/dashboard'>
@@ -112,7 +113,7 @@ const Dashboard = () => {
         <div className='collections'>
           <div
             key={tripList.length}
-            className='trip-card new-trip'
+            className='trip-card new-trip-card'
             onClick={() => setIsModalShown(true)}
           >
             <div className='plus-container'>
@@ -138,6 +139,6 @@ const Dashboard = () => {
       <Footer />
     </div>
   )
-}
+};
 
 export default Dashboard;

@@ -1,10 +1,32 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { db } from '../../firebase';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { useSearchParams } from 'react-router-dom';
-import { getNotes, saveNotes } from '../../API';
-import { TripContext } from '../Trip/Trip';
+import { TripContext } from './Trip';
 import './Notes.css';
 import savingLoadingImg from '../../img/icons_loading_circle.gif';
+
+const getNotes = async (targetNotes) => {
+  try {
+    const pinSnap = await getDoc(doc(db, 'trips', targetNotes.tripId, 'tracks', targetNotes.trackId, 'pins', targetNotes.pinId));
+    if (pinSnap.exists()) {
+      return pinSnap.data().notes;
+    }
+  } catch (err) {
+    console.log('Error getting notes', err);
+  }
+};
+
+const saveNotes = async (notesInfo) => {
+  try {
+    await updateDoc(doc(db, 'trips', notesInfo.tripId, 'tracks', notesInfo.trackId, 'pins', notesInfo.pinId), {
+      notes: notesInfo.notes
+    });
+  } catch (err) {
+    console.log('Error updating notes', err);
+  }
+};
 
 const Notes = () => {
   const [searchParams] = useSearchParams();
@@ -17,7 +39,7 @@ const Notes = () => {
   const [isSaved, setIsSaved] = useState(false);
   const dayTrack = useSelector(state => state.trip);
   const value = useContext(TripContext);
-  const { isNoteOpen, setIsNoteOpen, currentFocusNote, setCurrentFocusNote, isDirectionOpen } = value;
+  const { isNoteOpen, setIsNoteOpen, currentFocusNote, setCurrentFocusNote } = value;
   const focusIndex = currentFocusNote ? currentFocusNote : 0;
   const notesClassName  = isNoteOpen ? 'notes-container' : 'display-none';
 
@@ -37,7 +59,7 @@ const Notes = () => {
           setNotes(notes);
         });
     }
-  }, [focusIndex, isDirectionOpen]);
+  }, [focusIndex]);
 
   useEffect(() => {
     if (!isSaved) {

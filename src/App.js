@@ -3,15 +3,29 @@ import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './firebase';
-import { getDoc, doc } from 'firebase/firestore';
+import { getDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { setUser, getAvatarRef } from './store/slice/userSlice';
-import { creatNewUser } from './API';
 import WelcomeAnimation from './components/WelcomeAnimation/WelcomeAnimation';
 import Home from './components/Home/Home';
 import Dashboard from './components/Dashboard/Dashboard';
 import Trip from './components/Trip/Trip';
 import Profile from './components/Profile/Profile';
 import './App.css';
+
+const creatNewUser = async (userId, username, email) => {
+  try {
+    await setDoc(doc(db, 'user', userId), {
+      name: username,
+      email: email,
+      tripId: [],
+      FirstEntryTime: serverTimestamp(),
+      avatar: 'default'
+    });
+    console.log('create new user successfully');
+  } catch (err) {
+    console.error('Error adding document: ', err);
+  }
+};
 
 const App = () => {
   const userId = useSelector(state => state.user.userId);
@@ -70,20 +84,29 @@ const App = () => {
     }
   }, [userId]);
 
-  // let output=null;
-  // if(userId){
-  //   output=<></>
-  // }
+  let output;
+  if (userId) {
+    output = <>
+      <Route path='/' element={<Dashboard />} />
+      <Route path='/dashboard' element={<Dashboard />} />
+      <Route path='/trip/:tripId' element={<Trip />} />
+      <Route path='/profile' element={<Profile />} />
+    </>
+  } else {
+    output = <>
+      <Route path='/' element={<Home />} />
+      <Route path='/dashboard' element={<Navigate to='/' />} />
+      <Route path='/trip/:tripId' element={<Navigate to='/' />} />
+      <Route path='/profile' element={<Navigate to='/' />} />
+    </>
+  }
+
   return isLoading ? <WelcomeAnimation /> : (
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={userId ? <Dashboard /> : <Home />} />
+          {output}
           <Route path='/home' element={<Home />} />
-          <Route path='/dashboard' element={userId ? <Dashboard /> : <Navigate to='/' />} />
-          <Route path='/trip/:tripId' element={userId ? <Trip /> : <Navigate to='/' />}>
-          </Route>
-          <Route path='/profile' element={userId ? <Profile /> : <Navigate to='/' />} />
           <Route
               path='*'
               element={
@@ -99,31 +122,3 @@ const App = () => {
 };
 
 export default App;
-
-  // useEffect(() => {
-  //   onAuthStateChanged(auth, user => {
-  //     if (user) {
-  //       try {
-  //         getDoc(doc(db, 'user', user.uid))
-  //           .then(userSnap => {
-  //             if (userSnap.exists()) {
-  //               dispatch(setUser({
-  //                 userId: user.uid,
-  //                 username: userSnap.data().name,
-  //                 email: user.email
-  //               }));
-  //             } else {
-  //               dispatch(setUser({
-  //                 userId: user.uid,
-  //                 username: user.displayName,
-  //                 email: user.email,
-  //               }));
-  //               creatUserIfNew(user.uid, user.displayName, user.email);
-  //             }
-  //           })
-  //       } catch (err) {
-  //         console.log('Error getting user', err);
-  //       }
-  //     }
-  //   });
-  // }, []);

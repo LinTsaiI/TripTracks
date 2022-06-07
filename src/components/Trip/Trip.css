@@ -8,6 +8,7 @@
   width: 100%;
   height: 100%;
   background: rgb(255 255 255 / 80%) url('../../img/icons_dashboard_loading.gif') no-repeat center center;
+  background-size: 70px;
   z-index: 2;
 }
 
@@ -16,6 +17,7 @@
   width: inherit;
   height: 100%;
   background: rgb(255 255 255 / 80%) url('../../img/icons_dashboard_loading.gif') no-repeat center center;
+  background-size: 70px;
   z-index: 2;
 }
 

@@ -2,7 +2,7 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { changeDirectionOptions } from '../../store/slice/tripSlice';
-import { TripContext, DirectionContext } from '../Trip/Trip';
+import { TripContext, DirectionContext } from './Trip';
 import './Arrow.css';
 import pathIcon from '../../img/icons_itinerary.png';
 import carIcon from '../../img/icons_car.png';
@@ -129,7 +129,6 @@ const Arrow = ({ index }) => {
   };
 
   const chooseAnotherDirectionOption = (e) => {
-    console.log(otherDirectionOptions[e.target.id])
     const choice = otherDirectionOptions[e.target.id].mode;
     setDirectionInfo(otherDirectionOptions[e.target.id].value);
     showDirectionIcon(choice);

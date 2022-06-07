@@ -8,9 +8,9 @@
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background: rgb(255 255 255 / 70%) url('../../img/icons_dashboard_loading2.gif') no-repeat center center;
-  background-size: 80px;
-  z-index: 2;
+  background: rgb(255 255 255 / 70%) url('../../img/icons_dashboard_loading.gif') no-repeat center center;
+  background-size: 70px;
+  z-index: 3;
 }
 
 .dashboard-sidebar {
@@ -310,7 +310,7 @@ hr {
     width: 120px;
   }
 
-  .new-trip {
+  .new-trip-card {
     display: none;
   }
 
@@ -398,7 +398,7 @@ hr {
     display: none;
   }
 
-  .new-trip {
+  .new-trip-card {
     display: none;
   }
 
