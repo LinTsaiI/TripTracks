@@ -1,7 +1,12 @@
 import React from 'react';
+import './Footer.css';
 
 const Footer = () => {
-  return <h3>This is Footer</h3>
+  return (
+  <div className='footer-container'>
+    <div>COPYRIGHT @ TripTracks</div>
+  </div>
+  )
 }
 
 export default Footer;

@@ -1,0 +1,11 @@
+.footer-container {
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  height: 40px;
+  line-height: 40px;
+  background-color: #cecece;
+  color: #212529;
+  text-align: center;
+  z-index: 1;
+}

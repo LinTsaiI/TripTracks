@@ -1,0 +1,83 @@
+.arrow {
+  display: block;
+}
+
+.arrow-content {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto 0 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.default-direction-icon {
+  margin: 0 5px;
+  height: 20px;
+  width: 20px;
+}
+
+.direction {
+  font-style: italic;
+  color: #969696;
+  font-size: 12px;
+}
+
+.direction-fetching-icon {
+  width: 25px;
+}
+
+.other-direction-fetching-icon {
+  width: 25px;
+  margin: 30px 60px;
+}
+
+.dropdown-icon {
+  width: 10px;
+  height: 10px;
+  margin: 0 10px;
+}
+
+.dropdownModal {
+  position: absolute;
+  top: 30px;
+  left: 10px;
+  width: max-content;
+  background-color: white;
+  box-shadow: 0px 4px 12px rgb(0 0 0 / 20%);
+  font-size: 12px;
+  color: #6c757d;
+  border-radius: 10px;
+  z-index: 1;
+}
+
+.other-direction-option {
+  display: flex;
+  padding: 8px 16px;
+}
+
+.other-direction-option:hover {
+  background-color: #e4e4e4;
+  cursor: pointer;
+}
+
+.other-direction-icon {
+  margin-right: 5px;
+  width: 20px;
+  height: 20px;
+}
+
+.direction-anchor {
+  padding: 6px 16px;
+  border-top: 1px solid #cecece;
+  text-align: center;
+}
+
+.direction-anchor > a {
+  color: #6c757d;
+}
+
+.direction-anchor > a:hover {
+  color: #555a5e;
+  font-weight: 500;
+}

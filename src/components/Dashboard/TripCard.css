@@ -1,11 +1,121 @@
 .trip-card {
+  position: relative;
+  display: flex;
   width: 250px;
-  height: 150px;
+  height: 280px;
   margin: 20px;
-  border: 1px solid black;
+  padding: 10px;
+  border: 1px solid rgba(105, 105, 105, 0.1);
+  box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+  cursor: pointer;
   border-radius: 5px;
 }
 
 .trip-card:hover {
-  box-shadow: 2px 2px 6px rgb(0 0 0 / 40%);
+  box-shadow: 2px 4px 12px rgb(0 0 0 / 30%);
+}
+
+.trip-card-cover {
+  position: relative;
+  width: 100%;
+  height: 75%;
+  border-radius: 5px;
+}
+
+.trip-card-img {
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.trip-card-option, .trip-card-option-opened {
+  position: absolute;
+  display: flex;
+  width: 30px;
+  height: 30px;
+  background-color: rgb(255 255 255 / 50%);
+  border-radius: 15px;
+  right: 5px;
+  top: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.trip-card-option:hover {
+  background-color: rgb(255 255 255 / 80%);
+}
+
+.trip-card-option > img, .trip-card-option-opened > img {
+  width: 26px;
+  height: 26px;
+}
+
+.trip-card-option-modal {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 35px;
+  right: 0px;
+  width: 100px;
+  padding: 10px;
+  background-color: white;
+  box-shadow: 0px 4px 12px rgb(0 0 0 / 50%);
+  color: #6c757d;
+  border-radius: 10px;
+  z-index: 1;
+}
+
+.trip-card-option-modal:hover {
+  background-color: rgb(245, 245, 245);
+}
+
+.trip-card-option-modal > img {
+  width: 28px;
+  height: 28px;
+}
+
+.trip-card-option-modal > div {
+  margin: 0 5px;
+}
+
+.trip-card-content {
+  width: 100%;
+  padding: 0 10px 0 10px;
+  height: 25%;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  color: #6c757d;
+}
+
+.trip-name {
+  font-size: 20px;
+  line-height: 40px;
+  font-weight: bold;
+  text-shadow: 1px 2px 2px rgb(0 0 0 / 20%);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.trip-card-date {
+  display: flex;
+}
+
+.duration {
+  font-size: 15px;
+}
+
+.calendar-icon {
+  width: 20px;
+  height: 20px;
+  margin: 0 5px;
+}
+
+.display-none {
+  display: none;
 }

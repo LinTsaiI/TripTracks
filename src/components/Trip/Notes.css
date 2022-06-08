@@ -1,0 +1,111 @@
+.notes-container {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 300px;
+  height: 400px;
+  background-color: #F8F5F2;
+  opacity: 0.9;
+  z-index: 1;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 4px 2px rgb(0 0 0 / 20%);
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-top-part {
+  border-bottom: 1px solid #9F9C9C;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.notes-title-block {
+  display: inline-flex;
+  align-items: center;
+}
+
+.notes-title {
+  margin: 0 10px;
+  font-size: 30px;
+}
+
+.notes-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: #819DB8 url('../../img/icons_note.png') no-repeat center center;
+  background-size: 30px;
+}
+
+.notes-pin-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.notes-field-block {
+  width: 100%;
+  flex: 1
+}
+
+.notes-input-field {
+  background-color: transparent;
+  border: none;
+  padding: 10px;
+  outline: none;
+  font-size: 16px;
+  resize: none;
+  height: calc(100% - 35px);
+  width: 100%;
+}
+
+.display-none {
+  display: none;
+}
+
+.note-save-bock {
+  position: absolute;
+  width: calc(100% - 20px);
+  height: 35px;
+  bottom: 10px;
+}
+
+.save-note-btn {
+  font-size: 14px;
+  width: 50px;
+  height: 35px;
+  border-radius: 20px;
+  float: right;
+  background-color: #ffffff;
+  border: none;
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 30%);
+  cursor: pointer;
+}
+
+.save-note-btn:hover {
+  background-color: #dedede;
+}
+
+.saving {
+  width: 30px;
+  height: 30px;
+  float: right;
+  margin-right: 5px;
+}
+
+.saved {
+  color: #3a9c8a;
+  font-weight: bold;
+  float: right;
+  line-height: 35px;
+  margin-right: 5px;
+}
+
+@media only screen and (max-width: 700px) {
+  .notes-container {
+    width: 250px;
+    height: 320px;
+  }
+}

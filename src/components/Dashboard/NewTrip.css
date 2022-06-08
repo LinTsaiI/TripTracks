@@ -1,0 +1,97 @@
+.modal {
+  position: fixed;
+  top: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(0 0 0 / 50%);
+  z-index: 2;
+}
+
+.modal-main {
+  position: fixed;
+  width: 400px;
+  height: auto;
+  top: 40px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 12px rgb(0 0 0 / 20%);
+  padding: 25px;
+  font-size: 20px;
+  color: #646464;
+}
+
+.create-form-name {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  cursor: pointer;
+}
+
+.create-form-input {
+  margin: 10px 0;
+}
+
+.label-value {
+  font-size: 16px;
+}
+
+.create-form-input > input {
+  width: 100%;
+  height: 45px;
+  border-radius: 10px;
+  font-size: 18px;
+  padding: 10px;
+  border: 1px solid #e4e4e4;
+  outline: none;
+}
+
+.create-form-input > input::placeholder {
+  color: #b3b3b3;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-btn {
+  background-color: #134161;
+  color: #F1EBE4;
+  margin: 20px auto 0 auto;
+  width: 150px;
+  height: 50px;
+  padding: 10px;
+  font-size: 20px;
+  border: none;
+  border-radius: 25px;
+  box-shadow: 2px 2px 2px rgb(0 0 0 / 20%);
+  cursor: pointer;
+  font-family: 'Source Sans Pro', Calibri, Tahoma, sans-serif;
+}
+
+.create-btn:hover:enabled {
+  box-shadow: 2px 2px 6px rgb(0 0 0 / 40%);
+}
+
+.create-btn:disabled {
+  background-color: #bbc2c0;
+  cursor: auto;
+}
+
+@media only screen and (max-width: 600px) and (min-width: 360px) {
+  .modal-main {
+    max-width: 320px;
+  }
+}
