@@ -6,7 +6,7 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { Loader } from '@googlemaps/js-api-loader';
 import { resetNewTrip } from '../../store/slice/dashboardSlice';
 import { fetchDayTrack, initTrackData, clearPinList, deletePin } from '../../store/slice/tripSlice';
-import { getTrackData } from '../../utilities';
+import { getTrackData, setInfoWindowContent } from '../../utilities';
 import Tracks from './Tracks';
 import Search from './Search';
 import Notes from './Notes';
@@ -21,7 +21,6 @@ import barIcon from '../../img/icons_bar.png';
 import shopIcon from '../../img/icons_shop.png';
 import hotelIcon from '../../img/icons_hotel.png';
 import defaultMarker from '../../img/icons_hotelMarker.png';
-import star from '../../img/icons_star.png';
 import imgPlaceholder from '../../img/img_placeholder.png';
 
 export const TripContext = createContext();
@@ -303,31 +302,9 @@ const Trip = () => {
             displayType = 'Others';
             icon = defaultMarker;
         }
-        infoWindow.setContent(`
-          <div class='infoWindow-container'>
-            <div class='infoWindow-upper'>
-              <div class='infoWindow-upper-left'>
-                <h2>${placeName}</h2>
-                <div class='infoWindow-upper-left-type'>
-                  <img src=${icon}>
-                  <div class='infoWindow-upper-left-type'>${displayType}</div>
-                </div>
-                <h4>${address}</h4>
-              </div>
-              <img src=${photo} class='infoWindow-upper-right'/>
-            </div>
-            <div class='infoWindow-bottom'>
-              <div>
-                <div class='infoWindow-bottom-rating'>
-                  <div></div>
-                  <p>${rating} ${voteNumber}</p>
-                </div>
-                <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${placeId}' target='_blank'>Find on google map</a>
-              </div>
-              <div id='deleteBtn' class='infoWindow-bottom-trashcan'></div>
-            </div>
-          </div>
-        `);
+
+        const infoWindowContent = setInfoWindowContent(placeName, icon, displayType, address, photo, rating, voteNumber, placeId, 'deleteBtn', trashCanIcon);
+        infoWindow.setContent(infoWindowContent);
         infoWindow.open({
           anchor: pinMarker,
           map: map,

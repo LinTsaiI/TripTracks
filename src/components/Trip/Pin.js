@@ -1,8 +1,9 @@
 import React, { useRef, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deletePin, reOrderPinList } from '../../store/slice/tripSlice';
+import { setInfoWindowContent } from '../../utilities';
 import { MapContext, TripContext } from './Trip';
-import Arrow from './Arrow';
+import Directions from './Directions';
 import './Pin.css';
 import trashCanIcon from '../../img/icons_trashcan.png';
 import attractionIcon from '../../img/icons_attractions.png';
@@ -12,7 +13,6 @@ import barIcon from '../../img/icons_bar.png';
 import shopIcon from '../../img/icons_shop.png';
 import hotelIcon from '../../img/icons_hotel.png';
 import defaultMarker from '../../img/icons_hotelMarker.png';
-import star from '../../img/icons_star.png';
 import imgPlaceholder from '../../img/img_placeholder.png';
 
 const Pin = ({ setIsNoteOpen, currentFocusNote, setCurrentFocusNote, setFocusInfoWindow } ) => {
@@ -76,31 +76,8 @@ const Pin = ({ setIsNoteOpen, currentFocusNote, setCurrentFocusNote, setFocusInf
             icon = defaultMarker;
         }
 
-        infoWindow.setContent(`
-          <div style='width: 300px'>
-            <div style='width: 100%; display: flex'>
-              <div style='width: 60%'>
-                <h2>${placeName}</h2>
-                <div style='display: flex; align-items: center'>
-                  <img src=${icon} style='width: 20px'>
-                  <div style='font-size: 16px; margin: 0 3px'>${displayType}</div>
-                </div>
-                <h4>${address}</h4>
-              </div>
-              <div style='width: 40%; margin: 10px; background: #ffffff url("${photo}") no-repeat center center; background-size: cover'></div>
-            </div>
-            <div style='width: 100%; display: flex; align-items: end'>
-              <div>
-                <div style='display: flex; align-items: center; margin: 5px 0'>
-                  <img src=${star} style='width: 15px; height: 15px'/>
-                  <p style='margin: 0 3px'>${rating} ${voteNumber}</p>
-                </div>
-                <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${placeId}' target='_blank'>Find on google map</a>
-              </div>
-              <img id='deleteBtn' src=${trashCanIcon} style='width: 28px; height: 28px; margin: 0 10px 0 auto; cursor: pointer;'/>
-            </div>
-          </div>
-        `);
+        const infoWindowContent = setInfoWindowContent(placeName, icon, displayType, address, photo, rating, voteNumber, placeId, 'deleteBtn', trashCanIcon);
+        infoWindow.setContent(infoWindowContent);
         infoWindow.open({
           anchor: pinMarkerList[index],
           map: map,
@@ -186,7 +163,7 @@ const Pin = ({ setIsNoteOpen, currentFocusNote, setCurrentFocusNote, setFocusInf
                   <button className='delete-btn' onClick={deleteSelectedPin} title='Delete'/>
                 </div>
               </div>
-              <Arrow index={index} />
+              <Directions index={index} />
             </div>
           )
         })

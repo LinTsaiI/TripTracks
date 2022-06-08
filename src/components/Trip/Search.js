@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { MapContext } from './Trip';
 import { addNewPin } from '../../store/slice/tripSlice';
+import { setInfoWindowContent } from '../../utilities';
 import './Search.css';
 import singleSearchMarker from '../../img/icons_searchMarker.png';
 import addPinIcon from '../../img/icons_pin2.png';
@@ -20,13 +21,13 @@ import cafeIcon from '../../img/icons_cafe.png';
 import barIcon from '../../img/icons_bar.png';
 import shopIcon from '../../img/icons_shop.png';
 import hotelIcon from '../../img/icons_hotel.png';
-import star from '../../img/icons_star.png';
 import imgPlaceholder from '../../img/img_placeholder.png';
 
 const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
   const [searchParams] = useSearchParams();
   const day = searchParams.get('day');
   const trackIndex = day ? day-1 : 0;
+  const [inputQuery, setInputQuery] = useState('');
   const [inputTarget, setInputTarget] = useState(null);
   const [marker, setMarker] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
@@ -35,7 +36,6 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
   const [drawingAreaMarkers, setDrawingAreaMarkers] = useState([]);
   const [isDrawBtnDisabled, setIsDrawBtnDisabled] = useState(true);
   const [drawingOption, setDrawingOption] = useState(null);
-  const [clickedMapPlace, setClickedMapPlace] = useState(null);
   const [drawingCover, setDrawingCover] = useState('display-none');
   const checkedOption = useRef();
   const drawingClassName = isDrawing ? 'display-none' : 'draw-btn';
@@ -55,8 +55,8 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
     if (map) {
       map.addListener('click', (event) => {
         if (event.placeId) {
+          console.log('click place on the map')
           event.stop();
-          setClickedMapPlace(event.placeId);
           const service = new google.maps.places.PlacesService(map);
           const marker = new google.maps.Marker({
             map: map,
@@ -71,6 +71,7 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
               setPlaceInfo(result);
               setMarker(marker);
+              showInfoWindow(result, marker);
               marker.addListener('click', () => {
                 showInfoWindow(result, marker);
               });
@@ -82,24 +83,20 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
   }, [map]);
 
   useEffect(() => {
-    if (marker) {
-      marker.setMap(null);
-    }
-  }, [clickedMapPlace]);
-
-  useEffect(() => {
     setTimeout(() => {
       if (map && inputTarget) {
         let autocomplete = new window.google.maps.places.Autocomplete(inputTarget, autocompleteOptions);
         autocomplete.bindTo('bounds', map);
         autocomplete.addListener('place_changed', () => {
-          setInputTarget(current => current.value = '');
+          console.log('autocomplete')
+          setInputQuery('');
           const place = autocomplete.getPlace();
           const marker = new google.maps.Marker({
             map: map,
             icon: singleSearchMarker,
             zIndex: 99
           });
+          showInfoWindow(place, marker);
           setMarker(marker);
           setPlaceInfo(place);
           marker.addListener('click', () => {
@@ -129,7 +126,6 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
 
   useEffect(() => {
     if (placeInfo) {
-      showInfoWindow();
       let infoWindowListener = infoWindow.addListener('domready', () => {
         const addBtn = document.getElementById('addBtn');
         addBtn.addEventListener('click', () => {
@@ -167,15 +163,19 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
       setFocusInfoWindow(infoWindowListener);
       return () => {
         google.maps.event.removeListener(infoWindowListener);
+        if (marker) {
+          marker.setMap(null);
+        }
       }
     }
   }, [placeInfo]);
 
   const showInfoWindow = (place = placeInfo, focusedMarker = marker) => {
+    console.log(place)
     const placeName = place.name;
     const address = place.formatted_address ? place.formatted_address : place.vicinity;
     const photo = place.photos ? place.photos[0].getUrl() : imgPlaceholder;
-    const place_id = place.place_id;
+    const placeId = place.place_id;
     const rating = place.rating ? place.rating : '';
     const voteNumber = place.user_ratings_total ? `(${place.user_ratings_total} Reviews)` : '';
     let type;
@@ -210,31 +210,8 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
         icon = hotelMarker;
     }
 
-    infoWindow.setContent(`
-      <div style='width: 300px'>
-        <div style='width: 100%; display: flex'>
-          <div style='width: 60%'>
-            <h2>${placeName}</h2>
-            <div style='display: flex; align-items: center'>
-              <img src=${icon} style='width: 20px'>
-              <div style='font-size: 16px; margin: 0 3px'>${type}</div>
-            </div>
-            <h4>${address}</h4>
-          </div>
-          <div style='width: 40%; margin: 10px; background: #ffffff url("${photo}") no-repeat center center; background-size: cover'></div>
-        </div>
-        <div style='width: 100%; display: flex; align-items: end'>
-          <div>
-            <div style='display: flex; align-items: center; margin: 5px 0'>
-              <img src=${star} style='width: 15px; height: 15px'/>
-              <p style='margin: 0 3px'>${rating} ${voteNumber}</p>
-            </div>
-            <a style='color: #313131' href='https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${place_id}' target='_blank'>Find on google map</a>
-          </div>
-          <img id='addBtn' src=${addPinIcon} style='width: 28px; height: 28px; margin: 0 10px 0 auto; cursor: pointer;'/>
-        </div>
-      </div>
-    `);
+    const infoWindowContent = setInfoWindowContent(placeName, icon, type, address, photo, rating, voteNumber, placeId, 'addBtn', addPinIcon);
+    infoWindow.setContent(infoWindowContent);
     map.panTo(place.geometry.location);
     infoWindow.open({
       anchor: focusedMarker,
@@ -245,47 +222,49 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
   };
 
   const searchPlace = () => {
-    setInputTarget(current => current.value = '');
-    infoWindow.close();
-    const service = new google.maps.places.PlacesService(map);
-    let request = {
-      query: inputTarget.value,
-      fields: placeReturnField,
-    };
-    service.findPlaceFromQuery(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        setPlaceInfo(results[0]);
-        const marker = new google.maps.Marker({
-          map: map,
-          icon: singleSearchMarker,
-          zIndex: 99
-        });
-        marker.addListener('click', () => {
+    if (inputQuery) {
+      console.log('find place')
+      setInputQuery('');
+      infoWindow.close();
+      const service = new google.maps.places.PlacesService(map);
+      let request = {
+        query: inputQuery,
+        fields: placeReturnField,
+      };
+      service.findPlaceFromQuery(request, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+          setPlaceInfo(results[0]);
+          const marker = new google.maps.Marker({
+            map: map,
+            icon: singleSearchMarker,
+            zIndex: 99
+          });
           showInfoWindow(results[0], marker);
-        })
-        setMarker(marker);
-      } else {
-        console.log('no such place');
-      }
-    });
+          marker.addListener('click', () => {
+            showInfoWindow(results[0], marker);
+          })
+          setMarker(marker);
+        } else {
+          console.log('no such place');
+        }
+      });
+    }
   };
 
   const handelSearchOptionInput = (e) => {
+    google.maps.event.clearListeners(map, 'mousedown');
     map.setOptions({ draggable: false, clickableIcons: false });
     checkedOption.current = e.target;
     setIsDrawBtnDisabled(false);
     setDrawingOption(e.target.value);
-    if(marker) {
+    if (marker) {
       marker.setMap(null);
     }
     setIsDrawing(true);
     setDrawingCover('drawing-cover');
     infoWindow.close();
     map.addListener('mousedown', () => drawFreeRegion());
-    map.addListener('touchstart', () => {
-      e.preventDefault();
-      drawFreeRegion();
-    });
+    map.addListener('touchstart', () => drawFreeRegion());
   };
 
   const drawFreeRegion = () => {
@@ -295,15 +274,8 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
       strokeColor: '#848484',
       strokeWeight: 3,
     });
-    map.addListener('mousemove', (e) => {
-      // document.body.style.cursor = "url('../../img/icons_drawing.png'), crosshair";
-      poly.getPath().push(e.latLng);
-    });
-    map.addListener('touchmove', (e) => {
-      // document.body.style.cursor = "url('../../img/icons_drawing.png'), crosshair";
-      e.preventDefault();
-      poly.getPath().push(e.latLng);
-    });
+    map.addListener('mousemove', (e) => poly.getPath().push(e.latLng));
+    map.addListener('touchmove', (e) => poly.getPath().push(e.latLng));
     const finishDrawing = () => {
       setDrawingCover('display-none');
       const path = poly.getPath();
@@ -321,10 +293,7 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
       setArea(region);
     }
     map.addListener('mouseup', () => finishDrawing());
-    map.addListener('touchend', (e) => {
-      e.preventDefault();
-      finishDrawing();
-    });
+    map.addListener('touchend', () => finishDrawing());
   }
 
   useEffect(() => {
@@ -333,6 +302,9 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
       google.maps.event.clearListeners(map, 'mousedown');
       google.maps.event.clearListeners(map, 'mousemove');
       google.maps.event.clearListeners(map, 'mouseup');
+      google.maps.event.clearListeners(map, 'touchstart');
+      google.maps.event.clearListeners(map, 'touchmove');
+      google.maps.event.clearListeners(map, 'touchend');
 
       const service = new google.maps.places.PlacesService(map);
       const paths = area.getPaths();
@@ -404,7 +376,6 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
               let marker = new google.maps.Marker(markerOptions);
               marker.addListener('click', () => {
                 showInfoWindow(result, marker);
-                setMarker(marker);
                 setPlaceInfo(result);
               });
               markers.push(marker);
@@ -455,7 +426,15 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
     <div>
       <div className={drawingCover}></div>
       <div className='search-input-block'>
-        <input type='text' className='search-input' onClick={(e) => setInputTarget(e.target)}/>
+        <input type='text' className='search-input' value={inputQuery}
+          onClick={(e) => setInputTarget(e.target)}
+          onChange={(e) => setInputQuery(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key == 'Enter') {
+              searchPlace();
+            }
+          }}
+        />
         <input type='button' className='search-button' onClick={() => searchPlace()}/>
       </div>
       <form className='drawing-search-option' onChange={handelSearchOptionInput}>

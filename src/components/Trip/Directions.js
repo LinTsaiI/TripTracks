@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { changeDirectionOptions } from '../../store/slice/tripSlice';
 import { TripContext, MapContext } from './Trip';
-import './Arrow.css';
+import './Directions.css';
 import pathIcon from '../../img/icons_itinerary.png';
 import carIcon from '../../img/icons_car.png';
 import trainIcon from '../../img/icons_train.png';
@@ -11,7 +11,7 @@ import walkIcon from '../../img/icons_walk.png';
 import directionLoadingIcon from '../../img/icons_loading.gif';
 import triangleIcon from '../../img/icons_triangle.png';
 
-const Arrow = ({ index }) => {
+const Directions = ({ index }) => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const day = searchParams.get('day');
@@ -213,4 +213,4 @@ const Arrow = ({ index }) => {
   )
 }
 
-export default Arrow;
+export default Directions;

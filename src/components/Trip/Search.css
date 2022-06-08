@@ -68,6 +68,7 @@
   z-index: 1;
   pointer-events: none;
   touch-action: none;
+  cursor: crosshair;
 }
 
 .drawing-search-option {
