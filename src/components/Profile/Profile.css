@@ -1,6 +1,7 @@
-/* .profile-map-infoWindow > button.gm-ui-hover-effect {
+.profile-map > div > button.gm-ui-hover-effect {
   visibility: hidden;
-} */
+}
+
 .user-data-processing {
   position: fixed;
   width: 100vw;

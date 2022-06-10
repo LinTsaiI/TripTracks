@@ -55,7 +55,9 @@ const Profile = () => {
         }
         const marker = new google.maps.Marker(markerOptions);
         marker.addListener('mouseover', () => {
-          tripInfoWindow.setContent(`<div className='profile-map-infoWindow'>${tripList[index].tripName}<div>`);
+          tripInfoWindow.setContent(`
+            <div style='color: #134161; font-size: 18px; font-weight: bold'>${tripList[index].tripName}<div>
+          `);
           tripInfoWindow.open({
             anchor: marker,
             map: map,
