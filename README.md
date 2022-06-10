@@ -2,7 +2,7 @@
 
 TripTracks is a travel planner based on interaction with Google Map Services. It provides an intuitive operation experience to easily search places, adds places to the list of interest, and manipulate the order of the itinerary.
 
-![](https://i.imgur.com/NDzE3Fv.png)
+![](https://i.imgur.com/zeADE9o.png)
 
 
 ## Table of Content
