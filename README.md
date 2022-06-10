@@ -1,6 +1,6 @@
 # TripTracks
 
-TripTracks is a travel planner based on interaction with Google Map Services. It provides an intuitive operation experience to easily search places, add places to the list of interest, and manipulate the order of the itinerary.
+TripTracks is a travel planner based on interaction with Google Map Services. It provides an intuitive operation experience to easily search places, adds places to the list of interest, and manipulate the order of the itinerary.
 
 ![](https://i.imgur.com/NpKj4yK.png)
 
@@ -32,7 +32,7 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 * SPA with functional components.
 * Used hooks: useState, useEffect, useRef, useContext.
 * Component Structure:
- ![](https://i.imgur.com/PH2o2jY.png)
+ ![](https://i.imgur.com/PuHOsx2.png)
 
 ### React Router
 * version: 6
