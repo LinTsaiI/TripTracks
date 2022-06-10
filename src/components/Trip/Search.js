@@ -55,7 +55,6 @@ const Search = ({ setFocusInfoWindow, setIsNoteOpen }) => {
     if (map) {
       map.addListener('click', (event) => {
         if (event.placeId) {
-          console.log('click place on the map')
           event.stop();
           const service = new google.maps.places.PlacesService(map);
           const marker = new google.maps.Marker({
