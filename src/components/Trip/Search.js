@@ -6,7 +6,7 @@ import { addNewPin } from '../../store/slice/tripSlice';
 import { setInfoWindowContent } from '../../utilities';
 import './Search.css';
 import singleSearchMarker from '../../img/icons_searchMarker.png';
-import addPinIcon from '../../img/icons_pin2.png';
+import addPinIcon from '../../img/icons_pin.png';
 import drawingIcon from '../../img/icons_drawing.png';
 import eraserIcon from '../../img/icons_eraser.png';
 import attractionMarker from '../../img/icons_attractionMarker.png';

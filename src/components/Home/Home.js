@@ -3,11 +3,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate} from 'react-router-dom';
 import Sign from './Sign';
 import tripTracksIcon from '../../img/icon_triptracks.png';
-import function_demo_img1 from '../../img/function_demo_01.png';
-import function_demo_img2 from '../../img/function_demo_02.png';
-import function_demo_img3 from '../../img/function_demo_03.png';
-import mapDemo from '../../img/map_demo.gif';
-import RWD from '../../img/RWD.png';
 import './Home.css';
 
 const Home = () => {
@@ -44,29 +39,58 @@ const Home = () => {
         </div>
       </div>
       <div className='home-description'>
-        <div className='home-part1'>
-          <div className='home-part1-text'>
-            <h2>A map is your daily itinerary</h2>
-            <h3>Separate daily itineraries by maps. Easy to switch between different days.</h3>
-            <h3>Follow the track you planned, and enjoy a wonderful trip.</h3>
+        <div className='home-text-left'>
+          <div className='home-text-left-content'>
+            <h2>Your daily itinerary can be organized on one map</h2>
+            <h3>Search places and arrange itineraries on separated maps of your trip duration</h3>
+            <h3>Switch between days and follow the track you planned. Enjoy a wonderful trip</h3>
           </div>
-          <img src={mapDemo}/>
+          <img src='https://i.imgur.com/CO2L18E.gif'/>
         </div>
-        <div className='home-part2'>
-          <h2>Easy to use</h2>
-          <div className='home-part2-imgs'>
-            <img src={function_demo_img1}/>
-            <img src={function_demo_img2}/>
-            <img src={function_demo_img3}/>
+        <div className='home-inline'>
+          <h2>Three different ways to search placese</h2>
+          <div className='home-inline-imgs'>
+            <div>
+              <h3>Search on the search box</h3>
+              <img src='https://i.imgur.com/kwMLK6F.png'/>
+            </div>
+            <div>
+              <h3>Click a place on the map</h3>
+              <img src='https://i.imgur.com/MnmLBYX.png'/>
+            </div>
+            <div>
+              <h3>Customize an area for a specific place type</h3>
+              <img src='https://i.imgur.com/QZBkeUj.png'/>
+            </div>
           </div>
         </div>
-        <div className='home-part3'>
-          <img src={RWD}/>
-          <div className='home-part3-text'>
-            <h2>Easy to browse</h2>
-            <h3>We support desktop and a mobile device.</h3>
-            <h3>Arrange your trip in anywhere and wherever you want</h3>
+        <div className='home-text-right'>
+          <img src='https://i.imgur.com/AGQSFC2.gif'/>
+          <div className='home-text-right-content'>
+            <h2>Easy to change the order of the itinerary</h2>
+            <h3>Drag and drop the order you want</h3>
           </div>
+        </div>
+        <div className='home-text-left'>
+          <div className='home-text-left-content'>
+            <h2>Find out directions</h2>
+            <h3>View distance and time between places</h3>
+          </div>
+          <img src='https://i.imgur.com/Sezb0px.png'/>
+        </div>
+        <div className='home-text-right'>
+          <img src='https://i.imgur.com/LHBUN0M.png'/>
+          <div className='home-text-right-content'>
+            <h2>Keep memo</h2>
+            <h3>Take some notes about the places</h3>
+          </div>
+        </div>
+        <div className='home-text-left'>
+          <div className='home-text-left-content'>
+            <h2>Browse in anywhere</h2>
+            <h3>Support deesktop, tablet, and mobile devices</h3>
+          </div>
+          <img src='https://i.imgur.com/OPoH3Rl.png'/>
         </div>
       </div>
       {

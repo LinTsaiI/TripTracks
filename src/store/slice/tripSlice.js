@@ -161,7 +161,6 @@ export const tripSlice = createSlice({
         state.isFetching = true;
       })
       .addCase(fetchDayTrack.fulfilled, (state, action) => {
-        console.log('dayTrack data fetch success');
         const { tripId, trackId, mapCenter, zoom, pinIds, pinList, directions } = action.payload;        
         state.mapCenter = mapCenter;
         state.zoom = zoom;
@@ -201,11 +200,7 @@ export const tripSlice = createSlice({
         state.pinList = newPinList;
         state.isPathUpdating = false;
       })
-      .addCase(changeDirectionOptions.pending, (state, action) => {
-        console.log('change direction choice pending');
-      })
       .addCase(changeDirectionOptions.fulfilled, (state, action) => {
-        console.log('update directions success');
         state.directions = action.payload;
       });
   }
