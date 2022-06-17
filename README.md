@@ -132,5 +132,6 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 ## Contact
 
 * :blush:Developer: Tsai-I, Lin
-* :link:LinkedIn: [www.linkedin.com/in/lintsaii](https://)
+* :link:LinkedIn: [https://www.linkedin.com/in/lintsaii/](https://www.linkedin.com/in/lintsaii/)
+* :clipboard:CV: [https://drive.google.com/file/d/1SrHYTeOatKB19YcoUtamujJDEt_Jflfs/view?usp=sharing](https://drive.google.com/file/d/1SrHYTeOatKB19YcoUtamujJDEt_Jflfs/view?usp=sharing)
 * :mailbox:Email: alicelin9326@gmail.com
