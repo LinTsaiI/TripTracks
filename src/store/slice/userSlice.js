@@ -6,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 export const getAvatarRef = createAsyncThunk('user/getAvatar', async (userId) => {
   const userSnap = await getDoc(doc(db, 'user', userId));
   return userSnap.data().avatar;
-}); 
+});
 
 export const userSlice = createSlice({
   name: 'user',

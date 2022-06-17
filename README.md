@@ -25,52 +25,52 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 * [Contact](#contact)
 
 
-## <a name="#frontend">✤ Front-end Technique</a>
+## ✤ Front-end Technique
 
-### <a name="#tech-stack">Tech Stack</a>
+### Tech Stack
 ![](https://i.imgur.com/v2lATQ2.png)
 
-### <a name="#react">React</a>
+### React
 * SPA with functional components.
 * Used hooks: useState, useEffect, useRef, useContext.
-* <a name="#component-structure">Component Structure</a>:
+* Component Structure:
 &nbsp;
  ![](https://i.imgur.com/b9OP6jK.png)
 
-### <a name="#react-router">React Router</a>
+### React Router
 * version: 6
 * Handle the SPA routing.
 
-### <a name="#redux">Redux Toolkit</a>
+### Redux Toolkit
 * Manage the global states shared with multiple components.
 * Use `createAsyncThunk` to handle async interactions with the database.
 
-### <a name="#webpack&babel">Webpack & Babel</a>
+### Webpack & Babel
 * Handle module bundling of the project.
 * ES6 JavaScript syntax for browser compatibility.
 
 
-## <a name="#backend">✤ Back-end Technique (Firebase Cloud Services)</a>
-### <a name="#auth">Firebase Authentication</a>
+## ✤ Back-end Technique (Firebase Cloud Services)
+### Firebase Authentication
 * Sign in / sign up with email and password.
 * Support Google sign in.
 
-### <a name="#firestore">Cloud Firestore</a>
+### Cloud Firestore
 * Holds user data and trip data.
 * Every trip plan, the itinerary of each day, and every single place the user saved has its own document id which helps manage and change the data.
 &nbsp;
  ![](https://i.imgur.com/3A3nQ2i.png)
 
-### <a name="#storage">Firebase Storage</a>
+### Firebase Storage
 * Host images uploaded from users.
 
-### <a name="#hosting">Firebase Hosting</a>
+### Firebase Hosting
 * Host the static and dynamic content of the project.
 
 
-## <a name="#third-party">✤ Third Party Library</a>
+## ✤ Third Party Library
 
-### <a name="#google-map">Google Maps JavaScript API</a>
+### Google Maps JavaScript API
 * Direction Service
 * Geometry Library
     * poly
@@ -80,7 +80,7 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
     * Place Details requests
     * Places Autocomplete
 
-## <a name="#main-features">✤ Main Features</a>
+## ✤ Main Features
 ### User Authentication
 * Sign up / sign in locally or with Google via Firebase Authentication.
 
@@ -121,7 +121,7 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 * Can change the username and avatar. The user data is hosted by **Cloud Firestore** and **Firebase Storage** separately.
 * Implement RWD to support mobile devices. (Note: The drag and drop feature for changing the order of places currently supports desktop and laptop only.)
 
-## <a name="#contact">Contact</a>
+## Contact
 
 * Developer: Tsai-I, Lin
 * LinkedIn: [www.linkedin.com/in/lintsaii](https://)
