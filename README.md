@@ -18,11 +18,11 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 * [Front-end Technique](#✤-front-end-technique)
     * [Tech Stack](#tech-stack)
     * [React](#react)
-        * [Component Structure](#component-structure:)
+        * [Component Structure](#component-structure)
     * [React Router](#react-router)
     * [Redux Toolkit](#redux-toolkit)
-    * [Webpack & Babel](#webpack-&-babel)
-* [Back-end Technique (Firebase Cloud Services)](#✤-back-end-technique-(firebase-cloud-services))
+    * [Webpack & Babel](#webpack--babel)
+* [Back-end Technique (Firebase Cloud Services)](#✤-back-end-technique-firebase-cloud-services)
     * [Firebase Authentication](#firebase-authentication)
     * [Cloud Firestore](#cloud-firestore)
     * [Firebase Storage](#firebase-storage)
@@ -41,7 +41,7 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 ### React
 * SPA with functional components.
 * Used hooks: useState, useEffect, useRef, useContext.
-* Component Structure:
+#### Component Structure:
 &nbsp;
  ![](https://i.imgur.com/b9OP6jK.png)
 
@@ -73,7 +73,7 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 * Host images uploaded from users.
 
 ### Firebase Hosting
-* Host the static and dynamic content of the project.
+* Host the static content of the project.
 
 
 ## ✤ Third Party Library
