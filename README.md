@@ -36,14 +36,14 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 ## ✤ Front-end Technique
 
 ### Tech Stack
-![](https://i.imgur.com/v2lATQ2.png)
+![](https://i.imgur.com/9BJ0GbQ.png)
 
 ### React
 * SPA with functional components.
-* Used hooks: useState, useEffect, useRef, useContext.
+* Used hooks: `useState`, `useEffect`, `useRef`, `useContext`.
 #### Component Structure:
 &nbsp;
- ![](https://i.imgur.com/b9OP6jK.png)
+ ![](https://i.imgur.com/saZ9WyB.png)
 
 ### React Router
 * version: 6
@@ -79,6 +79,7 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 ## ✤ Third Party Library
 
 ### Google Maps JavaScript API
+No React packages are used like react-google-maps other than the official [@googlemaps/js-api-loader](https://www.npmjs.com/package/@googlemaps/js-api-loader) for loading Google Maps API script.
 * Direction Service
 * Geometry Library
     * poly
