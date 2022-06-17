@@ -11,8 +11,8 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 | Account         | Password |
 | --------------- | -------- |
 | test@gmail.com  | testtest |
-&nbsp;
 
+&nbsp;
 ## Table of Content
 
 * [Front-end Technique](#✤-front-end-technique)
