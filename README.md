@@ -4,24 +4,32 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 
 ![](https://i.imgur.com/zeADE9o.png)
 
+:link:Demo: https://triptracks-tw.web.app/
+
+:bust_in_silhouette:Test account:
+
+| Account         | Password |
+| --------------- | -------- |
+| test@gmail.com  | testtest |
+&nbsp;
 
 ## Table of Content
 
-* [Front-end Technique](#frontend)
+* [Front-end Technique](#✤-front-end-technique)
     * [Tech Stack](#tech-stack)
     * [React](#react)
-        * [Component Structure](#component-structure)
+        * [Component Structure](#component-structure:)
     * [React Router](#react-router)
-    * [Redux Toolkit](#redux)
-    * [Webpack & Babel](#webpack&babel)
-* [Back-end Technique (Firebase Cloud Services)](#backend)
-    * [Firebase Authentication](#auth)
-    * [Cloud Firestore](#firestore)
-    * [Firebase Storage](#storage)
-    * [Firebase Hosting](#hosting)
-* [Third Party Library](#third-party)
-    * [Google Maps JavaScript API](#google-map)
-* [Main Features](#main-features)
+    * [Redux Toolkit](#redux-toolkit)
+    * [Webpack & Babel](#webpack-&-babel)
+* [Back-end Technique (Firebase Cloud Services)](#✤-back-end-technique-(firebase-cloud-services))
+    * [Firebase Authentication](#firebase-authentication)
+    * [Cloud Firestore](#cloud-firestore)
+    * [Firebase Storage](#firebase-storage)
+    * [Firebase Hosting](#firebase-hosting)
+* [Third Party Library](#✤-third-party-library)
+    * [Google Maps JavaScript API](#google-maps-javascript-api)
+* [Main Features](#✤-main-features)
 * [Contact](#contact)
 
 
@@ -123,6 +131,6 @@ TripTracks is a travel planner based on interaction with Google Map Services. It
 
 ## Contact
 
-* Developer: Tsai-I, Lin
-* LinkedIn: [www.linkedin.com/in/lintsaii](https://)
-* Email: alicelin9326@gmail.com
+* :blush:Developer: Tsai-I, Lin
+* :link:LinkedIn: [www.linkedin.com/in/lintsaii](https://)
+* :mailbox:Email: alicelin9326@gmail.com
